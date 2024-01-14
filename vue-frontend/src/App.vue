@@ -11,7 +11,7 @@ import HelloWorld from './components/HelloWorld.vue'
       
 
       <RouterLink to="/newview" class="float-right bg-red-500 text-white border-0 rounded-md text-2xl px-3 mx-2 my-2">Login</RouterLink>
-      <RouterLink to="/about" class="float-right">About</RouterLink>
+      <RouterLink to="/about" class="float-right"></RouterLink>
     </nav>  
     <RouterView />
   </div>
