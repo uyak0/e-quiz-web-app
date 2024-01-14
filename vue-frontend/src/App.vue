@@ -5,11 +5,15 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <nav class="top-0 absolute z-50 w-full">
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
-    <RouterLink to="/newview">New View</RouterLink>
-  </nav>  
-  <RouterView />
+  <div class="">
+    <nav class="font-jetBrains top-0 left-0 absolute w-full">
+      <RouterLink to="/" class="text-white hover:bg-transparent text-3xl px-2">E-Quizz</RouterLink>
+      
+
+      <RouterLink to="/newview" class="float-right bg-red-500 text-white border-0 rounded-md text-2xl px-3 mx-2 my-2">Login</RouterLink>
+      <RouterLink to="/about" class="float-right">About</RouterLink>
+    </nav>  
+    <RouterView />
+  </div>
 </template>
 
