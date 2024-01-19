@@ -5,6 +5,7 @@ A web application centered around the idea of an all-in-one classroom management
 ### To run PHP server
 ```bash
 cd laravel-backend
+composer i
 php artisan serve
 ```
 
