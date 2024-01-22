@@ -4,6 +4,6 @@
 
 <template>
   <div>
-    <TheNewView />
+    this is a sign up view
   </div>
 </template>
