@@ -1,4 +1,3 @@
-#vue #php #laravel #node
 # Development Environment
 Run these commands to start the Laravel and Vue.js development server
 
