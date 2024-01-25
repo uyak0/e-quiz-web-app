@@ -1,8 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
-import LoginView from '@/views/LoginView.vue'
-import SignUpView from '@/views/SignUpView.vue'
+import LoginView from '../views/LoginView.vue'
+import SignUpView from '../views/SignUpView.vue'
+import CreateQuizView from '../views/CreateQuizView.vue'
+
+// function AuthGuard(to, from, next) {
+//   if (!sessionStorage.getItem('token')) {
+//     next({ name: 'login' })
+//   } else {
+//     next()
+//   }
+// }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,8 +36,13 @@ const router = createRouter({
     },
     {
       path: '/signup',
-      name: 'signup',
+      name: 'sign up',
       component: SignUpView
+    },
+    {
+      path: '/createquiz',
+      name: 'create quiz',
+      component: CreateQuizView, 
     }
   ]
 })

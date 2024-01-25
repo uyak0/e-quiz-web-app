@@ -1,8 +1,9 @@
 <script setup>
-  import TheNewView from '../components/TheNewView.vue';
+  import HomeLogo from '@/components/HomeLogo.vue';
 </script>
 
 <template>
+  <HomeLogo />
   <div>
     this is a sign up view
   </div>

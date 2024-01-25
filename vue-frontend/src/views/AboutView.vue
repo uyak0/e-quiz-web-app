@@ -1,6 +1,11 @@
+<script setup>
+  import HomeLogo from '@/components/HomeLogo.vue';
+</script>
+
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <HomeLogo/>
+  <div class="">
+    This is the About us view
   </div>
 </template>
 
