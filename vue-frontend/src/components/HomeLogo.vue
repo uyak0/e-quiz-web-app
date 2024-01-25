@@ -1,5 +1,7 @@
 <template>
-    <RouterLink to="/" class="w-full text-center hover:bg-transparent float-left text-white font-bold border-0 rounded-md text-2xl px-3 mx-2 my-2">
-        E-Quizz
-    </RouterLink>
+    <div class="z-10 w-full text-center hover:bg-transparent float-left text-white text-2xl">
+        <RouterLink to="/" class="font-bold hover:">
+            E-Quizz
+        </RouterLink>
+    </div>
 </template>
