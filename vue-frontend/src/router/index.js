@@ -4,6 +4,7 @@ import AboutView from '../views/AboutView.vue'
 import LoginView from '../views/LoginView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import CreateQuizView from '../views/CreateQuizView.vue'
+import ForgotPasswordView from '../views/ForgotPassword.vue'
 
 // function AuthGuard(to, from, next) {
 //   if (!sessionStorage.getItem('token')) {
@@ -12,8 +13,6 @@ import CreateQuizView from '../views/CreateQuizView.vue'
 //     next()
 //   }
 // }
-
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +50,14 @@ const router = createRouter({
       component: SignUpView,
       meta: {
         title: 'Sign Up'
+      }
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot password',
+      component: ForgotPasswordView,
+      meta: {
+        title: 'Forgot Password'
       }
     },
     {

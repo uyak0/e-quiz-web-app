@@ -1,11 +1,22 @@
 <script setup>
   import HomeLogo from '@/components/HomeLogo.vue';
   
+
   async function login(){
     await axios.get('/sanctum/csrf-cookie')
-    await axios.post('/api/login', {
+    await axios.post('http://localhost:8000/api/login', {
       username: document.getElementById('username').value,
       password: document.getElementById('password').value
+    })
+    .then(response => {
+      console.log(response)
+      if(response.data === 'success'){
+        window.location.href = '/home' 
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      alert(error.response.data)
     })
   }
 </script>
@@ -20,7 +31,7 @@
   <!-- Right: Login Form -->
   <div class="bg-gray-700 h-screen lg:p-36 md:p-52 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
     <h1 class="text-2xl font-semibold mb-4">Login</h1>
-    <form action="#" method="POST">
+    <form v-on:submit="login">
 
       <!-- Username Input -->
       <div class="mb-4 text-gray-600">
@@ -42,14 +53,16 @@
 
       <!-- Forgot Password Link -->
       <div class="mb-6 text-blue-500">
-        <a href="#" class="hover:underline">Forgot Password?</a>
+        <RouterLink to="/forgot-password"> Forgot Password? </RouterLink>
       </div>
+    
       <!-- Login Button -->
       <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Login</button>
+    
     </form>
     <!-- Sign up  Link -->
     <div class="mt-6 text-blue-500 text-center">
-      <a href="#" class="hover:underline">Sign up Here</a>
+      <RouterLink to="/signup"> Sign Up Here </RouterLink>
     </div>
   </div>
   <!-- </div> -->
