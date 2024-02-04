@@ -9,23 +9,36 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     /**
-     * Handle an authentication attempt.
-     */
-    public function authenticate(Request $request): RedirectResponse
+    * Login user and create token
+    *
+    * @param  [string] email
+    * @param  [string] password
+    * @param  [boolean] remember_me
+    */
+
+    public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+        $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+        'remember_me' => 'boolean'
         ]);
- 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
- 
-            return redirect()->intended('dashboard');
+
+        $credentials = request(['email','password']);
+        if(!Auth::attempt($credentials))
+        {
+        return response()->json([
+            'message' => 'Unauthorized'
+        ],401);
         }
- 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+
+        $user = $request->user();
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->plainTextToken;
+
+        return response()->json([
+        'accessToken' =>$token,
+        'token_type' => 'Bearer',
+        ]);
     }
 }

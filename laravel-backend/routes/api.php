@@ -21,4 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/students', [StudentsController::class, 'index']);
-Route::post('/login', [LoginController::class, 'login']);
+
+Route::group(['prefix' => 'auth'], function() {
+    Route::post('/login', [LoginController::class, 'authenticate']);
+});
