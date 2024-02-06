@@ -5,7 +5,7 @@
 
   const email = ref('')
   const password = ref('')
-  const api = 'http://localhost:8000/api/'
+  const api = process.env.LARAVEL_API
   const confirm_psw = ref('')
   const confirm_psw_label = ref('Confirm Password')
   
