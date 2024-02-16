@@ -56,8 +56,8 @@ const router = createRouter({
       }
     },
     {
-      path: '/createquiz',
-      name: 'create quiz',
+      path: '/createquiz/mcq',
+      name: 'create quiz MCQ',
       component: CreateQuizView, 
     },
     {
