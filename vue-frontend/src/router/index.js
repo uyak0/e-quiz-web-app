@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { HomeView, AboutView, LoginView, SignUpView, CreateQuizView, ForgotPasswordView, StudentHomeView } from '@/views/views.js'
+import { HomeView, AboutView, LoginView, SignUpView, CreateQuizView, CreateMCQ, ForgotPasswordView, StudentHomeView } from '@/views/views.js'
 
 // function AuthGuard(to, from, next) {
 //   if (!sessionStorage.getItem('token')) {
@@ -56,9 +56,16 @@ const router = createRouter({
       }
     },
     {
-      path: '/createquiz/mcq',
-      name: 'create quiz MCQ',
+      path: '/createquiz',
+      name: 'create quiz',
       component: CreateQuizView, 
+      children: [
+        {
+          path: 'mcq',
+          name: 'create mcq',
+          component: CreateMCQ
+        }
+      ]
     },
     {
       path: '/student-home',
