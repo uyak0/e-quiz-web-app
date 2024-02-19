@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { HomeView, AboutView, LoginView, SignUpView, CreateQuizView, CreateMCQ, ForgotPasswordView, StudentHomeView } from '@/views/views.js'
+import { HomeView, AboutView, LoginView, SignUpView, CreateQuizView, ForgotPasswordView, StudentHomeView } from '@/views/views.js'
 
 // function AuthGuard(to, from, next) {
 //   if (!sessionStorage.getItem('token')) {
@@ -41,7 +41,7 @@ const router = createRouter({
     },
     {
       path: '/signup',
-      name: 'sign up',
+      name: 'signUp',
       component: SignUpView,
       meta: {
         title: 'Sign Up'
@@ -49,27 +49,23 @@ const router = createRouter({
     },
     {
       path: '/forgot-password',
-      name: 'forgot password',
+      name: 'forgotPassword',
       component: ForgotPasswordView,
       meta: {
         title: 'Forgot Password'
       }
     },
     {
-      path: '/createquiz',
-      name: 'create quiz',
-      component: CreateQuizView, 
-      children: [
-        {
-          path: 'mcq',
-          name: 'create mcq',
-          component: CreateMCQ
-        }
-      ]
+      path: '/quiz/create',
+      name: 'quiz',
+      component: CreateQuizView,
+      meta: {
+        title: 'Create Quiz'
+      }
     },
     {
-      path: '/student-home',
-      name: 'student dashboard/home',
+      path: '/student/home',
+      name: 'studentHome',
       component: StudentHomeView,
       meta: {
         title: 'Dashboard'
