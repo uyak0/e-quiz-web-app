@@ -5,6 +5,7 @@
   import TitleDateInsert from '@/components/Quiz Creation/TitleDateInsert.vue'
   import SubmitCancel from '@/components/Quiz Creation/SubmitCancel.vue'
   import MCQuestion from '@/components/Quiz Creation/MCQuestion.vue'
+  import SelectQType from '@/components/Quiz Creation/SelectQType.vue'
 
   let selected = ref(null)
   const date = ref('')
@@ -16,16 +17,12 @@
     <RouterView />
     <SubmitCancel />
         
-    <div v-if="selected==='mcq'">
+    <div v-if="selected==='mcq'" class="rounded-md border-2 mx-4 my-4">
       <MCQuestion />
     </div>
 
     <!-- Question Type Selection -->
-    <select v-model="selected" class="float-right text-slate-600">
-      <option value="mcq">Multi-choice</option>
-      <option value="sub">Subjective</option>
-      <option value="tfq">True/False</option>
-    </select>
+    <SelectQType v-model="selected"/>
   </div>
 
 </template>
