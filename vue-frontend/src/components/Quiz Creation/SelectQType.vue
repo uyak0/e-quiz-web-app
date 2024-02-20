@@ -1,17 +1,15 @@
 <script setup>
-  const props = defineProps({
-    selected: String
-  })
+import {ref, watchEffect} from 'vue';
 
-  props.selected = {
-    
-  }
+  const props = defineProps({
+    questionType: String
+  })
 </script>
 
 <template>
-  <select class="float-right text-slate-600">
-    <option value="{{ props.selected }}">Multi-choice</option>
-    <option value="{{ props.selected }}">Subjective</option>
-    <option value="{{ props.selected }}">True/False</option>
+  <select @change="$emit('update:questionType', $event.target.value)" class="float-right text-slate-600 pr-4">
+    <option value="mcq">Multi-choice</option>
+    <option value="sub">Subjective</option>
+    <option value="tfq">True/False</option>
   </select>
 </template>

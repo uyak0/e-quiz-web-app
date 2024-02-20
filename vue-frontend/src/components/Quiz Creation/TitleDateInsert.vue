@@ -4,7 +4,7 @@
   import { ref } from 'vue'
 
   const date = ref('')
-  defineProps([ 'date' ])
+  defineProps(['date'])
 </script>
 
 <template>
