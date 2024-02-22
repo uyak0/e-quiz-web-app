@@ -3,59 +3,47 @@
   import { onMounted, ref } from 'vue'
   import TitleDateInsert from '@/components/Quiz Creation/TitleDateInsert.vue'
   import MCQuestion from '@/components/Quiz Creation/MCQuestion.vue'
-  import SelectQType from '@/components/Quiz Creation/SelectQType.vue'
+  import QuestionTypeDDL from '@/components/Quiz Creation/QuestionTypeDDL.vue'
   import SubjectiveQuestion from "@/components/Quiz Creation/SubjectiveQuestion.vue";
   import TFQuestion from "@/components/Quiz Creation/TFQuestion.vue";
 
   const date = ref('')
-  let questionProps = ref([{
-      questionNo: 1,
-      questionType: 'mcq'
-  }]) // first question defaults
-
-  const questionTypeChange = (questionNo, newValue) => {
-    const index = questionProps.value.findIndex(obj => obj.questionNo === questionNo);    // find index of object with the same question number
-    questionProps.value[index].questionType = newValue;     // use the index to update questionType to the new one
-  };
+  let questionProps= ref([
+      { questionType: 'mcq' }
+  ]) // first question defaults
 
   const addQuestion = () => {
     questionProps.value.push({ questionNo: questionProps.value.length+1, questionType: 'mcq' })
   };
-  
-  onMounted(() => {
-    // questionProps.value.push({ questionNo: 2, questionType: 'mcq' });
-    console.log(questionProps.value);
-  })
 </script>
 
 <template>
-  <div class="bg-slate-700 h-screen w-3/4 mx-auto ">
+  <div class="bg-slate-700 h-full w-3/4 mx-auto py-8">
     <TitleDateInsert v-model="date"/>
 
     <!-- Question Component -->
-    <div v-for="index of questionProps.length" :key="index"
+    <div v-for="(item, index) of questionProps" :key="index"
          class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
       <div class="wrapper grid grid-cols-2 mb-2">
-        <h1 class="text-2xl w-1/2">Question #{{ index }}</h1>
+        <h1 class="text-2xl w-1/2">Question #{{ index + 1 }}</h1>
         <div class="mx-4">
           <!-- sorry to anyone that has to read this, idk a better way to do this -->
-          <SelectQType v-model="questionProps[index-1].questionType"
-                       @update:question-type="questionTypeChange(questionProps[index-1].questionNo, $event)"/>
+          <QuestionTypeDDL v-model="item.questionType" />
         </div>
       </div>
     
       <!-- Multi-choice Question -->
-      <div v-if="questionProps[index-1].questionType==='mcq'">
+      <div v-if="item.questionType==='mcq'">
         <MCQuestion />
       </div>
 
       <!-- Subjective Question -->
-      <div v-else-if="questionProps[index-1].questionType==='sub'">
+      <div v-else-if="item.questionType==='sub'">
         <SubjectiveQuestion />
       </div>
 
       <!-- True/False Question -->
-      <div v-else-if="questionProps[index-1].questionType==='tfq'">
+      <div v-else-if="item.questionType==='tfq'">
         <TFQuestion />
       </div>
     </div>
@@ -65,8 +53,11 @@
       +
     </div>
 
-    <button class="rounded-md bg-blue-500 hover:bg-grey-600 float-right px-2">Create Quiz</button>
-    <button class="bg-transparent float-right mx-2">Cancel</button>
+    <!-- Submit and Cancel buttons -->
+    <div class="mx-4 text-md">
+      <button class="rounded-md bg-blue-500 hover:bg-grey-600 float-right px-2">Create Quiz</button>
+      <button class="bg-transparent float-right mx-2">Cancel</button>
+    </div>
   </div>
 
 </template>
