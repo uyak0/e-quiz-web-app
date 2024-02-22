@@ -9,9 +9,10 @@ composer i
 php artisan serve
 ```
 
-### To run Vue development server
+### To run Vue server
 ```bash
 cd vue-frontend
 npm i
-npm run dev
+npm run dev   # for development server
+npm run build # to build for production
 ```
