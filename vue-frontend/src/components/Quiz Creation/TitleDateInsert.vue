@@ -8,9 +8,9 @@
 </script>
 
 <template>
-  <span class="mx-4 font-jetBrains flex flex-nowrap border-none">
-    <input type="text" id="title" name="title" placeholder="Type Title Here..." class="text-grey-200 text-6xl bg-transparent" />
-    <div class="datepicker-wrapper self-end rounded-md flex-none">    
+  <span class="mx-4 font-jetBrains flex flex-rows border-none md:overflow-auto">
+    <input type="text" id="title" name="title" placeholder="Type Title Here..." class="text-grey-200 text-5xl bg-transparent md:overflow-hidden" />
+    <div class="datepicker-wrapper">    
       <VueDatePicker v-model="date" />  
     </div>
   </span>
