@@ -13,12 +13,13 @@
   ]) // first question defaults
 
   const addQuestion = () => {
-    questionProps.value.push({ questionNo: questionProps.value.length+1, questionType: 'mcq' })
+    questionProps.value.push({ questionType: 'mcq' })
   };
 </script>
 
 <template>
-  <div class="bg-slate-700 h-full w-3/4 mx-auto py-8">
+  <div :class="{ 'h-screen': questionProps.length < 3,
+                 'h-full': questionProps.length > 4 } " class="bg-slate-700 w-3/4 mx-auto py-8">
     <TitleDateInsert v-model="date"/>
 
     <!-- Question Component -->
@@ -27,7 +28,6 @@
       <div class="wrapper grid grid-cols-2 mb-2">
         <h1 class="text-2xl w-1/2">Question #{{ index + 1 }}</h1>
         <div class="mx-4">
-          <!-- sorry to anyone that has to read this, idk a better way to do this -->
           <QuestionTypeDDL v-model="item.questionType" />
         </div>
       </div>
