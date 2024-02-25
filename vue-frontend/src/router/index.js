@@ -1,5 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { HomeView, AboutView, LoginView, SignUpView, CreateQuizView, ForgotPasswordView, StudentHomeView } from '@/views/views.js'
+import HomeView from "@/views/HomeView.vue";
+import AboutView from "@/views/AboutView.vue";
+import LoginView from "@/views/LoginView.vue";
+import SignUpView from "@/views/SignUpView.vue";
+import ForgotPasswordView from "@/views/ForgotPasswordView.vue";
+import CreateQuizView from "@/views/CreateQuizView.vue";
+import StudentHomeView from "@/views/StudentHomeView.vue";
 
 // function AuthGuard(to, from, next) {
 //   if (!sessionStorage.getItem('token')) {

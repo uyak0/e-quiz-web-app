@@ -1,11 +1,12 @@
 <script setup>
   import TopBar from '@/components/TopBar.vue';
+  
+  const pageName = 'Home'
 </script>
 
 <template>
-  <TopBar />
-  
-  This is student's home View
+  <TopBar v-model="pageName"/>
+
 
   
 </template>
