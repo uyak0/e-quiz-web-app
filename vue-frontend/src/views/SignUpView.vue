@@ -32,7 +32,7 @@
     <form :submit="signup">
 
       <!-- Email Input -->
-      <div class="mb-4 text-gray-600">
+      <div class="mb-4 text-gray-600 ">
         <label class="block text-gray-600">Email</label>
         <input type="text" v-model="email" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
       </div>

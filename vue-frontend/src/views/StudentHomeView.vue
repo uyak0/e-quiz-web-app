@@ -6,7 +6,8 @@
 
 <template>
   <TopBar v-model="pageName"/>
-
-
+  <div class="bg-transparent">
+     
+  </div>
   
 </template>
