@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email');
-            $table->foreign('classroom_id')->references('id')->on('classrooms');
+            $table->unsignedBigInteger('classrooms_id');
+            $table->foreign('classrooms_id')->references('id')->on('classrooms');
+            $table->unsignedBigInteger('quizzes_id');
+            $table->foreign('quizzes_id')->references('id')->on('quizzes');
             $table->timestamps();
         });
     }
