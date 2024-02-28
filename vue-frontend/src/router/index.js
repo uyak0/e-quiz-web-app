@@ -6,6 +6,7 @@ import SignUpView from "@/views/SignUpView.vue";
 import ForgotPasswordView from "@/views/ForgotPasswordView.vue";
 import CreateQuizView from "@/views/CreateQuizView.vue";
 import StudentHomeView from "@/views/StudentHomeView.vue";
+import ClassroomView from "@/views/ClassroomView.vue";
 
 // function AuthGuard(to, from, next) {
 //   if (!sessionStorage.getItem('token')) {
@@ -76,6 +77,14 @@ const router = createRouter({
       meta: {
         title: 'Dashboard'
       }
+    },
+    {
+      path: '/classroom/:id',
+      name: 'classroom',
+      component: ClassroomView,
+      meta: {
+        title: 'Classroom'
+      },
     }
   ]
 })

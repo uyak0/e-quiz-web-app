@@ -7,9 +7,17 @@ use App\Models\Classroom;
 
 class ClassroomsController extends Controller
 {
-    public function index()
+    public function index(int $id = null)
     {
-        $classrooms=Classroom::all();
-        return response() -> json($classrooms);
+        if (!$id)
+        {
+            $classrooms=Classroom::all();
+            return response() -> json($classrooms);
+        }
+        else 
+        {
+            $classroom=Classroom::find($id);
+            return response() -> json($classroom);
+        }
     }
 }

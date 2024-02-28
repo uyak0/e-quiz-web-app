@@ -27,4 +27,4 @@ Route::group(['prefix' => 'auth'], function() {
     Route::post('/login', [LoginController::class, 'authenticate']);
 });
 
-Route::get('/classrooms', [ClassroomsController::class, 'index']);
+Route::get('/classrooms/{id?}', [ClassroomsController::class, 'index']);

@@ -25,7 +25,6 @@
 <template>
   <TopBar v-model="pageName"/>
   <div v-for="(item, index) in classrooms" :key="index">
-    <Classroom v-model="item.name"/>
-    {{item.name}}
+    <Classroom v-model="classrooms[index]"/>
   </div>
 </template>
