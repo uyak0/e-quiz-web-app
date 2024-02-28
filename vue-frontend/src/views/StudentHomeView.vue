@@ -5,7 +5,7 @@
   import {onMounted, ref} from "vue";
 
   const pageName = 'Home'
-  const classrooms = ref({})
+  const classrooms = ref([])
   const API = import.meta.env.VITE_LARAVEL_API
 
   function getClassrooms() {
@@ -24,7 +24,10 @@
 
 <template>
   <TopBar v-model="pageName"/>
-  <div v-for="(item, index) in classrooms" :key="index">
-    <Classroom v-model="classrooms[index]"/>
+  <div class="flex flex-rows justify-between">
+    <div v-for="(item, index) of classrooms" :key="index">
+      <!-- i have no idea why this works -->
+      <Classroom v-model="classrooms[index]"/> 
+    </div>
   </div>
 </template>
