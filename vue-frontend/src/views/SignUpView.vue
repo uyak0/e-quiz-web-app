@@ -6,12 +6,12 @@
   const username = ref('')
   const email = ref('')
   const password = ref('')
-  const role = ref('student')
+  const role = ref('')
   const buttonDisabled = ref(true) 
 
   const API = import.meta.env.VITE_LARAVEL_API;
 
-  const confirmPsw = reactive({
+  let confirmPsw = reactive({
     value: '',
     label: 'Confirm Password',
     labelColor: 'text-gray-600',
@@ -28,8 +28,14 @@
   }
 
   function preventSignUp() {
-    const inputs = [username, email, password, confirmPsw.value];
-    const isAllInputsFilled = inputs.every(input => input !== '');
+    let inputs = [
+      username.value, 
+      email.value, 
+      password.value, 
+      confirmPsw.value,
+      role.value
+    ];
+    let isAllInputsFilled = inputs.every(input => input !== '');
     
     if (isAllInputsFilled) {
       buttonDisabled.value = false;
@@ -57,6 +63,7 @@
 
   watchEffect(() => {
     ConfirmPasswordLabel()
+    preventSignUp()
   })
 </script>
 
@@ -67,16 +74,16 @@
   <!-- Right: Sign Up Form -->
   <div class="bg-gray-700 h-screen lg:p-36 md:p-52 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
     <h1 class="text-2xl font-semibold mb-4">Sign Up</h1>
-    <form @submit="signup">
+    <form @submit="Register">
       
       <!-- Username -->
-      <div class="mb-4 text-gray-600 ">
+      <div class="mb-4 text-gray-600">
         <label class="block text-gray-600">Username</label>
         <input type="text" v-model="username" placeholder="Username" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
       </div>
 
       <!-- Email Input -->
-      <div class="mb-4 text-gray-600 ">
+      <div class="mb-4 text-gray-600">
         <label class="block text-gray-600">Email</label>
         <input type="text" v-model="email" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
       </div>
@@ -95,12 +102,13 @@
       
       <!-- Select Role to register as -->
       <select v-model="role" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 text-gray-700">
+        <option value="" disabled hidden selected>Select a role</option>
         <option value="student">Student</option>
         <option value="teacher">Teacher</option>
       </select>
 
       <!-- Sign Up Button -->
-      <button :disabled="buttonDisabled" type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md my-8 py-2 px-2 w-1/2 float-right">Sign Up</button>
+      <button :disabled="buttonDisabled" type="submit" :class="{ 'bg-slate-300 hover:bg-slate-300': buttonDisabled }" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md my-8 py-2 px-2 w-1/2 float-right">Sign Up</button>
       
       <!-- Login Link -->
       <div class="float-left mb-4 text-blue-500">

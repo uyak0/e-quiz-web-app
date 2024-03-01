@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ClassroomsController;
+use App\Http\Controllers\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,7 @@ Route::get('/students', [StudentsController::class, 'index']);
 
 Route::group(['prefix' => 'auth'], function() {
     Route::post('/login', [LoginController::class, 'authenticate']);
+    Route::post('/register', [RegisterController::class, 'register']);
 });
 
 Route::get('/classrooms/{id?}', [ClassroomsController::class, 'index']);
