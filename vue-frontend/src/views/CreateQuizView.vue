@@ -15,6 +15,10 @@
   const addQuestion = () => {
     questionProps.value.push({ questionType: 'mcq' })
   };
+
+  function deleteQuestion(index) {
+    questionProps.value.splice(index, 1);
+  }
 </script>
 
 <template>
@@ -25,10 +29,14 @@
     <!-- Question Component -->
     <div v-for="(item, index) of questionProps" :key="index"
          class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
-      <div class="wrapper grid grid-cols-2 mb-2">
+      <div class="wrapper flex mb-2">
         <h1 class="text-2xl w-1/2">Question #{{ index + 1 }}</h1>
         <div class="mx-4">
           <QuestionTypeDDL v-model="item.questionType" />
+        </div>
+        <!-- Delete Button -->
+        <div @click="deleteQuestion" class="text-2xl cursor-pointer hover:text-red-600">
+          × 
         </div>
       </div>
     
