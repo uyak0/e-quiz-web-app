@@ -8,16 +8,28 @@
   import TFQuestion from "@/components/Quiz Creation/TFQuestion.vue";
 
   const date = ref('')
+  const API = import.meta.env.VITE_LARAVEL_API;
+
   let questionProps= ref([
       { questionType: 'mcq' }
   ]) // first question defaults
 
-  const addQuestion = () => {
+  function addQuestion() {
     questionProps.value.push({ questionType: 'mcq' })
   };
 
   function deleteQuestion(index) {
     questionProps.value.splice(index, 1);
+  };
+
+  function submitQuiz() {
+    axios.post(API + '/api/quiz/create', questionProps)
+      .then(response = () => {
+        console.log(response.data)
+      })
+      .catch(error = () => {
+        console.log(error)
+      })
   }
 </script>
 
@@ -36,7 +48,7 @@
         </div>
         <!-- Delete Button -->
         <div @click="deleteQuestion" class="text-2xl cursor-pointer hover:text-red-600">
-          × 
+          ⓧ 
         </div>
       </div>
     
