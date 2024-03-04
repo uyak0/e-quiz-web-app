@@ -1,12 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from "@/views/HomeView.vue";
-import AboutView from "@/views/AboutView.vue";
-import LoginView from "@/views/LoginView.vue";
-import SignUpView from "@/views/SignUpView.vue";
-import ForgotPasswordView from "@/views/ForgotPasswordView.vue";
-import CreateQuizView from "@/views/CreateQuizView.vue";
-import StudentHomeView from "@/views/StudentHomeView.vue";
-import ClassroomView from "@/views/ClassroomView.vue";
 
 // function AuthGuard(to, from, next) {
 //   if (!sessionStorage.getItem('token')) {
@@ -22,7 +14,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('@/views/HomeView.vue'),
       meta: { 
         title: 'E-Quizz'
       }
@@ -33,7 +25,7 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: AboutView,
+      component: () => import('@/views/AboutView.vue'),
       meta: {
         title: 'E-Quizz - About Us'
       }
@@ -41,7 +33,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView,
+      component: () => import('@/views/LoginView.vue'),
       meta: {
         title: 'Login'
       }
@@ -49,7 +41,7 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'signUp',
-      component: SignUpView,
+      component: () => import('@/views/SignUpView.vue'),
       meta: {
         title: 'Sign Up'
       }
@@ -57,35 +49,54 @@ const router = createRouter({
     {
       path: '/forgot-password',
       name: 'forgotPassword',
-      component: ForgotPasswordView,
+      component: () => import('@/views/ForgotPasswordView.vue') ,
       meta: {
         title: 'Forgot Password'
       }
     },
     {
-      path: '/quiz/create',
-      name: 'quiz',
-      component: CreateQuizView,
+      path: '/classroom/:id',
+      name: 'classroom',
+      component: () => import('@/views/ClassroomView.vue'),
       meta: {
-        title: 'Create Quiz'
-      }
+        title: 'Classroom'
+      },
+      children: [
+        {
+          path: 'quiz',
+          name: 'quiz',
+          component: () => import('@/views/QuizView.vue'),
+          children: [
+            {
+              // Quizzes creation page
+              path: 'create',
+              name: 'createQuiz',
+              component: () => import('@/views/CreateQuizView.vue'),
+              meta: {
+                title: 'Create Quiz'
+              }
+            },
+            {
+              path: ':id',
+              name: 'quiz',
+              component: () => import('@/views/QuizView.vue'),
+              meta: {
+                title: 'Quiz :id'
+              }
+            }
+          ]
+        },
+      ]
     },
     {
       path: '/student/home',
       name: 'studentHome',
-      component: StudentHomeView,
+      component: () => import('@/views/StudentHomeView.vue'),
       meta: {
         title: 'Dashboard'
       }
     },
-    {
-      path: '/classroom/:id',
-      name: 'classroom',
-      component: ClassroomView,
-      meta: {
-        title: 'Classroom'
-      },
-    }
+    
   ]
 })
 

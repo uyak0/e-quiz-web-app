@@ -14,10 +14,17 @@ class ClassroomsController extends Controller
             $classrooms=Classroom::all();
             return response() -> json($classrooms);
         }
-        else 
+        else
         {
             $classroom=Classroom::find($id);
             return response() -> json($classroom);
         }
+    }
+
+    public function quiz(int $id)
+    {
+        $classroom=Classroom::find($id);
+        $quiz=$classroom->quiz;
+        return response() -> json($quiz);
     }
 }

@@ -30,3 +30,4 @@ Route::group(['prefix' => 'auth'], function() {
 });
 
 Route::get('/classrooms/{id?}', [ClassroomsController::class, 'index']);
+Route::get('/quiz/{id?}', [ClassroomsController::class, 'quiz']);
