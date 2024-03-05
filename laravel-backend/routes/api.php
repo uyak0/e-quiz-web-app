@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\QuizzesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentsController;
@@ -30,4 +31,4 @@ Route::group(['prefix' => 'auth'], function() {
 });
 
 Route::get('/classrooms/{id?}', [ClassroomsController::class, 'index']);
-Route::get('/quiz/{id?}', [ClassroomsController::class, 'quiz']);
+Route::get('/quiz/{id?}', [QuizzesController::class, 'index']);

@@ -8,11 +8,9 @@ use App\Models\Quiz;
 
 class QuizzesController extends Controller
 {
-    public function index(int $classroom_id)
+    public function index()
     {
-        $classroom = Classroom::find($classroom_id);
-        $quizzes = $classroom->quizzes;
-
-        return view('quizzes.index', compact('classroom', 'quizzes'));
+        $quizzes = Quiz::all();
+        return response()->json($quizzes);
     }
 }

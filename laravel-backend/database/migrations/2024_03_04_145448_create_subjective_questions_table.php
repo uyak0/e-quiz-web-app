@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('description');
             $table->string('correct_answers')->nullable();
+            $table->foreignId('quiz_id')->references('id')->on('quizzes');
         });
     }
 

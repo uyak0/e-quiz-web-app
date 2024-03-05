@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('description');
             $table->string('correct_answers');
             $table->string('options');
+            $table->foreignId('quiz_id')->references('id')->on('quizzes');
         });
     }
 
