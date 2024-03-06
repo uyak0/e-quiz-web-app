@@ -3,17 +3,22 @@
   import axios from 'axios';
   import { onMounted, ref, watchEffect, reactive } from 'vue';
 
-  const username = ref('')
-  const email = ref('')
-  const password = ref('')
-  const role = ref('')
-  const buttonDisabled = ref(true) 
+  let username = ref('')
+  let password = ref('')
+  let role = ref('')
+  let buttonDisabled = ref(true) 
 
   const API = import.meta.env.VITE_LARAVEL_API;
 
-  let confirmPsw = reactive({
+  let confirmPsw = reactive({ // used reactive instead of ref here because it will look better in code
     value: '',
     label: 'Confirm Password',
+    labelColor: 'text-gray-600',
+  });
+
+  let email = reactive({
+    value: '',
+    label: 'Email',
     labelColor: 'text-gray-600',
   });
 
@@ -46,13 +51,14 @@
 
   function Register() {
     const data = {
-      username: username.value,
+      name: username.value,
       email: email.value,
       password: password.value,
-      role: role.value
+      password_confirmation: confirmPsw.value,
+      role: role.value,
     }
 
-    axios.post(API + '/auth/register', data)
+    axios.post(API + 'auth/register', data)
       .then(response => {
         console.log(response.data)
       })
@@ -61,9 +67,21 @@
       })
   }
 
+  function emailFormatCheck() {
+    let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailRegex.test(email.value)) {
+      email.label = 'Invalid Email Format!'
+      email.labelColor = 'text-red-500'
+    } else {
+      email.label = 'Email'
+      email.labelColor = 'text-gray-600'
+    }
+  }
+
   watchEffect(() => {
     ConfirmPasswordLabel()
     preventSignUp()
+    // emailFormatCheck()
   })
 </script>
 
@@ -74,7 +92,7 @@
   <!-- Right: Sign Up Form -->
   <div class="bg-gray-700 h-screen lg:p-36 md:p-52 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
     <h1 class="text-2xl font-semibold mb-4">Sign Up</h1>
-    <form @submit="Register">
+    <form @submit.prevent="Register">
       
       <!-- Username -->
       <div class="mb-4 text-gray-600">
@@ -84,8 +102,8 @@
 
       <!-- Email Input -->
       <div class="mb-4 text-gray-600">
-        <label class="block text-gray-600">Email</label>
-        <input type="text" v-model="email" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
+        <label class="block text-gray-600" :class="email.labelColor">{{ email.label }}</label>
+        <input type="text" id="email" v-model="email.value" @input="emailFormatCheck" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
       </div>
 
       <!-- Password Input -->

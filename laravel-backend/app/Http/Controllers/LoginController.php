@@ -1,11 +1,11 @@
 <?php
- 
+
 namespace App\Http\Controllers;
- 
+
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
- 
+
 class LoginController extends Controller
 {
     /**
@@ -19,9 +19,9 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-        'email' => 'required|string|email',
-        'password' => 'required|string',
-        'remember_me' => 'boolean'
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+            'remember_me' => 'boolean'
         ]);
 
         $credentials = request(['email','password']);
@@ -37,8 +37,10 @@ class LoginController extends Controller
         $token = $tokenResult->plainTextToken;
 
         return response()->json([
-        'accessToken' =>$token,
-        'token_type' => 'Bearer',
+            'accessToken' =>$token,
+            'token_type' => 'Bearer',
+            'user_id' => $user->id,
+            'role' => $user->role
         ]);
     }
 }

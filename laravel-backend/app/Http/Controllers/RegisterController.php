@@ -4,25 +4,30 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
     public function register(Request $request) {
         $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|confirmed',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users|max:255',
+            'password' => 'required|min:8|confirmed',
             'role' => 'required|string'
         ]);
 
-        $user = new User([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => $request->role
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
 
-        $user->save();
+        $credentials = $request->only('email', 'password');
+        Auth::attempt($credentials);
 
         return response()->json([
             'message' => 'Successfully created user!'

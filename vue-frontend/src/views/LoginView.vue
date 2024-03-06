@@ -2,37 +2,43 @@
   import HomeLogo from '@/components/HomeLogo.vue';
   import axios from 'axios';
   import router from '@/router';
-  import { ref } from 'vue'
+  import { ref,reactive } from 'vue'
 
-  const loginForm = ref([
+  const API = import.meta.env.VITE_LARAVEL_API;
+
+  const loginForm = reactive([
     { email: '' },
-    { pasword: '' }
+    { pasword: '' },
+    { remember: false }
   ])
 
-  async function login(){
-    
-    await axios.get('/sanctum/csrf-cookie')
+  function login(){
+    const loginData = {
+      email: loginForm.email,
+      password: loginForm.password,
+      remember_me: loginForm.remember
+    }
+
+    axios.get('/sanctum/csrf-cookie')
     .then (response => {
       // console.log(response)
       // console.log('Cookie Acquired')
     })
     
-    await axios.post('http://localhost:8000/api/auth/login', {
-      email: loginForm.email,
-      password: loginForm.password
-    })
-    .then(response => {
-      console.log(response)
-      // router.push({ path: '/'})
-      // if(response.data === 'success'){
-      //   router.push({ path: '/'})
-      // }
-    })
-    .catch(error => {
-      console.log(error)
-      alert(error.response.data)
-      router.push({ path: '/' })
-    })
+    axios.post(API + 'auth/login', loginData)
+      .then(response => {
+        console.log(response.data)
+        localStorage.setItem('token', response.data.access_token)
+        router.push({ path: '/' + response.data.role + '/' + response.data.user_id + '/home' })
+        // router.push({ path: '/'})
+        // if(response.data === 'success'){
+        //   router.push({ path: '/'})
+        // }
+      })
+      .catch(error => {
+        console.log(error)
+        alert('Invalid Credentials! Please try again.')
+      })
   }
 </script>
 
@@ -45,23 +51,23 @@
   <!-- Right: Login Form -->
   <div class="bg-gray-700 h-screen lg:p-36 md:p-52 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
     <h1 class="text-2xl font-semibold mb-4">Login</h1>
-    <form v-on:submit="login">
+    <form @submit.prevent="login">
 
       <!-- Email Input -->
       <div class="mb-4 text-gray-600">
         <label class="block text-gray-600">Email</label>
-        <input type="text" v-model="email" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
+        <input type="text" v-model="loginForm.email" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
       </div>
 
       <!-- Password Input -->
       <div class="mb-4 text-gray-600">
         <label for="password" class="block text-gray-600">Password</label>
-        <input type="password" v-model="password" placeholder="Password" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
+        <input type="password" v-model="loginForm.password" placeholder="Password" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
       </div>
 
       <!-- Remember Me Checkbox -->
       <div class="mb-4 flex items-center">
-        <input type="checkbox" id="remember" name="remember" class="text-blue-500">
+        <input type="checkbox" v-model="loginForm.remember" id="remember" name="remember" class="text-blue-500">
         <label for="remember" class="text-gray-600 ml-2">Remember Me</label>
       </div>
 

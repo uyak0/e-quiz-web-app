@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// function AuthGuard(to, from, next) {
-//   if (!sessionStorage.getItem('token')) {
-//     next({ name: 'login' })
-//   } else {
-//     next()
-//   }
-// }
+function AuthGuard(to, from, next) {
+  if (!localStorage.getItem('token')) {
+    next({ name: 'login' })
+  } else {
+    next({ name: 'home' })
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -89,14 +89,19 @@ const router = createRouter({
       ]
     },
     {
-      path: '/student/home',
-      name: 'studentHome',
-      component: () => import('@/views/StudentHomeView.vue'),
-      meta: {
-        title: 'Dashboard'
-      }
+      path: '/student/:id',
+      name: 'student',
+      children: [
+        {
+          path: 'home',
+          name: 'studentHome',
+          component: () => import('@/views/StudentHomeView.vue'),
+          meta: {
+            title: 'Home'
+          }
+        }
+      ]
     },
-    
   ]
 })
 

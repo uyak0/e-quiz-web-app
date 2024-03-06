@@ -3,13 +3,18 @@
   import Classroom from "@/components/Classroom.vue";
   import axios from "axios";
   import {onMounted, ref} from "vue";
+  import {useRoute} from "vue-router";
+
+  const API = import.meta.env.VITE_LARAVEL_API
+  const route = useRoute()
+  const studentId = route.params.id
 
   const pageName = 'Home'
   const classrooms = ref([])
-  const API = import.meta.env.VITE_LARAVEL_API
 
   function getClassrooms() {
-    axios.get(API + '/api/classrooms')
+    console.log(studentId) 
+    axios.get(API + 'classrooms/' + studentId)
       .then(response => {
         classrooms.value = response.data
       })

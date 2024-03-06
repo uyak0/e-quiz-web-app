@@ -4,21 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Classroom;
+use App\Models\Student;
 
 class ClassroomsController extends Controller
 {
-    public function index(int $id = null)
+    public function index(int $studentId)
     {
-        if (!$id)
-        {
-            $classrooms=Classroom::all();
-            return response() -> json($classrooms);
-        }
-        else
-        {
-            $classroom=Classroom::find($id);
-            return response() -> json($classroom);
-        }
+        $classrooms = Classroom::with('students')->where('student_id', $studentId)->get();
+        return response() -> json($classrooms);
     }
 
     public function quiz(int $id)

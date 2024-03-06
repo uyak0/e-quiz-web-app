@@ -8,7 +8,7 @@
   const classroom = ref({});
 
   function getClassroom() {
-    axios.get(API + '/api/classrooms/' + route.params.id)
+    axios.get(API + 'classrooms/' + route.params.id)
         .then(response => {
           classroom.value = response.data;
         })
