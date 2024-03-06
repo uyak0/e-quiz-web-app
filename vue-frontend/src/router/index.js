@@ -99,6 +99,14 @@ const router = createRouter({
           meta: {
             title: 'Home'
           }
+        },
+        {
+          path: 'profile',
+          name: 'studentProfile',
+          component: () => import('@/views/StudentProfileView.vue'),
+          meta: {
+            title: 'Profile'
+          }
         }
       ]
     },

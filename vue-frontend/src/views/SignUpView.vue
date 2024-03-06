@@ -11,7 +11,7 @@
   const API = import.meta.env.VITE_LARAVEL_API;
 
   let confirmPsw = reactive({ // used reactive instead of ref here because it will look better in code
-    value: '',
+    value: '',                // surely it wont matter
     label: 'Confirm Password',
     labelColor: 'text-gray-600',
   });
