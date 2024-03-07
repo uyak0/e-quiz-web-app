@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-function AuthGuard(to, from, next) {
-  if (!localStorage.getItem('token')) {
-    next({ name: 'login' })
+function isAuthenticated() {
+  const tokenExists = localStorage.getItem('token') ? true : false
+  if (tokenExists){
+    return true
   } else {
-    next({ name: 'home' })
+    return false
   }
 }
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -34,6 +34,18 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
+      beforeEnter: (to, from) => {
+        if (isAuthenticated) {
+          const userRole = localStorage.getItem('user_role')
+          const userID = localStorage.getItem('user_id')
+          if (userRole === 'teacher') {
+            return { path: 'teacher/' + userID + '/home' }
+          } 
+          else if (userRole === 'student') {
+            return { path: 'student/' + userID + '/home' }
+          }
+        }
+      },
       meta: {
         title: 'Login'
       }
@@ -112,6 +124,15 @@ const router = createRouter({
     },
   ]
 })
+
+// Navigation Guard
+// router.beforeEach((to, from) => {
+//   if (!isAuthenticated && to.name !== 'login') {
+//     return { name: 'login' }
+//   } else {
+//     return true
+//   }
+// })
 
 // Adds title tag to each route
 router.beforeEach((to, from) => {

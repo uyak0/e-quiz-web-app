@@ -30,6 +30,7 @@ class RegisterController extends Controller
         Auth::attempt($credentials);
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Successfully created user!'
         ], 201);
     }

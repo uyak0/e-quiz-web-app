@@ -2,6 +2,7 @@
   import HomeLogo from '@/components/HomeLogo.vue';
   import axios from 'axios';
   import { onMounted, ref, watchEffect, reactive } from 'vue';
+  import { useRouter } from 'vue-router';
 
   let username = ref('')
   let password = ref('')
@@ -9,6 +10,7 @@
   let buttonDisabled = ref(true) 
 
   const API = import.meta.env.VITE_LARAVEL_API;
+  const router = useRouter();
 
   let confirmPsw = reactive({ // used reactive instead of ref here because it will look better in code
     value: '',                // surely it wont matter
@@ -61,10 +63,14 @@
     axios.post(API + 'auth/register', data)
       .then(response => {
         console.log(response.data)
+        if (response.data.status === 'success') {
+          router.push('/login')
+        }
       })
       .catch(error => {
         console.log(error)
       })
+
   }
 
   function emailFormatCheck() {

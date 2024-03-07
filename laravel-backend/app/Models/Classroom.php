@@ -10,4 +10,9 @@ class Classroom extends Model
     use HasFactory;
     protected $table = 'classrooms';
     protected $fillable = ['name', 'description'];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_classrooms');
+    }
 }
