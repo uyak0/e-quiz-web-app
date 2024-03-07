@@ -12,20 +12,20 @@
     { remember: false }
   ])
 
-  function login(){
+  async function login(){
     const loginData = {
       email: loginForm.email,
       password: loginForm.password,
       remember_me: loginForm.remember
     }
 
-    axios.get('/sanctum/csrf-cookie')
-    .then (response => {
-      // console.log(response)
-      // console.log('Cookie Acquired')
-    })
+    await axios.get('/sanctum/csrf-cookie')
+      .then (response => {
+        // console.log(response)
+        // console.log('Cookie Acquired')
+      })
     
-    axios.post(API + 'auth/login', loginData)
+    await axios.post(API + 'auth/login', loginData)
       .then(response => {
         console.log(response.data)
         localStorage.setItem('token', response.data.accessToken)
@@ -51,7 +51,7 @@
   <HomeLogo />
   
   <!-- Right: Login Form -->
-  <div class="bg-gray-700 h-screen lg:p-36 md:p-52 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
+  <div class="bg-gray-700 h-screen lg:p-36 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
     <h1 class="text-2xl font-semibold mb-4">Login</h1>
     <form @submit.prevent="login">
 

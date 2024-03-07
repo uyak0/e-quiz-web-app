@@ -10,4 +10,9 @@ class Quiz extends Model
     use HasFactory;
     protected $table = 'quizzes';
     protected $fillable = ['title', 'due_date'];
+
+    public function classroom()
+    {
+        return $this->belongsTo(Classroom::class);
+    }
 }

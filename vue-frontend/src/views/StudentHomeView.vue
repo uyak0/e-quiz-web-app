@@ -14,7 +14,7 @@
 
   function getClassrooms() {
     console.log(studentId) 
-    axios.get(API + 'classrooms/' + studentId)
+    axios.get(API + 'student/classrooms/' + studentId)
       .then(response => {
         classrooms.value = response.data
       })
@@ -31,8 +31,8 @@
   <TopBar v-model="pageName"/>
   <div class="flex flex-rows justify-between">
     <div v-for="(item, index) of classrooms" :key="index">
-      <!-- i have no idea why this works -->
       <Classroom v-model="classrooms[index]"/> 
+      {{ console.log(item)}}
     </div>
   </div>
 </template>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class LoginController extends Controller
     * @param  [boolean] remember_me
     */
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|string|email',
@@ -40,7 +41,7 @@ class LoginController extends Controller
             'accessToken' =>$token,
             'token_type' => 'Bearer',
             'user_id' => $user->id,
-            'role' => $user->role
+            'role' => $user->roles()->first()->name
         ]);
     }
 }

@@ -2,23 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Models\Classroom;
 use App\Models\Student;
-use App\Models\User;
 
 class ClassroomsController extends Controller
 {
-    public function index(int $studentId)
+    public function studentClassroomList(int $studentId): JsonResponse
     {
-        $student = Student::find($studentId)->first();
-        $user =
-
-        $classrooms = $user->classrooms()->where('user_id', $user)->get();
+        $user = Student::find($studentId)->user->first();
+        $classrooms = $user->classrooms;
         return response() -> json($classrooms);
     }
 
-    public function quiz(int $id)
+    public function index(int $id): JsonResponse
+    {
+        $classroom=Classroom::find($id);
+        return response() -> json($classroom);
+    }
+
+    public function quiz(int $id): JsonResponse
     {
         $classroom=Classroom::find($id);
         $quiz=$classroom->quiz;

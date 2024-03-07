@@ -24,25 +24,16 @@ class UserSeeder extends Seeder
                 'email' => $faker->email,
                 'password' => Hash::make('password')
             ]);
+
+            $users = User::find($i+1);
+            $users->roles()->attach(random_int(1,2));
+
+        }
+        for ($i = 1; $i < User::count(); $i++) {
+            $classroom = Classroom::find(random_int(1,3));
+            $users = User::find($i);
+            $users->classrooms()->attach($classroom);
         }
 
-        DB::table('users')->insert([
-            [
-                'name' => 'student1',
-                'email' => 'email@email.com',
-                'password' => Hash::make('password'),
-            ],
-            [
-                'name' => 'teacher1',
-                'email' => 'teacher@email.com',
-                'password' => Hash::make('password'),
-            ]
-        ]);
-
-        $classrooms = Classroom::all();
-        foreach($classrooms as $classroom) {
-            $users = User::all()->random(5);
-            $classroom->users()->attach($users);
-        }
     }
 }
