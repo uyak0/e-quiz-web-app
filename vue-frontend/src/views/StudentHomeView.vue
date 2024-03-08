@@ -12,9 +12,8 @@
   const pageName = 'Home'
   const classrooms = ref([])
 
-  function getClassrooms() {
-    console.log(studentId) 
-    axios.get(API + 'student/classrooms/' + studentId)
+  async function getClassrooms() {
+    await axios.get(API + 'student/classrooms/' + studentId)
       .then(response => {
         classrooms.value = response.data
       })
@@ -29,7 +28,11 @@
 
 <template>
   <TopBar v-model="pageName"/>
-  <div class="flex flex-rows justify-between">
+  <div v-if="classrooms.length === 0" class="flex justify-center">
+    <p class="text-2xl">No classrooms found</p>
+  </div>
+
+  <div class="w-1/4 flex flex-rows justify-between">
     <div v-for="(item, index) of classrooms" :key="index">
       <Classroom v-model="classrooms[index]"/> 
       {{ console.log(item)}}

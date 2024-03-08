@@ -103,6 +103,18 @@ const router = createRouter({
     {
       path: '/student/:id',
       name: 'student',
+      beforeEnter: (to, from) => {
+        if (!isAuthenticated) {
+          return { name: 'login' }
+        }
+        else { 
+          const userRole = localStorage.getItem('user_role')
+          const userID = localStorage.getItem('user_id')
+          if (userRole !== 'student' || userID !== to.params.id) {
+            return  { path: 'student/' + userID + '/home' }
+          }
+        }
+      },
       children: [
         {
           path: 'home',

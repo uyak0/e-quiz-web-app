@@ -10,7 +10,8 @@ class ClassroomsController extends Controller
 {
     public function studentClassroomList(int $studentId): JsonResponse
     {
-        $user = Student::find($studentId)->user->first();
+        $student = Student::find($studentId);
+        $user = $student->user->first();
         $classrooms = $user->classrooms;
         return response() -> json($classrooms);
     }
