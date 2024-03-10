@@ -8,6 +8,16 @@ use App\Models\Student;
 
 class ClassroomsController extends Controller
 {
+    public function joinClassroom(int $studentId, int $classroomId): JsonResponse
+    {
+        $classroom = Classroom::find($classroomId)->first();
+        $student = Student::find($studentId)->first();
+        $user = $student->user();
+
+        $user->classrooms()->attach($classroom);
+        return response()->json(['message' => 'Classroom joined successfully']);
+    }
+
     public function studentClassroomList(int $studentId): JsonResponse
     {
         $student = Student::find($studentId);
@@ -16,9 +26,9 @@ class ClassroomsController extends Controller
         return response() -> json($classrooms);
     }
 
-    public function index(int $id): JsonResponse
+    public function index(string $classroomCode): JsonResponse
     {
-        $classroom=Classroom::find($id);
+        $classroom=Classroom::where('code', $classroomCode)->first();
         return response() -> json($classroom);
     }
 

@@ -131,6 +131,14 @@ const router = createRouter({
           meta: {
             title: 'Profile'
           }
+        },
+        {
+          path: 'classroom/join',
+          name: 'joinClassroom',
+          component: () => import('@/views/JoinClassroomView.vue'),
+          meta: {
+            title: 'Join A Classroom'
+          }
         }
       ]
     },

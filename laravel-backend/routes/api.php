@@ -30,6 +30,7 @@ Route::group(['prefix' => 'auth'], function() {
     Route::post('/register', [RegisterController::class, 'register']);
 });
 
+Route::put('/student/{studentId}/classroom/join/{classroomCode}', [ClassroomsController::class, 'joinClassroom']);
 Route::get('/student/classrooms/{id?}', [ClassroomsController::class, 'studentClassroomList']);
-Route::get('/classroom/{id?}', [ClassroomsController::class, 'index']);
+Route::get('/classroom/{classroomCode?}', [ClassroomsController::class, 'index']);
 Route::get('/quiz/{id?}', [QuizzesController::class, 'index']);

@@ -4,7 +4,9 @@
   import { useRoute } from 'vue-router';
   import { onMounted, ref } from 'vue';
 
-  const pageName = useRoute().meta.title 
+  const route = useRoute()
+  const pageName = route.meta.title 
+  const userProfileLink = '/student/' + route.params.id + '/profile'
 </script>
 
 <template>
@@ -21,8 +23,7 @@
         <ToggleTheme @dark-toggle="darkToggle"/> 
       </div>
 
-      <!-- Rounded Avatar Default -->
-      <RouterLink to="profile">
+      <RouterLink :to="userProfileLink">
         <div class="flex justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
           <UserAvatar />
         </div>
