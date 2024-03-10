@@ -7,6 +7,7 @@ use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ClassroomsController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,14 +24,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/students', [StudentsController::class, 'index']);
+Route::get('/user/{id}', [UserController::class, 'getUser']);
 
 Route::group(['prefix' => 'auth'], function() {
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/register', [RegisterController::class, 'register']);
 });
 
-Route::put('/student/{studentId}/classroom/join/{classroomCode}', [ClassroomsController::class, 'joinClassroom']);
-Route::get('/student/classrooms/{id?}', [ClassroomsController::class, 'studentClassroomList']);
+Route::group(['prefix' => 'student'], function() {
+    Route::get('/classrooms/{id?}', [ClassroomsController::class, 'studentClassroomList']);
+    Route::put('{userId}/classroom-join/{classroomId}', [ClassroomsController::class, 'joinClassroom']);
+});
+
 Route::get('/classroom/{classroomCode?}', [ClassroomsController::class, 'index']);
 Route::get('/quiz/{id?}', [QuizzesController::class, 'index']);

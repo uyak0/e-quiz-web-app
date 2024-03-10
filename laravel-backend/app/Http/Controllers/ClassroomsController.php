@@ -4,24 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use App\Models\Classroom;
-use App\Models\Student;
+use App\Models\User;
 
 class ClassroomsController extends Controller
 {
-    public function joinClassroom(int $studentId, int $classroomId): JsonResponse
+    public function joinClassroom(int $userId, int $classroomId): JsonResponse
     {
-        $classroom = Classroom::find($classroomId)->first();
-        $student = Student::find($studentId)->first();
-        $user = $student->user();
+        $classroom = Classroom::find($classroomId);
+        $user = User::find($userId);
 
         $user->classrooms()->attach($classroom);
         return response()->json(['message' => 'Classroom joined successfully']);
     }
 
-    public function studentClassroomList(int $studentId): JsonResponse
+    public function studentClassroomList(int $userId): JsonResponse
     {
-        $student = Student::find($studentId);
-        $user = $student->user->first();
+        $user = User::find($userId);
         $classrooms = $user->classrooms;
         return response() -> json($classrooms);
     }

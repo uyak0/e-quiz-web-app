@@ -7,7 +7,7 @@
   const API = import.meta.env.VITE_LARAVEL_API
   let classroomId = ''
   const route = useRoute()
-  const studentId = route.params.id
+  const userId = route.params.id
   let classroomCode = ref('')
 
   async function joinClassroom() {
@@ -20,7 +20,7 @@
         console.log(error)
       })
 
-    await axios.put(API + 'student/' + studentId + '/classroom/join/' + classroomId)
+    await axios.put(API + 'student/' + userId + '/classroom-join/' + classroomId)
       .then(response => {
         console.log(response.data)
       })

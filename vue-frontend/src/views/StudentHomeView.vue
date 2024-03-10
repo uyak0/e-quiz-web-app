@@ -7,14 +7,15 @@
 
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
-  const studentId = route.params.id
+  const userId = route.params.id
 
   const pageName = 'Home'
   const classrooms = ref([])
 
   async function getClassrooms() {
-    await axios.get(API + 'student/classrooms/' + studentId)
+    await axios.get(API + 'student/classrooms/' + userId)
       .then(response => {
+        console.log(response.data)
         classrooms.value = response.data
       })
       .catch(error => {
