@@ -8,13 +8,46 @@ use App\Models\User;
 
 class ClassroomsController extends Controller
 {
-    public function joinClassroom(int $userId, int $classroomId): JsonResponse
+    private function findId(string $classroomCode): int
     {
-        $classroom = Classroom::find($classroomId);
-        $user = User::find($userId);
+        $classroom = Classroom::where('code', $classroomCode)->first();
+        if ($classroom == null) {
+            return 0;
+        }
+        else {
+            return $classroom->id;
+        }
+    }
 
-        $user->classrooms()->attach($classroom);
-        return response()->json(['message' => 'Classroom joined successfully']);
+    public function joinClassroom(int $userId, string $classroomCode): JsonResponse
+    {
+        $classroomId = $this->findId($classroomCode);
+        $classroomJoined = User::find($userId)->classrooms()->where('classroom_id', $classroomId)->exists();
+
+        if ($classroomJoined) {
+            return response()->json([
+                'status' => 'already joined',
+                'message' => 'You already joined this classroom!'
+            ]);
+        }
+        else if ($classroomId == 0) {
+            return response()->json([
+                'status' => 'classroom not found',
+                'message' => 'Classroom not found! Check the code and try again'
+            ]);
+        }
+        else if (!$classroomJoined){
+            $classroom = Classroom::find($classroomId);
+            $user = User::find($userId);
+
+            $user->classrooms()->attach($classroom);
+
+            return response()->json([
+                'status' => 'success',
+                'classroom_id' => $classroomId,
+                'message' => 'Classroom joined successfully'
+            ]);
+        }
     }
 
     public function studentClassroomList(int $userId): JsonResponse
@@ -24,9 +57,9 @@ class ClassroomsController extends Controller
         return response() -> json($classrooms);
     }
 
-    public function index(string $classroomCode): JsonResponse
+    public function index(int $id): JsonResponse
     {
-        $classroom=Classroom::where('code', $classroomCode)->first();
+        $classroom=Classroom::find($id);
         return response() -> json($classroom);
     }
 

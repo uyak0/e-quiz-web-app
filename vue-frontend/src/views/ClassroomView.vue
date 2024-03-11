@@ -10,6 +10,7 @@
   function getClassroom() {
     axios.get(API + 'classroom/' + route.params.id)
       .then(response => {
+        console.log(response.data);
         classroom.value = response.data;
       })
       .catch(error => {

@@ -36,5 +36,5 @@ Route::group(['prefix' => 'student'], function() {
     Route::put('{userId}/classroom-join/{classroomId}', [ClassroomsController::class, 'joinClassroom']);
 });
 
-Route::get('/classroom/{classroomCode?}', [ClassroomsController::class, 'index']);
+Route::get('/classroom/{id}', [ClassroomsController::class, 'index']);
 Route::get('/quiz/{id?}', [QuizzesController::class, 'index']);

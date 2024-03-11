@@ -5,14 +5,12 @@
 </script>
 
 <template>
-  <div class="rounded-md border-black bg-slate-100 text-black w-20">
-    <RouterLink :to="{ path: '/classroom/' + classroomProps.id }">
-      <div class="banner h-10">
-        <img src="https://via.placeholder.com/150" alt="classroom banner" />
-      </div>
-      <div class="h-10">
-        <p>{{ classroomProps.name }}</p>
-      </div>
-    </RouterLink>
-  </div>
+  <RouterLink :to="{ path: '/classroom/' + classroomProps.id }" class="hover:scale-105 ease-in-out duration-100 my-4 mx-4 rounded-md border-black bg-slate-100 text-black h-48 w-48 overflow-hidden">
+    <div class="banner h-20 bg-gray-500 ">
+      some img
+    </div>
+    <div class="text-2xl mx-2">
+      <p>{{ classroomProps.name }}</p>
+    </div>
+  </RouterLink>
 </template>

@@ -6,13 +6,26 @@
 
   const route = useRoute()
   const pageName = route.meta.title 
-  const userProfileLink = '/student/' + route.params.id + '/profile'
+
+  const userRole = localStorage.getItem('user_role')
+  const userId = localStorage.getItem('user_id')
+  const token = localStorage.getItem('token')
+
+  const userProfileLink = '/' + userRole + '/' + userId + '/profile'
+  const userHomeLink = '/' + userRole + '/' + userId + '/home'
 </script>
 
 <template>
   <div class="sticky font-jetBrains flex flex-rows text-2xl justify-between px-2 py-1 bg-gray-600 place-items-center">
-    <RouterLink to="/"> E-Quizz </RouterLink>
-    
+    <div name="left modules" class="">
+      <RouterLink v-if="!token" to="/"> E-Quizz </RouterLink>
+      <RouterLink v-else-if="token" :to="userHomeLink"> E-Quizz </RouterLink>
+
+      <RouterLink v-if="pageName.includes('Home')" to="classroom/join" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
+        + Join a classroom 
+      </RouterLink>
+    </div>
+
     <!-- Page Name -->
     <div class="font-firaSans font-bold">
       {{ pageName }}
