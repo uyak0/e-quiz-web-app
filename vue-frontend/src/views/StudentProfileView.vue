@@ -29,13 +29,16 @@
 
   <div class="flex justify-center">
     <div class="h-screen bg-slate-700 w-3/4 mx-auto py-8 justify-center">
-      <div name="avatar and name" class="flex flex-rows">
+      <div name="Info" class="flex flex-rows">
         <UserAvatar class="w-1/4 h-1/4 mx-8 my-8 rounded-full border border-sky-200" /> 
-        <p class="text-6xl font-bold my-24 mx-4">{{ user.name }}</p>
+        <span class="flex flex-col place-self-center overflow-hidden">
+          <p class="text-6xl font-bold my-4 mx-4">{{ user.name }}</p>
+          <p class="text-4xl mx-4">{{ user.email }}</p>
+        </span>
       </div>
 
-      <div>
-        <span></span>
+      <div class="w-full text-3xl py-5 px-5 border border-x-0 border-cyan-300 hover:bg-sky-300 hover:text-gray-950 cursor-pointer">
+        > Logout
       </div>
     </div>
   </div>
