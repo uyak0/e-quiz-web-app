@@ -34,7 +34,7 @@ import HomeLogo from '@/components/HomeLogo.vue';
   <div class="z-10 flex flex-col justify-center h-screen px-6">
     <div class="wrapper font-jetBrains font-bold">
       <h1 class="text-9xl text-white">E-Quizz</h1><br>
-      <h3 class="text-3xl text-slate-400">Your personal hub of Learning.</h3>
+      <h3 class="text-3xl text-slate-400">Your personal hub of Learning. asdasd</h3>
     </div>
   </div>
 </template>
