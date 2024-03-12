@@ -11,6 +11,7 @@ class QuizzesController extends Controller
     public function index(): JsonResponse
     {
         $quizzes = Quiz::all();
+        $questions = $quizzes->
         return response()->json($quizzes);
     }
 
@@ -18,10 +19,8 @@ class QuizzesController extends Controller
     {
         $quiz = Quiz::create([
             'title' => $request->title,
-            'description' => $request->description,
-            'classroom_id' => $request->classroom_id,
             'due_date' => $request->due_date,
-        ]);
+        ])->classroom()->save($request->classroom_id);
 
         return response()->json([
             'message' => 'Quiz created successfully',

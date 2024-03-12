@@ -2,24 +2,36 @@
   import VueDatePicker from '@vuepic/vue-datepicker'
   import '@vuepic/vue-datepicker/dist/main.css'
   import { reactive, onMounted, ref, watchEffect} from 'vue'
-  import TitleDateInsert from '@/components/Quiz Creation/TitleDateInsert.vue'
   import MCQuestion from '@/components/Quiz Creation/MCQuestion.vue'
   import QuestionTypeDDL from '@/components/Quiz Creation/QuestionTypeDDL.vue'
   import SubjectiveQuestion from "@/components/Quiz Creation/SubjectiveQuestion.vue";
   import TFQuestion from "@/components/Quiz Creation/TFQuestion.vue";
   import { useRoute } from 'vue-router'
+  import axios from 'axios'
 
   const API = import.meta.env.VITE_LARAVEL_API;
-
-  let quizProps = ref({
-    title: '',
-    due_date: '',
-    questions: []
-  })
+  const route = useRoute()
 
   let questionProps= ref([
       { questionType: 'mcq' }
   ]) // first question defaults
+
+  let quizProps = ref({
+    title: '',
+    due_date: new Date(),
+    questions: questionProps.value,
+    classroom_id: route.params.classroomId
+  })
+
+  const formatDate = (date) => {
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
+
+    const newDate = `${year}-${month}-${day}` 
+    const time = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+    return newDate + ' ' + time
+  }
 
   function addQuestion() {
     questionProps.value.push({ questionType: 'mcq' })
@@ -32,21 +44,18 @@
   function submitQuizCreation() {
     const data = {
       title: quizProps.value.title,
-      due_date: quizProps.value.due_date,
+      due_date: formatDate(quizProps.value.due_date),
+      classroom_id: route.params.classroomId
     }
 
-    axios.post(API + '/api/quiz/create', questionProps)
-      .then(response = () => {
+    axios.post(API + 'quiz/create', data)
+      .then(response => {
         console.log(response.data)
       })
-      .catch(error = () => {
+      .catch(error => {
         console.log(error)
       })
   }
-
-  watchEffect(() => {
-    console.log(quizProps.value.due_date)
-  })
 </script>
 
 <template>
@@ -55,7 +64,7 @@
 
     <!-- Title and Date -->
     <span class="mx-4 font-jetBrains flex flex-rows border-none">
-      <input type="text" id="title" name="title" v-model="questionProps.title" placeholder="Type Title Here..." class="text-ellipsis whitespace-nowrap overflow-hidden text-grey-200 text-5xl bg-transparent ">
+      <input type="text" id="title" name="title" v-model="quizProps.title" placeholder="Type Title Here..." class="text-ellipsis whitespace-nowrap overflow-hidden text-grey-200 text-5xl bg-transparent ">
       <div class="">
         <VueDatePicker v-model="quizProps.due_date" />  
       </div>
@@ -98,7 +107,7 @@
 
     <!-- Submit and Cancel buttons -->
     <div class="mx-4 text-md">
-      <button @click="submit" class="rounded-md bg-blue-500 hover:bg-grey-600 float-right px-2">Create Quiz</button>
+      <button @click="submitQuizCreation" class="rounded-md bg-blue-500 hover:bg-grey-600 float-right px-2">Create Quiz</button>
       <button class="bg-transparent float-right mx-2">Cancel</button>
     </div>
   </div>

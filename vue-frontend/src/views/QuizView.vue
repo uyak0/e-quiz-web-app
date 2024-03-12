@@ -2,19 +2,18 @@
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
   import TopBar from "@/components/TopBar.vue";
+  import { useRoute } from 'vue-router'
 
   const API = import.meta.env.VITE_LARAVEL_API;
+  const route = useRoute()
 
-  let quizProps = ref([
-    { questionType: 'mcq' },
-    { questionType: 'sub' },
-    { questionType: 'tfq' }
-  ])
+  let quizProps = ref([])
 
   function getQuizzes() {
-    axios.get(API + '/api/quiz')
+    axios.get(API + 'quiz/' + route.params.quizId)
       .then(response => {
         quizProps.value = response.data
+        console.log(quizProps.value)
       })
       .catch(error => {
         console.log(error)
