@@ -50,7 +50,7 @@ class ClassroomsController extends Controller
         }
     }
 
-    public function studentClassroomList(int $userId): JsonResponse
+    public function userClassrooms(int $userId): JsonResponse
     {
         $user = User::find($userId);
         $classrooms = $user->classrooms;

@@ -4,12 +4,13 @@
   import axios from 'axios';
   import { ref, onMounted } from 'vue';
   import { RouterLink, useRoute, useRouter } from 'vue-router';
+  import { getStorageItem } from '@/functions/getStorageItem.js';
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute();
   const router = useRouter();
   const user = ref({});
-  const userId = localStorage.getItem('user_id');
+  const userId = getStorageItem('user_id');
 
   async function getUserData() {
     await axios.get(API + 'user/' + userId)
@@ -26,6 +27,7 @@
     let confirmLogOut = confirm('Are you sure you want to log out?')
     if (confirmLogOut) {
       localStorage.clear()
+      sessionStorage.clear()
       router.push({ path: '/' })
       alert('see you next time :(')
     }

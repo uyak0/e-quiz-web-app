@@ -4,17 +4,18 @@
   import axios from "axios";
   import {onMounted, ref} from "vue";
   import {useRoute, createRouter} from "vue-router";
+  import {getStorageItem} from "@/functions/getStorageItem.js";
   import Arrow from "@/components/Arrow.vue";
 
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
-  const userId = localStorage.getItem('user_id')
-  const userRole = localStorage.getItem('user_role')
+  const userId = getStorageItem('user_id')
+  const userRole = getStorageItem('user_role')
 
   const classrooms = ref([])
 
   async function getClassrooms() {
-    await axios.get(API + 'student/classrooms/' + userId)
+    await axios.get(API + 'user/classrooms/' + userId)
       .then(response => {
         console.log(response.data)
         classrooms.value = response.data
@@ -29,7 +30,7 @@
 </script>
 
 <template>
-  <TopBar v-model="classrooms"/>
+  <TopBar />
 
   <!-- Arrow pointing to "Join Classroom" button -->
   <div v-if="userRole === 'student' && classrooms.length === 0" class="absolute flex flex-rows left-32">

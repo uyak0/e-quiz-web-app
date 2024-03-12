@@ -16,7 +16,6 @@
     const loginData = {
       email: loginForm.email,
       password: loginForm.password,
-      remember_me: loginForm.remember
     }
 
     await axios.get('/sanctum/csrf-cookie')
@@ -28,9 +27,16 @@
     await axios.post(API + 'auth/login', loginData)
       .then(response => {
         console.log(response.data)
-        localStorage.setItem('token', response.data.accessToken)
-        localStorage.setItem('user_id', response.data.user_id)
-        localStorage.setItem('user_role', response.data.role)
+        if (!loginForm.remember) {
+          sessionStorage.setItem('token', response.data.accessToken)
+          sessionStorage.setItem('user_id', response.data.user_id)
+          sessionStorage.setItem('user_role', response.data.role)
+        }
+        else {
+          localStorage.setItem('token', response.data.accessToken)
+          localStorage.setItem('user_id', response.data.user_id)
+          localStorage.setItem('user_role', response.data.role)
+        }
         router.push({ path: '/' + response.data.role + '/' + response.data.user_id + '/home' })
         // router.push({ path: '/'})
         // if(response.data === 'success'){

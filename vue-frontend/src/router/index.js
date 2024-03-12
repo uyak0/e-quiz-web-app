@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getStorageItem } from '@/functions/getStorageItem.js'
 
 function isAuthenticated() {
-  const tokenExists = localStorage.getItem('token') ? true : false
+  const tokenExists = getStorageItem(token)
   if (tokenExists){
     return true
   } else {
     return false
   }
 }
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -36,13 +38,13 @@ const router = createRouter({
       component: () => import('@/views/LoginView.vue'),
       beforeEnter: (to, from) => {
         if (isAuthenticated) {
-          const userRole = localStorage.getItem('user_role')
-          const userID = localStorage.getItem('user_id')
+          const userRole = getStorageItem('user_role') 
+          const userID = getStorageItem('user_id') 
           if (userRole === 'teacher') {
-            return { path: 'teacher/' + userID + '/home' }
+            return { path: '/teacher/' + userID + '/home' }
           } 
           else if (userRole === 'student') {
-            return { path: 'student/' + userID + '/home' }
+            return { path: '/student/' + userID + '/home' }
           }
         }
       },
@@ -75,37 +77,44 @@ const router = createRouter({
       }
     },
     {
-      path: '/classroom/:id',
+      path: '/classroom',
       children: [
         {
-          path: '',
-          name: 'classroom',
-          component: () => import('@/views/ClassroomView.vue'),
-          meta: {
-            title: 'Classroom'
-          },
-        },
-        {
-          path: 'quiz',
+          path: ':classroomId',
           children: [
             {
-              // Quizzes creation page
-              path: 'create',
-              name: 'createQuiz',
-              component: () => import('@/views/CreateQuizView.vue'),
-              meta: {
-                title: 'Create Quiz'
-              }
+              path: '',
+              name: 'classroom',
+              component: () => import('@/views/ClassroomView.vue'),
+              meta: { title: 'Classroom' },
             },
             {
-              path: ':quizId',
-              name: 'quiz',
-              component: () => import('@/views/QuizView.vue'),
-              meta: {
-                title: 'Quiz :id'
-              }
-            }
+              path: 'quiz',
+              children: [
+                {
+                  // Quizzes creation page
+                  path: 'create',
+                  name: 'createQuiz',
+                  component: () => import('@/views/CreateQuizView.vue'),
+                  meta: { title: 'Create Quiz' }
+                },
+                {
+                  path: ':quizId',
+                  name: 'quiz',
+                  component: () => import('@/views/QuizView.vue'),
+                  meta: { title: 'Quiz' }
+                }
+              ]
+            },
           ]
+        },
+        {
+          path: 'create',
+          name: 'createClassroom',
+          component: () => import('@/views/CreateClassroomView.vue'),
+          meta: {
+            title: 'Create Classroom'
+          }
         },
       ]
     },
@@ -117,8 +126,8 @@ const router = createRouter({
           return { name: 'login' }
         }
         else { 
-          const userRole = localStorage.getItem('user_role')
-          const userID = localStorage.getItem('user_id')
+          const userRole = getStorageItem('user_role')
+          const userID = getStorageItem('user_id')
           if (userRole !== 'student' || userID !== to.params.id) {
             return  { path: 'student/' + userID + '/home' }
           }
