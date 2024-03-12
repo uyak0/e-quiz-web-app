@@ -67,17 +67,26 @@ const router = createRouter({
       }
     },
     {
-      path: '/classroom/:id',
-      name: 'classroom',
-      component: () => import('@/views/ClassroomView.vue'),
+      path: '/user/:id/profile',
+      name: 'userProfile',
+      component: () => import('@/views/UserProfileView.vue'),
       meta: {
-        title: 'Classroom'
-      },
+        title: 'Profile'
+      }
+    },
+    {
+      path: '/classroom/:id',
       children: [
         {
+          path: '',
+          name: 'classroom',
+          component: () => import('@/views/ClassroomView.vue'),
+          meta: {
+            title: 'Classroom'
+          },
+        },
+        {
           path: 'quiz',
-          name: 'quiz',
-          component: () => import('@/views/QuizView.vue'),
           children: [
             {
               // Quizzes creation page
@@ -89,7 +98,7 @@ const router = createRouter({
               }
             },
             {
-              path: ':id',
+              path: ':quizId',
               name: 'quiz',
               component: () => import('@/views/QuizView.vue'),
               meta: {
@@ -119,17 +128,9 @@ const router = createRouter({
         {
           path: 'home',
           name: 'studentHome',
-          component: () => import('@/views/StudentHomeView.vue'),
+          component: () => import('@/views/UserHomeView.vue'),
           meta: {
             title: 'Home'
-          }
-        },
-        {
-          path: 'profile',
-          name: 'studentProfile',
-          component: () => import('@/views/StudentProfileView.vue'),
-          meta: {
-            title: 'Profile'
           }
         },
         {
@@ -142,6 +143,48 @@ const router = createRouter({
         }
       ]
     },
+    {
+      path: '/teacher/:id',
+      name: 'teacher',
+      beforeEnter: (to, from) => {
+        if (!isAuthenticated) {
+          return { name: 'login' }
+        }
+        else { 
+          const userRole = localStorage.getItem('user_role')
+          const userID = localStorage.getItem('user_id')
+          if (userRole !== 'teacher' || userID !== to.params.id) {
+            return  { path: 'teacher/' + userID + '/home' }
+          }
+        }
+      },
+      children: [
+        {
+          path: 'home',
+          name: 'teacherHome',
+          component: () => import('@/views/UserHomeView.vue'),
+          meta: {
+            title: 'Home'
+          }
+        },
+        // {
+        //   path: 'classroom/create',
+        //   name: 'createClassroom',
+        //   component: () => import('@/views/CreateClassroomView.vue'),
+        //   meta: {
+        //     title: 'Create A Classroom'
+        //   }
+        // }
+      ]
+    },
+    // {
+    //   path: '/:pathMatch(.*)*',
+    //   name: 'notFound',
+    //   component: () => import('@/views/NotFoundView.vue'),
+    //   meta: {
+    //     title: '404 Not Found'
+    //   }
+    // }
   ]
 })
 

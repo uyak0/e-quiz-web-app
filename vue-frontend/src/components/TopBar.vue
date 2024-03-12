@@ -11,7 +11,7 @@
   const userId = localStorage.getItem('user_id')
   const token = localStorage.getItem('token')
 
-  const userProfileLink = '/' + userRole + '/' + userId + '/profile'
+  const userProfileLink = '/user/' + userId + '/profile'
   const userHomeLink = '/' + userRole + '/' + userId + '/home'
 </script>
 
@@ -21,7 +21,7 @@
       <RouterLink v-if="!token" to="/"> E-Quizz </RouterLink>
       <RouterLink v-else-if="token" :to="userHomeLink"> E-Quizz </RouterLink>
 
-      <RouterLink v-if="pageName.includes('Home')" to="classroom/join" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
+      <RouterLink v-if="userRole === 'student' && pageName.includes('Home')" to="classroom/join" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
         + Join a classroom 
       </RouterLink>
     </div>

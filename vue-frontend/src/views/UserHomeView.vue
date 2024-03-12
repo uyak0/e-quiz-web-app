@@ -8,7 +8,8 @@
 
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
-  const userId = route.params.id
+  const userId = localStorage.getItem('user_id')
+  const userRole = localStorage.getItem('user_role')
 
   const classrooms = ref([])
 
@@ -31,7 +32,7 @@
   <TopBar v-model="classrooms"/>
 
   <!-- Arrow pointing to "Join Classroom" button -->
-  <div v-if="classrooms.length === 0" class="absolute flex flex-rows left-32">
+  <div v-if="userRole === 'student' && classrooms.length === 0" class="absolute flex flex-rows left-32">
     <Arrow class="w-16"/>
     <p class="pt-11">Click here to join a classroom!</p>
   </div>

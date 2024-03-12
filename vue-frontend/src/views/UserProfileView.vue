@@ -3,8 +3,11 @@
   import UserAvatar from '@/components/UserAvatar.vue';
   import axios from 'axios';
   import { ref, onMounted } from 'vue';
+  import { RouterLink, useRoute, useRouter } from 'vue-router';
 
   const API = import.meta.env.VITE_LARAVEL_API;
+  const route = useRoute();
+  const router = useRouter();
   const user = ref({});
   const userId = localStorage.getItem('user_id');
 
@@ -19,6 +22,14 @@
       })
   }
 
+  function logOut() {
+    let confirmLogOut = confirm('Are you sure you want to log out?')
+    if (confirmLogOut) {
+      localStorage.clear()
+      router.push({ path: '/' })
+      alert('see you next time :(')
+    }
+  }
   onMounted(() => {
     getUserData();
   })
@@ -37,7 +48,7 @@
         </span>
       </div>
 
-      <div class="w-full text-3xl py-5 px-5 border border-x-0 border-cyan-300 hover:bg-sky-300 hover:text-gray-950 cursor-pointer">
+      <div @click="logOut" class="w-full text-3xl py-5 px-5 border border-x-0 border-cyan-300 hover:bg-sky-300 hover:text-gray-950 cursor-pointer">
         > Logout
       </div>
     </div>
