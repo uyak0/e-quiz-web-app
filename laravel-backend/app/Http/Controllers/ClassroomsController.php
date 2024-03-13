@@ -50,7 +50,7 @@ class ClassroomsController extends Controller
         }
     }
 
-    public function studentClassroomList(int $userId): JsonResponse
+    public function userClassrooms(int $userId): JsonResponse
     {
         $user = User::find($userId);
         $classrooms = $user->classrooms;
@@ -63,10 +63,10 @@ class ClassroomsController extends Controller
         return response() -> json($classroom);
     }
 
-    public function quiz(int $id): JsonResponse
+    public function classroomQuizzes(int $classroomId): JsonResponse
     {
-        $classroom=Classroom::find($id);
-        $quiz=$classroom->quiz;
-        return response() -> json($quiz);
+        $classroom = Classroom::find($classroomId);
+        $quizzes = $classroom->quizzes;
+        return response() -> json($quizzes);
     }
 }

@@ -24,7 +24,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/user/{id}', [UserController::class, 'getUser']);
+Route::group(['prefix' => 'classroom'], function() {
+    Route::get('/{id?}', [ClassroomsController::class, 'index']);
+    Route::post('/create', [ClassroomsController::class, 'store']);
+    Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
+});
+
+Route::group(['prefix' => 'user'], function() {
+    Route::get('/{id}', [UserController::class, 'getUser']);
+    Route::get('/classrooms/{id?}', [ClassroomsController::class, 'userClassrooms']);
+});
 
 Route::group(['prefix' => 'auth'], function() {
     Route::post('/login', [LoginController::class, 'login']);
@@ -32,9 +41,10 @@ Route::group(['prefix' => 'auth'], function() {
 });
 
 Route::group(['prefix' => 'student'], function() {
-    Route::get('/classrooms/{id?}', [ClassroomsController::class, 'studentClassroomList']);
     Route::put('{userId}/classroom-join/{classroomId}', [ClassroomsController::class, 'joinClassroom']);
 });
 
-Route::get('/classroom/{id}', [ClassroomsController::class, 'index']);
-Route::get('/quiz/{id?}', [QuizzesController::class, 'index']);
+Route::group(['prefix' => 'quiz'], function() {
+    Route::get('/{id?}', [QuizzesController::class, 'index']);
+    Route::post('/create', [QuizzesController::class, 'store']);
+});

@@ -2,17 +2,15 @@
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
   import TopBar from "@/components/TopBar.vue";
+  import { useRoute } from 'vue-router'
 
   const API = import.meta.env.VITE_LARAVEL_API;
+  const route = useRoute()
 
-  let quizProps = ref([
-    { questionType: 'mcq' },
-    { questionType: 'sub' },
-    { questionType: 'tfq' }
-  ])
+  let quizProps = ref([])
 
   function getQuizzes() {
-    axios.get(API + '/api/quiz')
+    axios.get(API + 'quiz/' + route.params.quizId)
       .then(response => {
         quizProps.value = response.data
       })
@@ -32,15 +30,19 @@
     <!-- Question Component -->
     <div class="bg-transparent bor">
       <h1>Question #{{ index + 1 }}</h1>
-      <div v-if="item.questionType === 'mcq'">
-        mcquestion
+      <div v-if="item.options">
+        <p>{{ item.question }}</p>
+        <div v-for="(option, index) in item.options" :key="index">
+          <input type="radio" :name="item.id" :value="option" />
+          <label>{{ option }}</label>
+        </div>
       </div>
 
-      <div v-if="item.questionType === 'sub'">
+      <div v-else-if="item.questionType === 'sub'">
         subjective question
       </div>
 
-      <div v-if="item.questionType === 'tfq'">
+      <div v-else-if="item.questionType === 'tfq'">
         true/false
       </div>
 
