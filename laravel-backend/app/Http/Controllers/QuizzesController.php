@@ -11,7 +11,7 @@ class QuizzesController extends Controller
     public function index(): JsonResponse
     {
         $quizzes = Quiz::all();
-        $questions = $quizzes->
+        $questions = $quizzes->questions;
         return response()->json($quizzes);
     }
 

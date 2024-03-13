@@ -12,7 +12,7 @@
   const userRole = getStorageItem('user_role')
   const createQuizPath = route.params.classroomId + '/quiz/create' // had to manually add classroomId infront of /quiz/create otherwise 
                                                                   // it'd direct to classroom/quiz/create for some reason
-
+  
   async function getClassroom() {
     await axios.get(API + 'classroom/' + route.params.classroomId)
       .then(response => {
@@ -22,6 +22,10 @@
       .catch(error => {
         console.log(error);
       });
+  }
+
+  async function getQuizzes() {
+    await axios.get(API + '')
   }
   
   onMounted(() => {

@@ -11,6 +11,7 @@
   const router = useRouter();
   const user = ref({});
   const userId = getStorageItem('user_id');
+  const userRole = getStorageItem('user_role');
 
   async function getUserData() {
     await axios.get(API + 'user/' + userId)
@@ -44,9 +45,10 @@
     <div class="h-screen bg-slate-700 w-3/4 mx-auto py-8 justify-center">
       <div name="Info" class="flex flex-rows">
         <UserAvatar class="w-1/4 h-1/4 mx-8 my-8 rounded-full border border-sky-200" /> 
-        <span class="flex flex-col place-self-center overflow-hidden">
+        <span class="py-2 flex flex-col place-self-center overflow-hidden">
           <p class="text-6xl font-bold my-4 mx-4">{{ user.name }}</p>
-          <p class="text-4xl mx-4">{{ user.email }}</p>
+          <p class="text-4xl my-4 mx-4">{{ user.email }}</p>
+          <p class="text-2xl mx-4 px-2 bg-red-500 rounded-md text-red-800" :class="{'bg-green-400 text-green-800': userRole === 'student' }" >{{ userRole }}</p>
         </span>
       </div>
 

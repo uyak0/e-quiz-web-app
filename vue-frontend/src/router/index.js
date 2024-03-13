@@ -44,7 +44,7 @@ const router = createRouter({
             return { path: '/teacher/' + userID + '/home' }
           } 
           else if (userRole === 'student') {
-            return { path: '/student/' + userID + '/home' }
+            return { path: '/student/' + userID + '/home'}
           }
         }
       },
@@ -123,14 +123,7 @@ const router = createRouter({
       name: 'student',
       beforeEnter: (to, from) => {
         if (!isAuthenticated) {
-          return { name: 'login' }
-        }
-        else { 
-          const userRole = getStorageItem('user_role')
-          const userID = getStorageItem('user_id')
-          if (userRole !== 'student' || userID !== to.params.id) {
-            return  { path: 'student/' + userID + '/home' }
-          }
+          return false 
         }
       },
       children: [
@@ -157,14 +150,7 @@ const router = createRouter({
       name: 'teacher',
       beforeEnter: (to, from) => {
         if (!isAuthenticated) {
-          return { name: 'login' }
-        }
-        else { 
-          const userRole = localStorage.getItem('user_role')
-          const userID = localStorage.getItem('user_id')
-          if (userRole !== 'teacher' || userID !== to.params.id) {
-            return  { path: 'teacher/' + userID + '/home' }
-          }
+          return false 
         }
       },
       children: [

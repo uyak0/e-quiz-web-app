@@ -3,13 +3,14 @@
   import UserAvatar from './UserAvatar.vue';
   import { useRoute } from 'vue-router';
   import { onMounted, ref } from 'vue';
+  import { getStorageItem } from '@/functions/getStorageItem.js'
 
   const route = useRoute()
   const pageName = route.meta.title 
 
-  const userRole = localStorage.getItem('user_role')
-  const userId = localStorage.getItem('user_id')
-  const token = localStorage.getItem('token')
+  const userRole = getStorageItem('user_role')
+  const userId = getStorageItem('user_id')
+  const token = getStorageItem('token')
 
   const userProfileLink = '/user/' + userId + '/profile'
   const userHomeLink = '/' + userRole + '/' + userId + '/home'
