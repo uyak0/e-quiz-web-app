@@ -9,7 +9,7 @@ class SubjectiveQuestion extends Model
 {
     use HasFactory;
     protected $table = 'subjective_questions';
-    protected $fillable = ['description', 'correct_answer'];
+    protected $fillable = ['description', 'question_no', 'correct_answer'];
 
     public function quiz()
     {

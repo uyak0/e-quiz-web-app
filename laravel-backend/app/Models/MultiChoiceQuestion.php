@@ -9,7 +9,7 @@ class MultiChoiceQuestion extends Model
 {
     use HasFactory;
     protected $table = 'multi_choice_questions';
-    protected $fillable = ['description', 'options', 'correct_answer'];
+    protected $fillable = ['description', 'options', 'question_no', 'correct_answer'];
 
     public function quiz()
     {

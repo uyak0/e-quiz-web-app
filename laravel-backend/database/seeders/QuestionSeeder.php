@@ -17,19 +17,22 @@ class QuestionSeeder extends Seeder
             [
                 'description' => 'What is the capital of Indonesia?',
                 'correct_answers' => 'Jakarta',
-                'options' => 'Jakarta, Bandung, Surabaya, Medan',
+                'options' => json_encode('Jakarta, Bandung, Surabaya, Medan'),
+                'question_no' => '1',
                 'quiz_id' => '1'
             ],
             [
                 'description' => 'What is the capital of Malaysia?',
                 'correct_answers' => 'Kuala Lumpur',
-                'options' => 'Kuala Lumpur, Penang, Johor Bahru, Malacca',
+                'options' => json_encode('Kuala Lumpur, Penang, Johor Bahru, Malacca'),
+                'question_no' => '2',
                 'quiz_id' => '1'
             ],
             [
                 'description' => 'What is the capital of Singapore?',
                 'correct_answers' => 'Singapore',
-                'options' => 'Singapore, Kuala Lumpur, Jakarta, Bangkok',
+                'options' => json_encode('Singapore, Kuala Lumpur, Jakarta, Bangkok'),
+                'question_no' => '3',
                 'quiz_id' => '1'
             ],
         ]);
@@ -38,16 +41,19 @@ class QuestionSeeder extends Seeder
             [
                 'description' => 'What is the capital of Indonesia?',
                 'correct_answers' => 'Jakarta',
+                'question_no' => '4',
                 'quiz_id' => '1'
             ],
             [
                 'description' => 'What is the capital of Malaysia?',
                 'correct_answers' => 'Kuala Lumpur',
+                'question_no' => '5',
                 'quiz_id' => '1'
             ],
             [
                 'description' => 'What is the capital of Singapore?',
                 'correct_answers' => 'Singapore',
+                'question_no' => '6',
                 'quiz_id' => '1'
             ],
         ]);
@@ -56,16 +62,19 @@ class QuestionSeeder extends Seeder
             [
                 'description' => 'Jakarta is the capital of Indonesia',
                 'correct_answer' => '1',
+                'question_no' => '7',
                 'quiz_id' => '1'
             ],
             [
                 'description' => 'Kuala Lumpur is the capital of Indonesia',
                 'correct_answer' => '0',
+                'question_no' => '8',
                 'quiz_id' => '1'
             ],
             [
                 'description' => 'Singapore is the capital of Indonesia',
                 'correct_answer' => '0',
+                'question_no' => '9',
                 'quiz_id' => '1'
             ],
         ]);

@@ -24,7 +24,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/classroom/{id}', [ClassroomsController::class, 'index']);
+Route::group(['prefix' => 'classroom'], function() {
+    Route::get('/{id?}', [ClassroomsController::class, 'index']);
+    Route::post('/create', [ClassroomsController::class, 'store']);
+    Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
+});
 
 Route::group(['prefix' => 'user'], function() {
     Route::get('/{id}', [UserController::class, 'getUser']);
