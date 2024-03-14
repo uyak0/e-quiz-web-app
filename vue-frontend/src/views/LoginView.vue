@@ -16,6 +16,7 @@
     const loginData = {
       email: loginForm.email,
       password: loginForm.password,
+      remember_me: loginForm.remember
     }
 
     await axios.get('/sanctum/csrf-cookie')
@@ -27,16 +28,7 @@
     await axios.post(API + 'auth/login', loginData)
       .then(response => {
         console.log(response.data)
-        if (!loginForm.remember) {
-          sessionStorage.setItem('token', response.data.accessToken)
-          sessionStorage.setItem('user_id', response.data.user_id)
-          sessionStorage.setItem('user_role', response.data.role)
-        }
-        else {
-          localStorage.setItem('token', response.data.accessToken)
-          localStorage.setItem('user_id', response.data.user_id)
-          localStorage.setItem('user_role', response.data.role)
-        }
+        localStorage.setItem('remember_token', response.data.rememberToken)
         router.push({ path: '/' + response.data.role + '/' + response.data.user_id + '/home' })
         // router.push({ path: '/'})
         // if(response.data === 'success'){
@@ -44,8 +36,8 @@
         // }
       })
       .catch(error => {
-        console.log(error)
-        alert('Invalid Credentials! Please try again.')
+        console.log(error.response.data.message)
+        alert(error.response.data.message)
       })
   }
 </script>

@@ -58,7 +58,8 @@
       </div>
       
       <div>
-
+        <button>Cancel</button>
+        <button>Submit answers</button>
       </div>
     </div>
   </div>

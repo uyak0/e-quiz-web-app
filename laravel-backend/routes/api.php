@@ -36,6 +36,7 @@ Route::group(['prefix' => 'user'], function() {
 });
 
 Route::group(['prefix' => 'auth'], function() {
+    Route::get('/user', [UserController::class, 'isAuthenticated']);
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/register', [RegisterController::class, 'register']);
 });
