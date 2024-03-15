@@ -22,22 +22,26 @@ class LoginController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
+            'remember_me' => 'boolean'
         ]);
 
         $credentials = request(['email','password']);
-        if(!Auth::attempt($credentials, $request->remember_me))
+        if(Auth::attempt($credentials, $request->remember_me))
+        {
+            $user = auth()->user();
+            return response()->json([
+                'status' => 'success',
+                'role' => $user->roles()->first()->name,
+                'user_id' => $user->id
+            ]);
+        }
+
+        else
         {
             return response()->json([
                 'message' => 'Invalid Credentials! Please try again'
             ],401);
         }
 
-        $user = $request->user();
-
-        return response()->json([
-            'rememberToken' => $user->remember_token,
-            'user_id' => $user->id,
-            'role' => $user->roles()->first()->name
-        ]);
     }
 }

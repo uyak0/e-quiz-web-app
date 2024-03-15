@@ -1,27 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getStorageItem } from '@/functions/getStorageItem.js'
 import axios from 'axios'
+import { ref } from 'vue'
 
 const API = import.meta.env.VITE_LARAVEL_API
 const rememberToken = getStorageItem('remember_token')
-let authData = {}
+var authData = ref({})
 
-function getUserData(authData) {
-  axios.get(API + 'auth/user', 
-    {
-      params: {
-        remember_token: rememberToken
-      }
-    })
+function isAuthenticated() {
+  axios.get(API + 'auth/user')
     .then(response => {
-      authData = response.data
-      console.log(authData)
+      authData.value = response.data
     })
     .catch(error => {
       console.log(error)
     }) 
-}
 
+  if (authData.value.role) {
+    return true
+  }
+  else {
+    return false
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,15 +47,17 @@ const router = createRouter({
       }
     },
     {
-      path: '/login',
+      path: '/login', 
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
       beforeEnter: (to, from) => {
-        getUserData(authData)
-        console.log(authData)
-        if (authData.role === 'student') {
+        if (isAuthenticated) {
+          return false
+        }
+        console.log(authData.value)
+        if (authData.value.role === 'student') {
           return { name: 'studentHome' }
-        } else if (authData.role === 'teacher') {
+        } else if (authData.value.role === 'teacher') {
           return { name: 'teacherHome' }
         }
       },
@@ -132,9 +135,7 @@ const router = createRouter({
       path: '/student/:id',
       name: 'student',
       beforeEnter: (to, from) => {
-        if (!isAuthenticated) {
-          return false 
-        }
+
       },
       children: [
         {

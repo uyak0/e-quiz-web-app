@@ -17,9 +17,9 @@ class UserController extends Controller
 
     public function isAuthenticated(Request $request): JsonResponse
     {
-        $user = User::where('remember_token', $request->remember_token)->first();
-        if($user)
+        if(Auth::viaRemember())
         {
+            $user = auth()->user();
             return response() -> json([
                 'role' => $user->roles()->first()->name
             ]);

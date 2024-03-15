@@ -5,6 +5,9 @@
   import { ref,reactive } from 'vue'
 
   const API = import.meta.env.VITE_LARAVEL_API;
+  axios.defaults.withCredentials = true;
+  axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
+  axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
 
   const loginForm = reactive([
     { email: '' },
@@ -19,16 +22,12 @@
       remember_me: loginForm.remember
     }
 
-    await axios.get('/sanctum/csrf-cookie')
-      .then (response => {
-        // console.log(response)
-        // console.log('Cookie Acquired')
+    await axios.get('/sanctum/csrf-cookie').then(response => {
+      axios.post(API + 'auth/login', loginData, {
+        headers: {'Accept': 'application/json'}
       })
-    
-    await axios.post(API + 'auth/login', loginData)
       .then(response => {
         console.log(response.data)
-        localStorage.setItem('remember_token', response.data.rememberToken)
         router.push({ path: '/' + response.data.role + '/' + response.data.user_id + '/home' })
         // router.push({ path: '/'})
         // if(response.data === 'success'){
@@ -39,8 +38,9 @@
         console.log(error.response.data.message)
         alert(error.response.data.message)
       })
+    })
   }
-</script>
+  </script>
 
 <template>
   <!-- Left: Image -->
