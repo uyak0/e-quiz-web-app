@@ -24,13 +24,12 @@
       })
   }
 
-  function logOut() {
+  async function logOut() {
     let confirmLogOut = confirm('Are you sure you want to log out?')
+
     if (confirmLogOut) {
-      localStorage.clear()
-      sessionStorage.clear()
+      const logOutUser = await axios.post(API + 'auth/logout')
       router.push({ path: '/' })
-      alert('see you next time :(')
     }
   }
   onMounted(() => {

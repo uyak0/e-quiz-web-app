@@ -38,6 +38,7 @@ Route::group(['prefix' => 'user'], function() {
 Route::group(['prefix' => 'auth'], function() {
     Route::get('/check-authentication', [UserController::class, 'isAuthenticated']);
     Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/logout', [LoginController::class, 'logout']);
     Route::post('/register', [RegisterController::class, 'register']);
 });
 

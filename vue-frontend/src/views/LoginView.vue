@@ -53,12 +53,12 @@
 
 <template>
   <!-- Left: Image -->
-  <div class="absolute top-0 -z-10 w-screen h-screen bg-cover bg-[url('/src/assets/HomePageBG.png')] opacity-10"></div>
+  <div class="absolute hidden top-0 -z-10 w-screen h-screen bg-cover sm:block sm:bg-[url('/src/assets/HomePageBG.png')] opacity-10"></div>
   
   <HomeLogo />
   
   <!-- Right: Login Form -->
-  <div class="bg-gray-700 h-screen lg:p-36 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
+  <div class="bg-gray-700 h-screen w-full sm:w-1/2 p-8 right-0 absolute z-10">
     <h1 class="text-2xl font-semibold mb-4">Login</h1>
     <form @submit.prevent="login">
 

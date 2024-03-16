@@ -42,6 +42,18 @@ class LoginController extends Controller
                 'message' => 'Invalid Credentials! Please try again'
             ],401);
         }
+    }
 
+    public function logout(Request $request): JsonResponse
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User logged out successfully'
+        ]);
     }
 }
