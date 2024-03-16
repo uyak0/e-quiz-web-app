@@ -2,12 +2,10 @@
   import HomeLogo from '@/components/HomeLogo.vue';
   import axios from 'axios';
   import router from '@/router';
-  import { ref,reactive } from 'vue'
+  import { ref,reactive, watchEffect } from 'vue'
 
   const API = import.meta.env.VITE_LARAVEL_API;
-  axios.defaults.withCredentials = true;
-  axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
-  axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
+  let buttonDisabled = ref(true)
 
   const loginForm = reactive([
     { email: '' },
@@ -15,32 +13,43 @@
     { remember: false }
   ])
 
+  function preventLogin() {
+    if (loginForm.email === '' || loginForm.password === '') {
+      buttonDisabled = true
+    } else {
+      buttonDisabled = false
+    }
+  }
+
   async function login(){
     const loginData = {
       email: loginForm.email,
       password: loginForm.password,
-      remember_me: loginForm.remember
+      remember_me: loginForm.remember,
     }
 
-    await axios.get('/sanctum/csrf-cookie').then(response => {
-      axios.post(API + 'auth/login', loginData, {
-        headers: {'Accept': 'application/json'}
-      })
-      .then(response => {
-        console.log(response.data)
-        router.push({ path: '/' + response.data.role + '/' + response.data.user_id + '/home' })
-        // router.push({ path: '/'})
-        // if(response.data === 'success'){
-        //   router.push({ path: '/'})
-        // }
-      })
-      .catch(error => {
-        console.log(error.response.data.message)
-        alert(error.response.data.message)
-      })
-    })
+    try {
+      await axios.get('sanctum/csrf-cookie');
+      const loginResponse = await axios.post(API + 'auth/login', loginData)
+
+      console.log(loginResponse.data)
+
+      if (loginResponse.data.status === 'success') {
+        router.push({ path: loginResponse.data.role + '/' + loginResponse.data.user_id + '/home'}) 
+      } else {
+        console.log(loginResponse.data.message)
+        alert(loginResponse.data.message) 
+      }
+    } catch (error) {
+      console.log(error.response.data)
+      alert(error.response.data.message)
+    }
   }
-  </script>
+
+  watchEffect(() => {
+    preventLogin()
+  })
+</script>
 
 <template>
   <!-- Left: Image -->
@@ -77,7 +86,7 @@
       </div>
     
       <!-- Login Button -->
-      <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Login</button>
+      <button :disabled="buttonDisabled" :class="{ 'bg-slate-300 hover:bg-slate-300': buttonDisabled }" type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Login</button>
     
     </form>
     <!-- Sign up  Link -->

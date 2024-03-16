@@ -18,12 +18,12 @@ return [
     'paths' => [
         'api/*',
         'sanctum/csrf-cookie',
-        "auth/*"
     ],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
+        '*',
         'http://localhost:5173',
     ],
 

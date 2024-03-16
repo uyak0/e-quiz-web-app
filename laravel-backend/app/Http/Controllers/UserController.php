@@ -17,12 +17,18 @@ class UserController extends Controller
 
     public function isAuthenticated(Request $request): JsonResponse
     {
-        if(Auth::viaRemember())
+        if(Auth::check())
         {
             $user = auth()->user();
             return response() -> json([
-                'role' => $user->roles()->first()->name
+                'status' => true,
+                'role' => $user->roles()->first()->name,
+                'id' => $user->id
             ]);
         }
+
+        return response()->json([
+            'status' => 'error',
+        ]);
     }
 }

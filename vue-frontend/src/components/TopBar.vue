@@ -14,6 +14,7 @@
 
   const userProfileLink = '/user/' + userId + '/profile'
   const userHomeLink = '/' + userRole + '/' + userId + '/home'
+  const joinClassroomLink = '/classroom/join'
 </script>
 
 <template>

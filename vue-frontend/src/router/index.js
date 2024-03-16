@@ -4,23 +4,20 @@ import axios from 'axios'
 import { ref } from 'vue'
 
 const API = import.meta.env.VITE_LARAVEL_API
-const rememberToken = getStorageItem('remember_token')
-var authData = ref({})
 
-function isAuthenticated() {
-  axios.get(API + 'auth/user')
-    .then(response => {
-      authData.value = response.data
-    })
-    .catch(error => {
-      console.log(error)
-    }) 
-
-  if (authData.value.role) {
-    return true
+async function checkAuth() {
+  try {
+    const auth = await axios.get(API + 'auth/check-authentication')
+    console.log(auth)
+    if (auth.data.status === true) {
+      return auth.data
+    }
+    else {
+      return false
+    }
   }
-  else {
-    return false
+  catch (error) {
+    console.error(error)
   }
 }
 
@@ -50,15 +47,17 @@ const router = createRouter({
       path: '/login', 
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      beforeEnter: (to, from) => {
-        if (isAuthenticated) {
-          return false
+      beforeEnter: async (to, from) => {
+        const authData = await checkAuth()
+        console.log(authData)
+        if (!authData.status){
+          return true 
         }
-        console.log(authData.value)
-        if (authData.value.role === 'student') {
-          return { name: 'studentHome' }
-        } else if (authData.value.role === 'teacher') {
-          return { name: 'teacherHome' }
+        else if (authData.role === 'student') {
+          return { path: 'student/' + authData.id + '/home'}
+        }
+        else if (authData.role === 'teacher') {
+          return { path: 'teacher/' + authData.id + '/home'}
         }
       },
       meta: {

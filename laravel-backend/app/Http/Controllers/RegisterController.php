@@ -57,15 +57,12 @@ class RegisterController extends Controller
                 ], 400);
             }
 
-            // Automatically log ins user after registration
-            $tokenResult = $user->createToken('Personal Access Token');
-            $token = $tokenResult->plainTextToken;
+            // auto login user
+            Auth::attempt($request->only('email', 'password'));
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Successfully created user!',
-                'accessToken' =>$token,
-                'token_type' => 'Bearer',
                 'user_id' => $user->id,
                 'role' => $user->roles()->first()->name
             ], 201);
