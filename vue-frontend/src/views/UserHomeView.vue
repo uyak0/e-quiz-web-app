@@ -4,26 +4,19 @@
   import axios from "axios";
   import {onMounted, ref} from "vue";
   import {useRoute, createRouter} from "vue-router";
-  import {getStorageItem} from "@/functions/getStorageItem.js";
   import Arrow from "@/components/Arrow.vue";
 
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
-  const userId = getStorageItem()
-  const userRole = localStorage.getItem('user_role')
+  const userId = route.params.userId
 
   const classrooms = ref([])
 
   async function getClassrooms() {
-    await axios.get(API + 'user/classrooms/' + userId)
-      .then(response => {
-        console.log(response.data)
-        classrooms.value = response.data
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    const response = await axios.get(API + 'user/classrooms/' + userId)
+    classrooms.value = response.data
   }
+
   onMounted(() => {
     getClassrooms();
   })

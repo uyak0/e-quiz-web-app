@@ -1,23 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getStorageItem } from '@/functions/getStorageItem.js'
 import axios from 'axios'
-import { ref } from 'vue'
 
 const API = import.meta.env.VITE_LARAVEL_API
 
-async function checkAuth() {
+async function checkAuth(){
+  const auth = await axios.get(API + 'auth/check-authentication')
+  return auth.data
+}
+
+async function inClassroom(id) {
   try {
-    const auth = await axios.get(API + 'auth/check-authentication')
-    console.log(auth)
-    if (auth.data.status === true) {
-      return auth.data
-    }
-    else {
-      return false
+    const inClass = await axios.get(API + 'user/in-classroom', {
+      params: {
+        classroom_id: id
+      }
+    }) 
+
+    if (inClass.data.status) {
+      return true
     }
   }
   catch (error) {
-    console.error(error)
+    console.log(error) 
   }
 }
 
@@ -29,17 +33,16 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
       meta: { 
+        requiresAuth: false,
         title: 'E-Quizz'
       }
     },
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('@/views/AboutView.vue'),
       meta: {
+        requiresAuth: false,
         title: 'E-Quizz - About Us'
       }
     },
@@ -48,16 +51,10 @@ const router = createRouter({
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
       beforeEnter: async (to, from) => {
-        const authData = await checkAuth()
-        console.log(authData)
-        if (!authData.status){
-          return true 
-        }
-        else if (authData.role === 'student') {
-          return { path: 'student/' + authData.id + '/home'}
-        }
-        else if (authData.role === 'teacher') {
-          return { path: 'teacher/' + authData.id + '/home'}
+        const auth = await checkAuth()
+        if (auth.status) {
+          if (auth.role === 'student') return { name: 'studentHome', params: { userId: auth.id } }
+          else if (auth.role === 'teacher') return { name: 'teacherHome', params: { userId: auth.id } }
         }
       },
       meta: {
@@ -69,6 +66,7 @@ const router = createRouter({
       name: 'signUp',
       component: () => import('@/views/SignUpView.vue'),
       meta: {
+        requiresAuth: false,
         title: 'Sign Up'
       }
     },
@@ -77,15 +75,8 @@ const router = createRouter({
       name: 'forgotPassword',
       component: () => import('@/views/ForgotPasswordView.vue') ,
       meta: {
+        requiresAuth: false,
         title: 'Forgot Password'
-      }
-    },
-    {
-      path: '/user/:id/profile',
-      name: 'userProfile',
-      component: () => import('@/views/UserProfileView.vue'),
-      meta: {
-        title: 'Profile'
       }
     },
     {
@@ -99,12 +90,18 @@ const router = createRouter({
               name: 'classroom',
               component: () => import('@/views/ClassroomView.vue'),
               meta: { title: 'Classroom' },
+              beforeEnter: async (to, from) => {
+                const auth = await checkAuth()
+                const inClass = await inClassroom(to.params.classroomId)
+                if (auth.status && inClass.status) {
+                  return true
+                } 
+              },
             },
             {
               path: 'quiz',
               children: [
                 {
-                  // Quizzes creation page
                   path: 'create',
                   name: 'createQuiz',
                   component: () => import('@/views/CreateQuizView.vue'),
@@ -131,10 +128,14 @@ const router = createRouter({
       ]
     },
     {
-      path: '/student/:id',
+      path: '/student/:userId',
       name: 'student',
-      beforeEnter: (to, from) => {
-
+      meta: { role: 'student' },
+      beforeEnter: async (to, from) => {
+        const auth = await checkAuth()
+        if (Number(to.params.userId) !== auth.id) {
+          return { name: 'studentHome', params: { userId: auth.id } }
+        }
       },
       children: [
         {
@@ -152,15 +153,25 @@ const router = createRouter({
           meta: {
             title: 'Join A Classroom'
           }
+        },
+        {
+          path: 'profile',
+          name: 'studentProfile',
+          component: () => import('@/views/UserProfileView.vue'),
+          meta: {
+            title: 'Profile'
+          }
         }
       ]
     },
     {
-      path: '/teacher/:id',
+      path: '/teacher/:userId',
       name: 'teacher',
-      beforeEnter: (to, from) => {
-        if (!isAuthenticated) {
-          return false 
+      meta: { role: 'teacher' },
+      beforeEnter: async (to, from) => {
+        const auth = await checkAuth()
+        if (Number(to.params.userId) !== auth.id) {
+          return { name: 'teacherHome', params: { userId: auth.id } }
         }
       },
       children: [
@@ -172,6 +183,15 @@ const router = createRouter({
             title: 'Home'
           }
         },
+        {
+          path: 'profile',
+          name: 'teacherProfile',
+          component: () => import('@/views/UserProfileView.vue'),
+          meta: {
+            title: 'Profile'
+          }
+        }
+
         // {
         //   path: 'classroom/create',
         //   name: 'createClassroom',

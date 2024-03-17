@@ -3,18 +3,16 @@
   import axios from "axios";
   import {useRoute} from "vue-router";
   import {onMounted, ref} from "vue";
-  import { getStorageItem } from "@/functions/getStorageItem.js";
 
   const route = useRoute()
   const API = import.meta.env.VITE_LARAVEL_API
 
-  const userRole = getStorageItem('user_role')
   const createQuizPath = route.params.classroomId + '/quiz/create' // had to manually add classroomId infront of /quiz/create otherwise 
                                                                   // it'd direct to classroom/quiz/create for some reason
   const classroomQuizzes = ref([])
   const classroomDetails = ref([])
   
-  async function getClassroom() {
+  async function getClassroomData() {
     await axios.get(API + 'classroom/' + route.params.classroomId)
       .then(response => {
         console.log(response.data);
@@ -38,7 +36,7 @@
   }
   
   onMounted(() => {
-    getClassroom();
+    getClassroomData()
     getQuizzes();
   })
 

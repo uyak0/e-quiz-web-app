@@ -28,7 +28,23 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'status' => 'error',
+            'status' => false,
+        ]);
+    }
+
+    public function inClassroom(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        $classroom = $user->classrooms()->where('classroom_id', $request->classroom_id)->first();
+        if($classroom)
+        {
+            return response()->json([
+                'status' => true,
+            ]);
+        }
+
+        return response()->json([
+            'status' => false,
         ]);
     }
 }

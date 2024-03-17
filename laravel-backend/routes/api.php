@@ -31,8 +31,9 @@ Route::group(['prefix' => 'classroom'], function() {
 });
 
 Route::group(['prefix' => 'user'], function() {
-    Route::get('/{id}', [UserController::class, 'getUser']);
+    // Route::get('/{id}', [UserController::class, 'getUser']);
     Route::get('/classrooms/{id?}', [ClassroomsController::class, 'userClassrooms']);
+    Route::get('/in-classroom', [UserController::class, 'inClassroom']);
 });
 
 Route::group(['prefix' => 'auth'], function() {
