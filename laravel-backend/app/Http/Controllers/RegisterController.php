@@ -63,8 +63,6 @@ class RegisterController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Successfully created user!',
-                'user_id' => $user->id,
-                'role' => $user->roles()->first()->name
             ], 201);
         } else {
             return response()->json([

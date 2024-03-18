@@ -26,6 +26,17 @@
 <template>
   <TopBar />
 
+  <!-- Arrow pointing to "Join Classroom" button -->
+  <div v-if="userRole === 'student' && classrooms.length === 0" class="absolute flex flex-rows left-32">
+    <Arrow class="w-16"/>
+    <p class="pt-11">Click here to join a classroom!</p>
+  </div>
+
+  <div v-if="userRole === 'teacher' && classrooms.length === 0" class="absolute flex flex-rows left-32">
+    <Arrow class="w-16"/>
+    <p class="pt-11">Click here to create a classroom!</p>
+  </div>
+
   <div v-if="classrooms.length === 0" class="flex justify-center h-screen">
     <div class="wrapper flex flex-col justify-center">
       <p class="text-2xl text-center">No classrooms found!</p>
