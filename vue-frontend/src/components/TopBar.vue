@@ -7,7 +7,7 @@
   const route = useRoute()
   const pageName = route.meta.title 
   const userId = route.params.userId
-  const userRole = route.meta.role
+  const userRole = route.params.userRole
 
   const userProfileLink = '/' + userRole + '/' + userId + '/profile'
   const userHomeLink = '/' + userRole + '/' + userId + '/home'

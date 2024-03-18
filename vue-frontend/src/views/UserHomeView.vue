@@ -9,6 +9,7 @@
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
   const userId = route.params.userId
+  const userRole = route.params.userRole
 
   const classrooms = ref([])
 

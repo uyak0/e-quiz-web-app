@@ -15,14 +15,15 @@
     console.log(join.data)
 
     if (join.data.status === 'success') {
+      alert('Joined classroom successfully, redirecting to classroom...')
       let classroomId = join.data.classroom_id
       router.push({ path: '/classroom/' + classroomId }) 
     }
-    else if (response.data.status === 'already joined') {
-      alert(response.data.message)
+    else if (join.data.status === 'already joined') {
+      alert(join.data.message)
     }
-    else if (response.data.status === 'classroom not found') {
-      alert(response.data.message) 
+    else if (join.data.status === 'classroom not found') {
+      alert(join.data.message) 
     }
   }
 </script>

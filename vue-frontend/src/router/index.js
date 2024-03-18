@@ -52,10 +52,8 @@ const router = createRouter({
       component: () => import('@/views/LoginView.vue'),
       beforeEnter: async (to, from) => {
         const auth = await checkAuth()
-        if (auth.status) {
-          if (auth.role === 'student') return { name: 'studentHome', params: { userId: auth.id } }
-          else if (auth.role === 'teacher') return { name: 'teacherHome', params: { userId: auth.id } }
-        }
+        if (auth.status) 
+          return { name: 'userHome', params: { userRole: auth.role, userId: auth.id } }
       },
       meta: {
         title: 'Login'
@@ -128,19 +126,17 @@ const router = createRouter({
       ]
     },
     {
-      path: '/student/:userId',
-      name: 'student',
-      meta: { role: 'student' },
+      path: '/:userRole/:userId',
       beforeEnter: async (to, from) => {
         const auth = await checkAuth()
         if (Number(to.params.userId) !== auth.id) {
-          return { name: 'studentHome', params: { userId: auth.id } }
+          return { name: to.name, params: { userRole: auth.role, userId: auth.id } }
         }
       },
       children: [
         {
           path: 'home',
-          name: 'studentHome',
+          name: 'userHome',
           component: () => import('@/views/UserHomeView.vue'),
           meta: {
             title: 'Home'
@@ -156,7 +152,7 @@ const router = createRouter({
         },
         {
           path: 'profile',
-          name: 'studentProfile',
+          name: 'userProfile',
           component: () => import('@/views/UserProfileView.vue'),
           meta: {
             title: 'Profile'
@@ -164,52 +160,6 @@ const router = createRouter({
         }
       ]
     },
-    {
-      path: '/teacher/:userId',
-      name: 'teacher',
-      meta: { role: 'teacher' },
-      beforeEnter: async (to, from) => {
-        const auth = await checkAuth()
-        if (Number(to.params.userId) !== auth.id) {
-          return { name: 'teacherHome', params: { userId: auth.id } }
-        }
-      },
-      children: [
-        {
-          path: 'home',
-          name: 'teacherHome',
-          component: () => import('@/views/UserHomeView.vue'),
-          meta: {
-            title: 'Home'
-          }
-        },
-        {
-          path: 'profile',
-          name: 'teacherProfile',
-          component: () => import('@/views/UserProfileView.vue'),
-          meta: {
-            title: 'Profile'
-          }
-        }
-
-        // {
-        //   path: 'classroom/create',
-        //   name: 'createClassroom',
-        //   component: () => import('@/views/CreateClassroomView.vue'),
-        //   meta: {
-        //     title: 'Create A Classroom'
-        //   }
-        // }
-      ]
-    },
-    // {
-    //   path: '/:pathMatch(.*)*',
-    //   name: 'notFound',
-    //   component: () => import('@/views/NotFoundView.vue'),
-    //   meta: {
-    //     title: '404 Not Found'
-    //   }
-    // }
   ]
 })
 

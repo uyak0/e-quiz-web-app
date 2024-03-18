@@ -10,18 +10,12 @@
   const route = useRoute();
   const router = useRouter();
   const user = ref({});
-  const userId = getStorageItem('user_id');
-  const userRole = getStorageItem('user_role');
+  const userId = route.params.userId
 
   async function getUserData() {
-    await axios.get(API + 'user/' + userId)
-      .then(response => {
-        user.value = response.data 
-        console.log(response.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    const userData = await axios.get(API + 'user/?id=' + userId)
+    user.value = userData.data 
+    console.log(userData.data)
   }
 
   async function logOut() {
