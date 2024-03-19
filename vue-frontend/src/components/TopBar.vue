@@ -12,19 +12,21 @@
   const userProfileLink = '/' + userRole + '/' + userId + '/profile'
   const userHomeLink = '/' + userRole + '/' + userId + '/home'
   const joinClassroomLink = '/classroom/join'
+
+  const enableButton = defineModel('enableButton')
 </script>
 
 <template>
   <div class="sticky font-jetBrains flex flex-rows text-2xl justify-between px-2 py-1 bg-gray-600 place-items-center">
     <div name="left modules" class="">
-      <RouterLink :to="userHomeLink" class="hidden sm:inline"> E-Quizz </RouterLink>
+      <RouterLink :to="userHomeLink"> E-Quizz </RouterLink>
 
       <!--Create/join classroom button-->
-      <RouterLink v-if="userRole === 'student' && pageName.includes('Home')" to="classroom/join" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
+      <RouterLink v-if="userRole === 'student' && pageName.includes('Home') && enableButton" to="classroom/join" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
         + Join a classroom 
       </RouterLink>
 
-      <RouterLink v-else-if="userRole === 'teacher' && pageName.includes('Home')" to="/classroom/create" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
+      <RouterLink v-else-if="userRole === 'teacher' && pageName.includes('Home') && enableButton"  to="classroom/create" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
         + Create a classroom
       </RouterLink>
     </div>

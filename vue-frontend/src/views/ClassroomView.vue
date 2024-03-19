@@ -13,26 +13,13 @@
   const classroomDetails = ref([])
   
   async function getClassroomData() {
-    await axios.get(API + 'classroom/' + route.params.classroomId)
-      .then(response => {
-        console.log(response.data);
-        classroomDetails.value = response.data;
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    const res = await axios.get(API + 'classroom/' + route.params.classroomId)
+    classroomDetails.value = res.data;
   }
 
   async function getQuizzes() {
-    await axios.get(API + 'classroom/quizzes/' + route.params.classroomId)
-      .then(response => {
-        console.log(response.data);
-        classroomQuizzes.value = response.data;
-        
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    const res = await axios.get(API + 'classroom/quizzes/' + route.params.classroomId)
+    classroomQuizzes.value = res.data;
   }
   
   onMounted(() => {
@@ -46,7 +33,7 @@
   <TopBar />
   <div class="flex flex-rows flex-grow-0 bg-fixed bg-[url('https://via.placeholder.com/200')]">
     <div class="flex flex-col">
-      <h1 class="text-9xl">{{classroomDetails.name}}</h1>
+      <h1 class="text-6xl">{{classroomDetails.name}}</h1>
       <h3 class="text-4xl">{{classroomDetails.description}}</h3>
     </div>
     <RouterLink v-if="userRole === 'teacher'" :to="createQuizPath" class="bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-2xl px-2"> 
