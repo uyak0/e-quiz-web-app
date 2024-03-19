@@ -79,6 +79,13 @@ const router = createRouter({
     },
     {
       path: '/classroom',
+      beforeEnter: async (to, from) => {
+        const auth = await checkAuth()
+        const inClass = await inClassroom(to.params.classroomId)
+        if (auth.status && inClass.status) {
+          return true
+        } 
+      },
       children: [
         {
           path: ':classroomId',
@@ -88,13 +95,6 @@ const router = createRouter({
               name: 'classroom',
               component: () => import('@/views/ClassroomView.vue'),
               meta: { title: 'Classroom' },
-              beforeEnter: async (to, from) => {
-                const auth = await checkAuth()
-                const inClass = await inClassroom(to.params.classroomId)
-                if (auth.status && inClass.status) {
-                  return true
-                } 
-              },
             },
             {
               path: 'quiz',
@@ -115,21 +115,13 @@ const router = createRouter({
             },
           ]
         },
-        {
-          path: 'create',
-          name: 'createClassroom',
-          component: () => import('@/views/CreateClassroomView.vue'),
-          meta: {
-            title: 'Create Classroom'
-          }
-        },
       ]
     },
     {
       path: '/:userRole/:userId',
       beforeEnter: async (to, from) => {
         const auth = await checkAuth()
-        if (Number(to.params.userId) !== auth.id) {
+        if (auth.status && Number(to.params.userId) !== auth.id) {
           return { name: to.name, params: { userRole: auth.role, userId: auth.id } }
         }
       },
@@ -143,12 +135,18 @@ const router = createRouter({
           }
         },
         {
-          path: 'classroom/join',
+          path: 'classroom-join',
           name: 'joinClassroom',
           component: () => import('@/views/JoinClassroomView.vue'),
+          beforeEnter: async (to, from) => {
+            const auth = await checkAuth()
+            if (to.params.userRole !== 'student') {
+              return false 
+            }
+          },
           meta: {
             title: 'Join A Classroom'
-          }
+          },
         },
         {
           path: 'profile',
@@ -157,7 +155,21 @@ const router = createRouter({
           meta: {
             title: 'Profile'
           }
-        }
+        },
+        {
+          path: 'classroom-create',
+          name: 'createClassroom',
+          component: () => import('@/views/CreateClassroomView.vue'),
+          beforeEnter: async (to, from) => {
+            const auth = await checkAuth()
+            if (to.params.userRole !== 'teacher') {
+              return false 
+            }
+          },
+          meta: {
+            title: 'Create Classroom'
+          }
+        },
       ]
     },
   ]

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Models\Classroom;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class ClassroomsController extends Controller
 {
@@ -17,6 +19,20 @@ class ClassroomsController extends Controller
         else {
             return $classroom->id;
         }
+    }
+
+    public function createClassroom(Request $request): JsonResponse
+    {
+        $code = hash('crc32', $request->classroom_name);
+        $classroom = Classroom::create([
+            'name' => $request->classroom_name,
+            'description' => $request->classroom_desc,
+            'code' => $code,
+        ]);
+        return response() -> json([
+            'status' => 'success',
+            'message' => 'Classroom created successfully!',
+        ], 201);
     }
 
     public function joinClassroom(int $userId, string $classroomCode): JsonResponse

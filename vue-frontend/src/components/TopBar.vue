@@ -14,6 +14,10 @@
   const joinClassroomLink = '/classroom/join'
 
   const enableButton = defineModel('enableButton')
+
+  onMounted(() => {
+    console.log(route.meta)
+  })
 </script>
 
 <template>
@@ -22,17 +26,17 @@
       <RouterLink :to="userHomeLink"> E-Quizz </RouterLink>
 
       <!--Create/join classroom button-->
-      <RouterLink v-if="userRole === 'student' && pageName.includes('Home') && enableButton" to="classroom/join" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
+      <RouterLink v-if="userRole === 'student' && pageName.includes('Home') && enableButton" to="classroom-join" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
         + Join a classroom 
       </RouterLink>
 
-      <RouterLink v-else-if="userRole === 'teacher' && pageName.includes('Home') && enableButton"  to="classroom/create" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
+      <RouterLink v-else-if="userRole === 'teacher' && pageName.includes('Home') && enableButton"  to="classroom-create" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
         + Create a classroom
       </RouterLink>
     </div>
 
     <!-- Page Name -->
-    <div class="hidden lg:block font-firaSans font-bold">
+    <div class="hidden sm:block font-firaSans font-bold">
       {{ pageName }}
     </div>
     
