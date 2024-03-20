@@ -2,8 +2,10 @@
   import TopBar from '@/components/TopBar.vue';
   import { ref } from 'vue';
   import axios from 'axios';
+  import { useRouter } from 'vue-router';
 
   const API = import.meta.env.VITE_LARAVEL_API
+  const router = useRouter()
   const classroomName = ref('');
   const classroomDesc = ref('');
 
@@ -14,6 +16,10 @@
     }
     try {
       const res = await axios.post(API + 'classroom/create', classroomData)
+      if (res.data.status == success) {
+        alert('Classroom created successfully, redirecting...')
+        router.push('/classroom/' + res.data.classroomId) 
+      }
     } catch (err) {
       console.log(err)
     }

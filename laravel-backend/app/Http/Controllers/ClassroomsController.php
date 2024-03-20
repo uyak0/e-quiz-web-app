@@ -7,6 +7,7 @@ use App\Models\Classroom;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class ClassroomsController extends Controller
 {
@@ -23,16 +24,29 @@ class ClassroomsController extends Controller
 
     public function createClassroom(Request $request): JsonResponse
     {
-        $code = hash('crc32', $request->classroom_name);
-        $classroom = Classroom::create([
-            'name' => $request->classroom_name,
-            'description' => $request->classroom_desc,
-            'code' => $code,
-        ]);
-        return response() -> json([
-            'status' => 'success',
-            'message' => 'Classroom created successfully!',
-        ], 201);
+        $role = auth()->user()->roles()->first()->name;
+        if (Auth::check()) {
+            if ($role != 'teacher') {
+                return response() -> json([
+                    'status' => 'error',
+                    'message' => 'You are not authorized to create a classroom!'
+                ]);
+            }
+
+            $code = hash('crc32', $request->classroom_name);
+            $classroom = Classroom::create([
+                'name' => $request->classroom_name,
+                'description' => $request->classroom_desc,
+                'code' => $code,
+            ]);
+
+            $this->joinClassroom(auth()->user()->id, $classroom->code);
+
+            return response() -> json([
+                'status' => 'success',
+                'message' => 'Classroom created successfully!',
+            ], 201);
+        }
     }
 
     public function joinClassroom(int $userId, string $classroomCode): JsonResponse

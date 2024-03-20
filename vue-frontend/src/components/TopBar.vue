@@ -13,7 +13,7 @@
   const userHomeLink = '/' + userRole + '/' + userId + '/home'
   const joinClassroomLink = '/classroom/join'
 
-  const enableButton = defineModel('enableButton')
+  const enableButton = defineModel()
 
   onMounted(() => {
     console.log(route.meta)

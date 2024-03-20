@@ -32,6 +32,7 @@ Route::group(['prefix' => 'classroom'], function() {
 
 Route::group(['prefix' => 'user'], function() {
     Route::get('/', [UserController::class, 'getUser']);
+    Route::get('/role', [UserController::class, 'getUserRole']);
     Route::get('/classrooms/{id?}', [ClassroomsController::class, 'userClassrooms']);
     Route::get('/in-classroom', [UserController::class, 'inClassroom']);
 });

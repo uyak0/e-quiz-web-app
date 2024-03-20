@@ -15,6 +15,12 @@ class UserController extends Controller
         return response() -> json($user);
     }
 
+    public function getUserRole(): JsonResponse
+    {
+        $user = auth()->user();
+        return response() -> json($user->roles()->first()->name);
+    }
+
     public function isAuthenticated(Request $request): JsonResponse
     {
         if(Auth::check())
