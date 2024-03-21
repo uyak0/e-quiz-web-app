@@ -104,15 +104,15 @@ const router = createRouter({
         },
         {
           path: 'classroom',
-          beforeEnter: async (to, from) => {
-            const inClass = await inClassroom(to.params.classroomId)
-            if (inClass.status) {
-              return true 
-            } 
-          },
           children: [
             {
               path: ':classroomId',
+              beforeEnter: async (to, from) => {
+                const inClass = await inClassroom(to.params.classroomId)
+                if (inClass.status) {
+                  return true 
+                } 
+              },
               children: [
                 {
                   path: '',
@@ -138,34 +138,6 @@ const router = createRouter({
                   ]
                 },
               ]
-            },
-            {
-              path: 'join',
-              name: 'joinClassroom',
-              component: () => import('@/views/JoinClassroomView.vue'),
-              beforeEnter: async (to, from) => {
-                const auth = await checkAuth()
-                if (to.params.userRole !== 'student') {
-                  return false 
-                }
-              },
-              meta: {
-                title: 'Join A Classroom'
-              },
-            },
-            {
-              path: 'create',
-              name: 'createClassroom',
-              component: () => import('@/views/CreateClassroomView.vue'),
-              beforeEnter: async (to, from) => {
-                const auth = await checkAuth()
-                if (to.params.userRole !== 'teacher') {
-                  return false 
-                }
-              },
-              meta: {
-                title: 'Create Classroom'
-              }
             },
           ]
         },
