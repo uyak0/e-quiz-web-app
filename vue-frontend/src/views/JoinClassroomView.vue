@@ -7,27 +7,24 @@
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
   const router = useRouter()
-  const userId = route.params.id
+  const userId = route.params.userId
   let classroomCode = ref('')
 
-  function joinClassroom() {
-    axios.put(API + 'student/' + userId + '/classroom-join/' + classroomCode.value)
-      .then(response => {
-        console.log(response.data)
-        if (response.data.status === 'success') {
-          let classroomId = response.data.classroom_id
-          router.push({ path: '/classroom/' + classroomId }) 
-        }
-        else if (response.data.status === 'already joined') {
-          alert(response.data.message)
-        }
-        else if (response.data.status === 'classroom not found') {
-          alert(response.data.message) 
-        }
-      })
-      .catch(error => {
-        console.log(error)
-      })
+  async function joinClassroom() {
+    const join = await axios.put(API + 'student/' + userId + '/classroom-join/' + classroomCode.value)
+    console.log(join.data)
+
+    if (join.data.status === 'success') {
+      alert('Joined classroom successfully, redirecting to classroom...')
+      let classroomId = join.data.classroom_id
+      router.push({ path: '/classroom/' + classroomId }) 
+    }
+    else if (join.data.status === 'already joined') {
+      alert(join.data.message)
+    }
+    else if (join.data.status === 'classroom not found') {
+      alert(join.data.message) 
+    }
   }
 </script>
 <template>

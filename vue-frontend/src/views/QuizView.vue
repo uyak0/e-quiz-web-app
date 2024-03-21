@@ -19,6 +19,11 @@
       })
   }
 
+  function getOptions(options) {
+    const separatedOptions = options.split(', ')
+    return separatedOptions
+  }
+
   onMounted(() => {
     getQuizzes()
   })
@@ -28,24 +33,34 @@
   <div v-for="(item, index) in quizProps" :key="index"
     class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
     <!-- Question Component -->
-    <div class="bg-transparent bor">
-      <h1>Question #{{ index + 1 }}</h1>
+    <div class="bg-transparent">
+      <h1 class="text-2xl font-bold"> #{{ index + 1 }}</h1>
+      <p>{{ item.description }}</p>
+
       <div v-if="item.options">
-        <p>{{ item.question }}</p>
-        <div v-for="(option, index) in item.options" :key="index">
-          <input type="radio" :name="item.id" :value="option" />
-          <label>{{ option }}</label>
+        <div v-for="(options, index) in getOptions(item.options)" :key="index">
+          <input type="radio" name="options">
+          <label for="options" class="px-2">
+            {{ options }}
+          </label>
         </div>
       </div>
 
-      <div v-else-if="item.questionType === 'sub'">
-        subjective question
+      <div v-else-if="!item.options && typeof(item.correct_answers) === 'string'">
+        <input type="text" placeholder="Type your answer here..." class="text-black rounded-md px-2 my-2"> 
       </div>
 
-      <div v-else-if="item.questionType === 'tfq'">
-        true/false
+      <div v-else-if="!item.options && typeof(item.correct_answer) === 'number'">
+        <select name="true false" class="rounded-md text-black pr-4 my-2">
+          <option value="0"> False </option>
+          <option value="1"> True </option>
+        </select>
       </div>
-
+      
+      <div>
+        <button>Cancel</button>
+        <button>Submit answers</button>
+      </div>
     </div>
   </div>
 </template>

@@ -1,12 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getStorageItem } from '@/functions/getStorageItem.js'
+import axios from 'axios'
 
-function isAuthenticated() {
-  const tokenExists = getStorageItem(token)
-  if (tokenExists){
-    return true
-  } else {
-    return false
+const API = import.meta.env.VITE_LARAVEL_API
+
+async function checkAuth(){
+  const auth = await axios.get(API + 'auth/check-authentication')
+  return auth.data
+}
+
+async function inClassroom(id) {
+  try {
+    const inClass = await axios.get(API + 'user/in-classroom', {
+      params: {
+        classroom_id: id
+      }
+    }) 
+
+    if (inClass.data.status) {
+      return true
+    }
+  }
+  catch (error) {
+    console.log(error) 
   }
 }
 
@@ -18,35 +33,27 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
       meta: { 
+        requiresAuth: false,
         title: 'E-Quizz'
       }
     },
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('@/views/AboutView.vue'),
       meta: {
+        requiresAuth: false,
         title: 'E-Quizz - About Us'
       }
     },
     {
-      path: '/login',
+      path: '/login', 
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      beforeEnter: (to, from) => {
-        if (isAuthenticated) {
-          const userRole = getStorageItem('user_role') 
-          const userID = getStorageItem('user_id') 
-          if (userRole === 'teacher') {
-            return { path: '/teacher/' + userID + '/home' }
-          } 
-          else if (userRole === 'student') {
-            return { path: '/student/' + userID + '/home'}
-          }
-        }
+      beforeEnter: async (to, from) => {
+        const auth = await checkAuth()
+        if (auth.status) 
+          return { name: 'userHome', params: { userRole: auth.role, userId: auth.id } }
       },
       meta: {
         title: 'Login'
@@ -57,6 +64,7 @@ const router = createRouter({
       name: 'signUp',
       component: () => import('@/views/SignUpView.vue'),
       meta: {
+        requiresAuth: false,
         title: 'Sign Up'
       }
     },
@@ -65,121 +73,104 @@ const router = createRouter({
       name: 'forgotPassword',
       component: () => import('@/views/ForgotPasswordView.vue') ,
       meta: {
+        requiresAuth: false,
         title: 'Forgot Password'
       }
     },
     {
-      path: '/user/:id/profile',
-      name: 'userProfile',
-      component: () => import('@/views/UserProfileView.vue'),
-      meta: {
-        title: 'Profile'
-      }
-    },
-    {
-      path: '/classroom',
+      path: '/:userRole/:userId',
+      beforeEnter: async (to, from) => {
+        const auth = await checkAuth()
+        if (auth.status && Number(to.params.userId) !== auth.id) {
+          return { name: to.name, params: { userRole: auth.role, userId: auth.id } }
+        }
+      },
       children: [
         {
-          path: ':classroomId',
+          path: 'home',
+          name: 'userHome',
+          component: () => import('@/views/UserHomeView.vue'),
+          meta: {
+            title: 'Home'
+          }
+        },
+        {
+          path: 'profile',
+          name: 'userProfile',
+          component: () => import('@/views/UserProfileView.vue'),
+          meta: {
+            title: 'Profile'
+          }
+        },
+        {
+          path: 'classroom',
+          beforeEnter: async (to, from) => {
+            const inClass = await inClassroom(to.params.classroomId)
+            if (inClass.status) {
+              return true 
+            } 
+          },
           children: [
             {
-              path: '',
-              name: 'classroom',
-              component: () => import('@/views/ClassroomView.vue'),
-              meta: { title: 'Classroom' },
-            },
-            {
-              path: 'quiz',
+              path: ':classroomId',
               children: [
                 {
-                  // Quizzes creation page
-                  path: 'create',
-                  name: 'createQuiz',
-                  component: () => import('@/views/CreateQuizView.vue'),
-                  meta: { title: 'Create Quiz' }
+                  path: '',
+                  name: 'classroom',
+                  component: () => import('@/views/ClassroomView.vue'),
+                  meta: { title: 'Classroom' },
                 },
                 {
-                  path: ':quizId',
-                  name: 'quiz',
-                  component: () => import('@/views/QuizView.vue'),
-                  meta: { title: 'Quiz' }
-                }
+                  path: 'quiz',
+                  children: [
+                    {
+                      path: 'create',
+                      name: 'createQuiz',
+                      component: () => import('@/views/CreateQuizView.vue'),
+                      meta: { title: 'Create Quiz' }
+                    },
+                    {
+                      path: ':quizId',
+                      name: 'quiz',
+                      component: () => import('@/views/QuizView.vue'),
+                      meta: { title: 'Quiz' }
+                    }
+                  ]
+                },
               ]
+            },
+            {
+              path: 'join',
+              name: 'joinClassroom',
+              component: () => import('@/views/JoinClassroomView.vue'),
+              beforeEnter: async (to, from) => {
+                const auth = await checkAuth()
+                if (to.params.userRole !== 'student') {
+                  return false 
+                }
+              },
+              meta: {
+                title: 'Join A Classroom'
+              },
+            },
+            {
+              path: 'create',
+              name: 'createClassroom',
+              component: () => import('@/views/CreateClassroomView.vue'),
+              beforeEnter: async (to, from) => {
+                const auth = await checkAuth()
+                if (to.params.userRole !== 'teacher') {
+                  return false 
+                }
+              },
+              meta: {
+                title: 'Create Classroom'
+              }
             },
           ]
         },
-        {
-          path: 'create',
-          name: 'createClassroom',
-          component: () => import('@/views/CreateClassroomView.vue'),
-          meta: {
-            title: 'Create Classroom'
-          }
-        },
       ]
     },
-    {
-      path: '/student/:id',
-      name: 'student',
-      beforeEnter: (to, from) => {
-        if (!isAuthenticated) {
-          return false 
-        }
-      },
-      children: [
-        {
-          path: 'home',
-          name: 'studentHome',
-          component: () => import('@/views/UserHomeView.vue'),
-          meta: {
-            title: 'Home'
-          }
-        },
-        {
-          path: 'classroom/join',
-          name: 'joinClassroom',
-          component: () => import('@/views/JoinClassroomView.vue'),
-          meta: {
-            title: 'Join A Classroom'
-          }
-        }
-      ]
-    },
-    {
-      path: '/teacher/:id',
-      name: 'teacher',
-      beforeEnter: (to, from) => {
-        if (!isAuthenticated) {
-          return false 
-        }
-      },
-      children: [
-        {
-          path: 'home',
-          name: 'teacherHome',
-          component: () => import('@/views/UserHomeView.vue'),
-          meta: {
-            title: 'Home'
-          }
-        },
-        // {
-        //   path: 'classroom/create',
-        //   name: 'createClassroom',
-        //   component: () => import('@/views/CreateClassroomView.vue'),
-        //   meta: {
-        //     title: 'Create A Classroom'
-        //   }
-        // }
-      ]
-    },
-    // {
-    //   path: '/:pathMatch(.*)*',
-    //   name: 'notFound',
-    //   component: () => import('@/views/NotFoundView.vue'),
-    //   meta: {
-    //     title: '404 Not Found'
-    //   }
-    // }
   ]
 })
 

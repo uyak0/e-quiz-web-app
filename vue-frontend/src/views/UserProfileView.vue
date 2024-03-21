@@ -10,27 +10,21 @@
   const route = useRoute();
   const router = useRouter();
   const user = ref({});
-  const userId = getStorageItem('user_id');
-  const userRole = getStorageItem('user_role');
+  const userId = route.params.userId
+  const userRole = route.params.userRole
 
   async function getUserData() {
-    await axios.get(API + 'user/' + userId)
-      .then(response => {
-        user.value = response.data 
-        console.log(response.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    const userData = await axios.get(API + 'user/?id=' + userId)
+    user.value = userData.data 
+    console.log(userData.data)
   }
 
-  function logOut() {
+  async function logOut() {
     let confirmLogOut = confirm('Are you sure you want to log out?')
+
     if (confirmLogOut) {
-      localStorage.clear()
-      sessionStorage.clear()
+      const logOutUser = await axios.post(API + 'auth/logout')
       router.push({ path: '/' })
-      alert('see you next time :(')
     }
   }
   onMounted(() => {
@@ -42,13 +36,13 @@
   <TopBar />
 
   <div class="flex justify-center">
-    <div class="h-screen bg-slate-700 w-3/4 mx-auto py-8 justify-center">
+    <div class="h-screen bg-slate-700 w-full sm:w-3/4 mx-auto py-8 justify-center">
       <div name="Info" class="flex flex-rows">
         <UserAvatar class="w-1/4 h-1/4 mx-8 my-8 rounded-full border border-sky-200" /> 
         <span class="py-2 flex flex-col place-self-center overflow-hidden">
-          <p class="text-6xl font-bold my-4 mx-4">{{ user.name }}</p>
-          <p class="text-4xl my-4 mx-4">{{ user.email }}</p>
-          <p class="text-2xl mx-4 px-2 bg-red-500 rounded-md text-red-800" :class="{'bg-green-400 text-green-800': userRole === 'student' }" >{{ userRole }}</p>
+          <p class="text-4xl sm:text-6xl font-bold sm:my-4 mx-4">{{ user.name }}</p>
+          <p class="text-2xl sm:text-4xl sm:my-4 mx-4">{{ user.email }}</p>
+          <p class="text-xl sm:text-2xl mx-4 px-2 bg-red-500 rounded-md text-red-800" :class="{'bg-green-400 text-green-800': userRole === 'student' }" >{{ userRole }}</p>
         </span>
       </div>
 

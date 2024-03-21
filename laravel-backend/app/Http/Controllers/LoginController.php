@@ -26,22 +26,34 @@ class LoginController extends Controller
         ]);
 
         $credentials = request(['email','password']);
-        if(!Auth::attempt($credentials))
+        if(Auth::attempt($credentials, $request->remember_me))
         {
-        return response()->json([
-            'message' => 'Unauthorized'
-        ],401);
+            $user = auth()->user();
+            return response()->json([
+                'status' => 'success',
+                'role' => $user->roles()->first()->name,
+                'user_id' => $user->id
+            ]);
         }
 
-        $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->plainTextToken;
+        else
+        {
+            return response()->json([
+                'message' => 'Invalid Credentials! Please try again'
+            ],401);
+        }
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
-            'accessToken' =>$token,
-            'token_type' => 'Bearer',
-            'user_id' => $user->id,
-            'role' => $user->roles()->first()->name
+            'status' => 'success',
+            'message' => 'User logged out successfully'
         ]);
     }
 }

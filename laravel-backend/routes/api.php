@@ -27,17 +27,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'classroom'], function() {
     Route::get('/{id?}', [ClassroomsController::class, 'index']);
-    Route::post('/create', [ClassroomsController::class, 'store']);
+    Route::post('/create', [ClassroomsController::class, 'createClassroom']);
     Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
 });
 
 Route::group(['prefix' => 'user'], function() {
-    Route::get('/{id}', [UserController::class, 'getUser']);
+    Route::get('/', [UserController::class, 'getUser']);
+    Route::get('/role', [UserController::class, 'getUserRole']);
     Route::get('/classrooms/{id?}', [ClassroomsController::class, 'userClassrooms']);
+    Route::get('/in-classroom', [UserController::class, 'inClassroom']);
 });
 
 Route::group(['prefix' => 'auth'], function() {
+    Route::get('/check-authentication', [UserController::class, 'isAuthenticated']);
     Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/logout', [LoginController::class, 'logout']);
     Route::post('/register', [RegisterController::class, 'register']);
 });
 

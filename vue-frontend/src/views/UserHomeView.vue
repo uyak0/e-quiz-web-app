@@ -2,40 +2,46 @@
   import TopBar from '@/components/TopBar.vue';
   import Classroom from "@/components/Classroom.vue";
   import axios from "axios";
-  import {onMounted, ref} from "vue";
+  import {onMounted, ref, watchEffect} from "vue";
   import {useRoute, createRouter} from "vue-router";
-  import {getStorageItem} from "@/functions/getStorageItem.js";
   import Arrow from "@/components/Arrow.vue";
 
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
-  const userId = getStorageItem('user_id')
-  const userRole = getStorageItem('user_role')
+  const userId = route.params.userId
+  const userRole = route.params.userRole
 
   const classrooms = ref([])
+  const joinOrCreateClassroomBtn = ref(true)
 
   async function getClassrooms() {
-    await axios.get(API + 'user/classrooms/' + userId)
-      .then(response => {
-        console.log(response.data)
-        classrooms.value = response.data
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    const response = await axios.get(API + 'user/classrooms/' + userId)
+    classrooms.value = response.data
+    joinOrCreateClassroomBtn.value = (classrooms.value.length === 0) ? true : false
   }
+
   onMounted(() => {
     getClassrooms();
+  })
+
+  watchEffect(() => {
+    console.log(joinOrCreateClassroomBtn.value)
+    console.log(classrooms.value.length)
   })
 </script>
 
 <template>
-  <TopBar />
+  <TopBar v-model:enable-button="joinOrCreateClassroomBtn"/>
 
   <!-- Arrow pointing to "Join Classroom" button -->
   <div v-if="userRole === 'student' && classrooms.length === 0" class="absolute flex flex-rows left-32">
     <Arrow class="w-16"/>
     <p class="pt-11">Click here to join a classroom!</p>
+  </div>
+
+  <div v-if="userRole === 'teacher' && classrooms.length === 0" class="absolute flex flex-rows left-32">
+    <Arrow class="w-16"/>
+    <p class="pt-11">Click here to create a classroom!</p>
   </div>
 
   <div v-if="classrooms.length === 0" class="flex justify-center h-screen">
@@ -44,10 +50,28 @@
     </div>
   </div>
 
-  <!-- List of Classroom Boxes -->
-  <div v-else class="w-3/4 flex flex-rows flex-wrap h-full justify-between">
-    <div v-for="(item, index) of classrooms" :key="index" class="flex">
-      <Classroom v-model="classrooms[index]"/> 
+  <div v-else class="flex justify-center">
+    <div class="sm:w-3/4 w-full flex flex-col sm:flex-row sm:flex-wrap content-start">
+      <!-- List of Classroom Boxes -->
+      <div v-for="(item, index) of classrooms" :key="index" class="h-fit">
+        <Classroom v-model="classrooms[index]" /> 
+      </div>
+
+      <!-- Join Classroom (for classrooms no.>= 1)-->
+      <RouterLink v-if="classrooms.length && userRole === 'student'" :to="{ name: 'joinClassroom' }" class="hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-ful">
+        <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
+          <p class="place-self-center font-bold">+</p>
+          <p class="place-self-center font-bold text-center">Join More Classrooms</p>
+        </div>
+      </RouterLink>
+
+      <!-- Create Classroom -->
+      <RouterLink v-else-if="classrooms.length && userRole === 'teacher'" :to="{ name: 'createClassroom' }" class="hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-ful">
+        <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
+          <p class="place-self-center font-bold">+</p>
+          <p class="place-self-center font-bold text-center">Create More Classrooms</p>
+        </div>
+      </RouterLink>
     </div>
   </div>
 </template>

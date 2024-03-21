@@ -2,9 +2,10 @@
   import HomeLogo from '@/components/HomeLogo.vue';
   import axios from 'axios';
   import router from '@/router';
-  import { ref,reactive } from 'vue'
+  import { ref,reactive, watchEffect } from 'vue'
 
   const API = import.meta.env.VITE_LARAVEL_API;
+  let buttonDisabled = ref(true)
 
   const loginForm = reactive([
     { email: '' },
@@ -12,52 +13,52 @@
     { remember: false }
   ])
 
+  function preventLogin() {
+    if (loginForm.email === '' || loginForm.password === '') {
+      buttonDisabled = true
+    } else {
+      buttonDisabled = false
+    }
+  }
+
   async function login(){
     const loginData = {
       email: loginForm.email,
       password: loginForm.password,
+      remember_me: loginForm.remember,
     }
 
-    await axios.get('/sanctum/csrf-cookie')
-      .then (response => {
-        // console.log(response)
-        // console.log('Cookie Acquired')
-      })
-    
-    await axios.post(API + 'auth/login', loginData)
-      .then(response => {
-        console.log(response.data)
-        if (!loginForm.remember) {
-          sessionStorage.setItem('token', response.data.accessToken)
-          sessionStorage.setItem('user_id', response.data.user_id)
-          sessionStorage.setItem('user_role', response.data.role)
-        }
-        else {
-          localStorage.setItem('token', response.data.accessToken)
-          localStorage.setItem('user_id', response.data.user_id)
-          localStorage.setItem('user_role', response.data.role)
-        }
-        router.push({ path: '/' + response.data.role + '/' + response.data.user_id + '/home' })
-        // router.push({ path: '/'})
-        // if(response.data === 'success'){
-        //   router.push({ path: '/'})
-        // }
-      })
-      .catch(error => {
-        console.log(error)
-        alert('Invalid Credentials! Please try again.')
-      })
+    try {
+      await axios.get('sanctum/csrf-cookie');
+      const loginResponse = await axios.post(API + 'auth/login', loginData)
+
+      console.log(loginResponse.data)
+
+      if (loginResponse.data.status === 'success') {
+        router.push({ path: loginResponse.data.role + '/' + loginResponse.data.user_id + '/home'}) 
+      } else {
+        console.log(loginResponse.data.message)
+        alert(loginResponse.data.message) 
+      }
+    } catch (error) {
+      console.log(error.response.data)
+      alert(error.response.data.message)
+    }
   }
+
+  watchEffect(() => {
+    preventLogin()
+  })
 </script>
 
 <template>
   <!-- Left: Image -->
-  <div class="absolute top-0 -z-10 w-screen h-screen bg-cover bg-[url('/src/assets/HomePageBG.png')] opacity-10"></div>
+  <div class="absolute hidden top-0 -z-10 w-screen h-screen bg-cover sm:block sm:bg-[url('/src/assets/HomePageBG.png')] opacity-10"></div>
   
   <HomeLogo />
   
   <!-- Right: Login Form -->
-  <div class="bg-gray-700 h-screen lg:p-36 sm:20 p-8 w-1/2 right-0 absolute lg:w-1/2 z-10">
+  <div class="bg-gray-700 h-screen w-full sm:w-1/2 p-8 right-0 absolute z-10">
     <h1 class="text-2xl font-semibold mb-4">Login</h1>
     <form @submit.prevent="login">
 
@@ -85,7 +86,7 @@
       </div>
     
       <!-- Login Button -->
-      <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Login</button>
+      <button :disabled="buttonDisabled" :class="{ 'bg-slate-300 hover:bg-slate-300': buttonDisabled }" type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Login</button>
     
     </form>
     <!-- Sign up  Link -->
