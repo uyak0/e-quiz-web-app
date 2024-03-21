@@ -22,6 +22,16 @@ class ClassroomsController extends Controller
         }
     }
 
+    public function deleteClassroom(int $id)
+    {
+        Classroom::find($id)->users()->detach();
+        Classroom::destroy($id);
+        return response() -> json([
+            'status' => 'success',
+            'message' => 'Classroom deleted successfully!'
+        ]);
+    }
+
     public function createClassroom(Request $request): JsonResponse
     {
         $role = auth()->user()->roles()->first()->name;
@@ -43,6 +53,7 @@ class ClassroomsController extends Controller
             $this->joinClassroom(auth()->user()->id, $classroom->code);
 
             return response() -> json([
+                'classroom_id' => $classroom->id,
                 'status' => 'success',
                 'message' => 'Classroom created successfully!',
             ], 201);

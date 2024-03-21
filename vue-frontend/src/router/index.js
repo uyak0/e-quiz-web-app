@@ -104,15 +104,15 @@ const router = createRouter({
         },
         {
           path: 'classroom',
-          beforeEnter: async (to, from) => {
-            const inClass = await inClassroom(to.params.classroomId)
-            if (inClass.status) {
-              return true 
-            } 
-          },
           children: [
             {
               path: ':classroomId',
+              beforeEnter: async (to, from) => {
+                const inClass = await inClassroom(to.params.classroomId)
+                if (inClass.status) {
+                  return true 
+                } 
+              },
               children: [
                 {
                   path: '',
