@@ -14,7 +14,8 @@
 
   const classrooms = ref([])
   const joinOrCreateClassroomBtn = ref(true)
-  const modalEnabled = ref(false) 
+  const modalEnabled = ref(false)
+  const emit = defineEmits(['modalEnabled'])
 
   async function getClassrooms() {
     const response = await axios.get(API + 'user/classrooms/' + userId)
@@ -22,18 +23,50 @@
     joinOrCreateClassroomBtn.value = (classrooms.value.length === 0) ? true : false
   }
 
+  async function joinClassroom() {
+    const join = await axios.put(API + 'student/' + userId + '/classroom-join/' + classroomCode.value)
+    console.log(join.data)
+
+    if (join.data.status === 'success') {
+      alert('Joined classroom successfully, redirecting to classroom...')
+      let classroomId = join.data.classroom_id
+      router.push({ path: '/classroom/' + classroomId }) 
+    }
+    else if (join.data.status === 'already joined') {
+      alert(join.data.message)
+    }
+    else if (join.data.status === 'classroom not found') {
+      alert(join.data.message) 
+    }
+  }
+
+  async function createClassroom() {
+    const classroomData = {
+      classroom_name: classroomName.value,
+      classroom_desc: classroomDesc.value,
+    }
+    try {
+      const res = await axios.post(API + 'classroom/create', classroomData)
+      if (res.data.status === 'success') {
+        alert('Classroom created successfully, redirecting...')
+        router.push(res.data.classroom_id) 
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   onMounted(() => {
     getClassrooms();
   })
 
   watchEffect(() => {
-    console.log(joinOrCreateClassroomBtn.value)
-    console.log(classrooms.value.length)
+    console.log(modalEnabled.value)
   })
 </script>
 
 <template>
-  <TopBar v-model:enable-button="joinOrCreateClassroomBtn"/>
+  <TopBar @modal-enabled="(value) => { modalEnabled = value }" v-model:enable-button="joinOrCreateClassroomBtn"/>
 
   <!-- Arrow pointing to "Join Classroom" button -->
   <div v-if="userRole === 'student' && classrooms.length === 0" class="absolute flex flex-rows left-32">
@@ -60,7 +93,7 @@
       </div>
 
       <!-- Join Classroom (for classrooms no.>= 1)-->
-      <button @click="modalEnabled = !modalEnabled" v-if="classrooms.length && userRole === 'student'" :to="{ name: 'joinClassroom' }" class="cursor-pointer hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-ful">
+      <button @click="$emit('modalEnabled')" v-if="classrooms.length && userRole === 'student'" class="cursor-pointer hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
         <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
           <p class="place-self-center font-bold">+</p>
           <p class="place-self-center font-bold text-center">Join More Classrooms</p>
@@ -68,7 +101,7 @@
       </button>
 
       <!-- Create Classroom -->
-      <button @click="modalEnabled = !modalEnabled" v-else-if="classrooms.length && userRole === 'teacher'" :to="{ name: 'createClassroom' }" class="hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-ful">
+      <button @click="$emit('modalEnabled')" v-else-if="classrooms.length && userRole === 'teacher'" class="hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
         <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
           <p class="place-self-center font-bold">+</p>
           <p class="place-self-center font-bold text-center">Create More Classrooms</p>
@@ -86,7 +119,7 @@
         </div>
       </Modal>
 
-      <Modal v-else v-model="modalEnabled">
+      <Modal v-else-if="userRole === 'teacher'">
         <div class="bg-gray-600 rounded-md w-3/4 h-fit flex place-self-center">
           <div class="flex flex-col text-black">
             <input type="text" v-model="classroomName" placeholder="Classroom Name" class="border-2 border-gray-300 rounded-md p-2 m-2">
