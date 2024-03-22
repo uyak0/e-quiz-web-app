@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Models\Students;
+use App\Models\Student;
 
 class StudentsController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
-        $students = Students::all();
+        $students = Student::all();
         return response() -> json($students);
     }
 }

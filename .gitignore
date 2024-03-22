@@ -1,3 +1,8 @@
+vendor/
+
+# jetBrains
+.idea
+
 # Logs
 logs
 *.log
