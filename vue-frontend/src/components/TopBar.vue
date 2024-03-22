@@ -19,14 +19,6 @@
   const classroomCode = ref('')
   const classroomName = ref('');
   const classroomDesc = ref('');
-
-  function emitModalEnable() {
-    emit('modalEnabled', true)
-  }
-
-  onMounted(() => {
-    console.log(route.meta)
-  })
 </script>
 
 <template>
@@ -35,11 +27,11 @@
       <RouterLink :to="{ name: 'userHome' }"> E-Quizz </RouterLink>
 
       <!--Create/join classroom button-->
-      <button @click="emitModalEnable" v-if="userRole === 'student' && enableButton" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
+      <button @click="emit('modalEnabled')" v-if="userRole === 'student' && enableButton" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
         + Join a classroom 
       </button>
 
-      <button @click="emitModalEnable" v-else-if="userRole === 'teacher' && enableButton" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
+      <button @click="emit('modalEnabled')" v-else-if="userRole === 'teacher' && enableButton" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
         + Create a classroom
       </button>
     </div>
