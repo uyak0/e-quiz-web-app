@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, watchEffect } from 'vue';
   import axios from 'axios';
   import TopBar from "@/components/TopBar.vue";
   import { useRoute } from 'vue-router'
@@ -7,16 +7,13 @@
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute()
 
-  let quizProps = ref([])
+  let quizzes = ref([])
+  let chosenAnswers = ref([])
 
-  function getQuizzes() {
-    axios.get(API + 'quiz/' + route.params.quizId)
-      .then(response => {
-        quizProps.value = response.data
-      })
-      .catch(error => {
-        console.log(error)
-      })
+  async function getQuizzes() {
+    const res = await axios.get(API + 'quiz/' + route.params.quizId)
+    quizzes.value = res.data
+    console.log(quizzes.value)
   }
 
   function getOptions(options) {
@@ -24,38 +21,53 @@
     return separatedOptions
   }
 
+  function MCQAnswer(index, answer) {
+    chosenAnswers.value.push({ question: index, answer: answer }) 
+  }
+
   onMounted(() => {
     getQuizzes()
+  })
+
+  watchEffect(() => {
+    console.log(chosenAnswers.value)
   })
 </script>
 
 <template>
-  <div v-for="(item, index) in quizProps" :key="index"
+  <TopBar />
+  <div v-for="(question, qNum) in quizzes" :key="qNum"
     class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
     <!-- Question Component -->
     <div class="bg-transparent">
-      <h1 class="text-2xl font-bold"> #{{ index + 1 }}</h1>
-      <p>{{ item.description }}</p>
+      <h1 class="text-2xl font-bold"> #{{ qNum + 1 }}</h1>
+      <p>{{ question.description }}</p>
 
-      <div v-if="item.options">
-        <div v-for="(options, index) in getOptions(item.options)" :key="index">
-          <input type="radio" name="options">
-          <label for="options" class="px-2">
+      <!-- Multi-choice Question -->
+      <div v-if="question.options">
+        <div v-for="(options, index) in getOptions(question.options)" :key="index">
+          <input type="radio" :name="qNum" :value="index" v-model="chosenAnswers[qNum]">
+          <label :for="options" class="px-2">
             {{ options }}
           </label>
         </div>
       </div>
+      <!-- -------- -->
 
-      <div v-else-if="!item.options && typeof(item.correct_answers) === 'string'">
+      <!-- Subjective Question -->
+      <div v-else-if="!question.options && typeof(question.correct_answers) === 'string'">
         <input type="text" placeholder="Type your answer here..." class="text-black rounded-md px-2 my-2"> 
       </div>
+      <!-- ----- -->
 
-      <div v-else-if="!item.options && typeof(item.correct_answer) === 'number'">
+      <!-- True/False Question -->
+      <div v-else-if="!question.options && typeof(question.correct_answer) === 'number'">
         <select name="true false" class="rounded-md text-black pr-4 my-2">
           <option value="0"> False </option>
           <option value="1"> True </option>
         </select>
       </div>
+      <!-- ----- -->
       
     </div>
   </div>
