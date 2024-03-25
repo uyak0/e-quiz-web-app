@@ -1,32 +1,31 @@
 <template>
     <!--Header-->
     <div class="bg-white border b border-gray-300 fixed top-0 w-full shadow">
-        <div class="lg:container mx-auto p-4">
-            <div class="grid grid-cols-3 gap-4">
-                <div class="col-span-1 min-w-[250px]">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <img :src="fileLink('UserProfile.png')" class="w-12 h-12 rounded-full border-2 border-blue-400" alt="user">
-                            <span class="font-semibold text-xl pl-1">Jee Sheng</span>
-                        </div>
-                        <div class="relative inline-block text-left group">
-                           <three-dots-icon class="w-6 h-6 cursor-pointer"></three-dots-icon>
-
-                           <div class="origin-top-right absolute right-0 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 hidden group-hover:block">
-                                <div class="py-1">
-                                    <a href="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Profile</a>
-                                    <a href="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Logout</a>
-                                </div>
-                           </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-2 text-right">
-                    <button class="bg-red-500 text-white px-4 py-2 rounded-md" @click="logout">Logout</button>
-                </div>
+    <div class="lg:container mx-auto p-4">
+      <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-1 min-w-[250px]">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img :src="fileLink('UserProfile.png')" class="w-12 h-12 rounded-full border-2 border-blue-400" alt="user">
+              <span class="font-semibold text-xl pl-1">{{ user ? user.name : 'Guest' }}</span>
             </div>
+            <div class="relative inline-block text-left group">
+              <three-dots-icon class="w-6 h-6 cursor-pointer"></three-dots-icon>
+              <div class="origin-top-right absolute right-0 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 hidden group-hover:block">
+                <div class="py-1">
+                  <a href="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Profile</a>
+                  <a href="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" @click.prevent="logout">Logout</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="col-span-2 text-right">
+          <button class="bg-red-500 text-white px-4 py-2 rounded-md" @click="logout">Logout</button>
+        </div>
+      </div>
     </div>
+  </div>
 
     <div class="lg:container mx-auto mt-[90px] px-4 mb-4">
         <div class="grid grid-cols-3 gap-4">
@@ -109,8 +108,8 @@
 
                     <!--Chat Footer-->
                     <div class="flex items-center p-4 bg-white rounded-bl-md rounded-br-md">
-                        <input type="text" placeholder="Search" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-400 mb-4">
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-400 ml-2" disabled>Send</button>
+                        <input type="text" v-model="messageContent" placeholder="Type your message here" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-400 mb-4">
+                        <button @click.prevent="submitMessage" class="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-400 ml-2" >Send</button>
                     </div>
                 </div>
                 
@@ -126,27 +125,72 @@
 </template>
 
 <script>
-import {ThreeDotsIcon} from "@/components/ThreeDotsIcon.vue";
-
+import axios from 'axios';
+import ThreeDotsIcon from "@/components/icons/ThreeDotsIcon.vue";
+import { ref } from 'vue';
 
 export default {
     name: 'ChatApp',
     components:  { ThreeDotsIcon },
+    props: ["user", "emittedMessage"],
+    emits: ["onCloseChat"],
+    setup(props){
+        const { user } = props;
+
+        const messageContent = ref("");
+
+        function submitMessage() {
+            if (!messageContent.value) {
+                return;
+            }
+
+            const payload ={
+                receiver_id: user.id,
+                message_content: messageContent.value
+            };
+
+            window.axios.post("/messages", payload)
+                    .then(response => {
+                        if(response && response.data.status) {
+                            messageContent.value = "";
+                        }
+                    }).catch(error => {
+                        console.error(error.response);
+                    });
+        }
+
+        return {
+            messageContent,
+            submitMessage
+        }
+    },
+
     data(){
         return{
             isChatOpen:true,
         }
     },
     methods: {
+        async fetchUser() {
+            try{
+                const response = await axios.get('/user'); // Updated API endpoint
+                this.user = response.data; // Assuming the API returns user data
+            }catch (error){
+                console.error('Error fetching user:', error);
+            }
+        },
         logout(){
             console.log('logout');
         },
 
         fileLink(file) {
             return '/assets/' + file;
-        }
-    }
-}
+        },
+    },
+    created() {
+    this.fetchUser(); // Fetch user data when the component is created
+  },
+};
 
 </script>
 

@@ -53,3 +53,9 @@ Route::group(['prefix' => 'quiz'], function() {
     Route::get('/{id?}', [QuizzesController::class, 'index']);
     Route::post('/create', [QuizzesController::class, 'store']);
 });
+
+Route::get("/online-users", [UserController::class, "getOnlineUsers"]);
+
+Route::group(['prefix' => 'messages', 'middleware' => 'auth'], function() {
+    Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
+});

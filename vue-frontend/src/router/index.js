@@ -47,6 +47,15 @@ const router = createRouter({
       }
     },
     {
+      path: '/chatroom',
+      name: 'Chatroom',
+      component: ()=> import('@/views/ChatroomView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: 'Chatroom'
+      }
+    },
+    {
       path: '/login', 
       name: 'login',
       component: () => import('@/views/LoginView.vue'),

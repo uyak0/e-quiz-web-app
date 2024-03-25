@@ -53,4 +53,14 @@ class UserController extends Controller
             'status' => false,
         ]);
     }
+
+    public function getOnlineUser(){
+        if(!auth()->check()) {
+            return response()->json(data:['users'=>[]]);
+        }
+
+        $user = User::where('id', "!=", auth()->user()->id)->get();
+        
+        return response()->json(data: ['users'=> $user]);
+    }
 }
