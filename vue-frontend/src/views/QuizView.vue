@@ -8,7 +8,12 @@
   const route = useRoute()
 
   let quizzes = ref([])
-  let chosenAnswers = ref([])
+  let userAnswers = ref([
+    {
+      questionNum: Number,
+      answer: String 
+    }
+  ])
 
   async function getQuizzes() {
     const res = await axios.get(API + 'quiz/' + route.params.quizId)
@@ -21,16 +26,17 @@
     return separatedOptions
   }
 
-  function MCQAnswer(index, answer) {
-    chosenAnswers.value.push({ question: index, answer: answer }) 
+  function changeAnswer(event, qNum) {
+    // if (userAnswers.value.questionNum
+    userAnswers.value.push({
+      questionNum: qNum,
+      answer: event.target.value
+    })
+    console.log(userAnswers.value)
   }
 
   onMounted(() => {
     getQuizzes()
-  })
-
-  watchEffect(() => {
-    console.log(chosenAnswers.value)
   })
 </script>
 
@@ -45,10 +51,10 @@
 
       <!-- Multi-choice Question -->
       <div v-if="question.options">
-        <div v-for="(options, index) in getOptions(question.options)" :key="index">
-          <input type="radio" :name="qNum" :value="index" v-model="chosenAnswers[qNum]">
-          <label :for="options" class="px-2">
-            {{ options }}
+        <div v-for="(option, index) in getOptions(question.options)" :key="index">
+          <input type="radio" :name="qNum" :value="option" @input="changeAnswer($event, qNum)">
+          <label :for="option" class="px-2">
+            {{ option }}
           </label>
         </div>
       </div>
@@ -56,13 +62,13 @@
 
       <!-- Subjective Question -->
       <div v-else-if="!question.options && typeof(question.correct_answers) === 'string'">
-        <input type="text" placeholder="Type your answer here..." class="text-black rounded-md px-2 my-2"> 
+        <input type="text" placeholder="Type your answer here..." class="text-black rounded-md px-2 my-2" @input="changeAnswer($event, qNum)"> 
       </div>
       <!-- ----- -->
 
       <!-- True/False Question -->
       <div v-else-if="!question.options && typeof(question.correct_answer) === 'number'">
-        <select name="true false" class="rounded-md text-black pr-4 my-2">
+        <select name="true false" class="rounded-md text-black pr-4 my-2" @input="changeAnswer($event, qNum)">
           <option value="0"> False </option>
           <option value="1"> True </option>
         </select>
