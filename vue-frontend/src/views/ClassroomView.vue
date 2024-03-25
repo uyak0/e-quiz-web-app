@@ -2,14 +2,13 @@
   import TopBar from "@/components/TopBar.vue";
   import DeleteIcon from "@/components/icons/DeleteIcon.vue";
   import axios from "axios";
-  import {useRoute} from "vue-router";
+  import {useRoute, useRouter} from "vue-router";
   import {onMounted, ref} from "vue";
 
   const route = useRoute()
+  const router = useRouter()
   const API = import.meta.env.VITE_LARAVEL_API
 
-  const createQuizPath = route.params.classroomId + '/quiz/create' // had to manually add classroomId infront of /quiz/create otherwise 
-                                                                  // it'd direct to classroom/quiz/create for some reason
   const classroomQuizzes = ref([])
   const classroomDetails = ref([])
   const userRole = ref('')
@@ -32,9 +31,12 @@
 
   async function deleteClassroom() {
     let confirmDlt = confirm('Are you sure you want to delete this classroom? \nThis action cannot be undone. All quizzes and students will be deleted as well!')
+    let confirmDlt2;
+
     if (confirmDlt) {
-      let confirmDlt2 = prompt("Type the classroom's name to proceed: ")
+      confirmDlt2 = prompt("Type the classroom's name to proceed: ")
     }
+
     if (confirmDlt2 !== classroomDetails.value.name) {
       return alert('Classroom name does not match, aborting...')
     }
@@ -49,7 +51,6 @@
   onMounted(() => {
     getClassroomData()
     getUserRole()
-    console.log(userRole.value)
     getQuizzes();
   })
 
@@ -65,7 +66,7 @@
       <DeleteIcon v-if="userRole === 'teacher'" @click="deleteClassroom"/> 
     </div>
 
-    <RouterLink v-if="userRole === 'teacher'" :to="createQuizPath" class="bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-2xl px-2"> 
+    <RouterLink v-if="userRole === 'teacher'" :to="{name: 'createQuiz'}" class="bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-2xl px-2"> 
       + Create a Quiz 
     </RouterLink>
     
