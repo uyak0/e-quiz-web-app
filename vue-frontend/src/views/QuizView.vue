@@ -23,29 +23,27 @@
 
   function changeAnswer(event, qNum) {
     const answer = event.target.value
-    const questionNum = userAnswers.value.find((answer) => answer.questionNum === qNum)
-    const index = userAnswers.value.indexOf(questionNum)
+    const existingAnswer = userAnswers.value.find((answer) => answer.questionNum === qNum)
+    const index = userAnswers.value.indexOf(existingAnswer)
 
-    if (questionNum !== -1) {
-      userAnswers.value.splice(index, 1)
-      userAnswers.value.push({
-        questionNum: qNum,
-        answer: answer,
-        isDone: true
-      })
-      if (answer === '') {
-        userAnswers.value.splice(index, 1)
+    if (!existingAnswer) {
+      userAnswers.value.push({ questionNum: qNum, answer: answer })
+    } else {
+      userAnswers.value.splice(index, 1, { questionNum: qNum, answer: answer })
+      if (answer == '') {     // for catching empty SUBJECTIVE QUESTION's answers
+        userAnswers.value.splice(index, 1,)
       }
     }
   }
 
   function isDone(qNum) {
-    if (userAnswers.value.find((answer) => answer.isDone === true)) return true
-    else return false
+    return isDone = this.userAnswers.some(answer => answer.questionNum === qNum);
   }
 
   function submit() {
     let confirmSubmit;
+
+    console.log(userAnswers.value)
 
     if (userAnswers.value.length !== quizzes.value.length) {
       alert('Please answer all questions before submitting!')
@@ -54,8 +52,8 @@
     }
 
     if (confirmSubmit) {
-      for (i = 0; i < userAnswers.value.length; i++) {
-        const answer = userAnswers.value[i]
+      for (let i = 0; i < userAnswers.value.length; i++) {
+        const answer = userAnswers.value[i].answer
         const question = quizzes.value.find((question) => question.id === answer.questionNum)
         if (question.correct_answer === answer.answer || question.correct_answers === answer.answer) {
           console.log('Correct')
@@ -77,7 +75,7 @@
     class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
     <!-- Question Component -->
     <div class="bg-transparent">
-      <h1 v-bind="userAnswers.questionNum" class="text-2xl font-bold" :class="{ 'text-green-400': isDone(qNum + 1) }"> #{{ qNum + 1 }}</h1>
+      <h1 class="text-2xl font-bold" :class="{ 'text-green-400': isDone(qNum + 1) }"> #{{ qNum + 1 }}</h1>
       <p>{{ question.description }}</p>
 
       <!-- Multi-choice Question -->
@@ -100,6 +98,7 @@
       <!-- True/False Question -->
       <div v-else-if="!question.options && typeof(question.correct_answer) === 'number'">
         <select name="true false" class="rounded-md text-black pr-4 my-2" @change="changeAnswer($event, qNum + 1)">
+          <option value="default" selected disabled>True/False</option>
           <option value="0"> False </option>
           <option value="1"> True </option>
         </select>
