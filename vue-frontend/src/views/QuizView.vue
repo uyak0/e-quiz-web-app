@@ -1,19 +1,18 @@
 <script setup>
   import { ref, onMounted, watchEffect } from 'vue';
-  import axios from 'axios';
-  import TopBar from "@/components/TopBar.vue";
   import { useRoute } from 'vue-router'
+  import axios from 'axios';
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute()
 
-  let quizzes = ref([])
+  let quiz = ref([])
   let userAnswers = ref([])
 
-  async function getQuizzes() {
+  async function getQuiz() {
     const res = await axios.get(API + 'quiz/' + route.params.quizId)
-    quizzes.value = res.data
-    console.log(quizzes.value)
+    quiz.value = res.data
+    console.log(res.data)
   }
 
   function getOptions(options) {
@@ -37,15 +36,13 @@
   }
 
   function isDone(qNum) {
-    return isDone = this.userAnswers.some(answer => answer.questionNum === qNum);
+    return this.userAnswers.some(answer => answer.questionNum === qNum);
   }
 
   function submit() {
-    let confirmSubmit;
-
-    console.log(userAnswers.value)
-
-    if (userAnswers.value.length !== quizzes.value.length) {
+    let confirmSubmit = true;
+    
+    if (userAnswers.value.length !== quiz.value.length) {
       alert('Please answer all questions before submitting!')
     } else {
       confirmSubmit = confirm('Are you sure you want to submit your answers?')
@@ -54,8 +51,10 @@
     if (confirmSubmit) {
       for (let i = 0; i < userAnswers.value.length; i++) {
         const answer = userAnswers.value[i].answer
-        const question = quizzes.value.find((question) => question.id === answer.questionNum)
-        if (question.correct_answer === answer.answer || question.correct_answers === answer.answer) {
+        const correctAnswer = quiz.value[i].correct_answer     // true/false questions have undefined data type of correct_answer for some reason
+        const correctAnswers = quiz.value[i].correct_answers
+        if (answer == correctAnswer || answer == correctAnswers) { 
+           
           console.log('Correct')
         } else {
           console.log('Incorrect')
@@ -65,13 +64,12 @@
   }
 
   onMounted(() => {
-    getQuizzes()
+    getQuiz()
   })
 </script>
 
 <template>
-  <TopBar />
-  <div v-for="(question, qNum) in quizzes" :key="qNum"
+  <div v-for="(question, qNum) in quiz" :key="qNum"
     class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
     <!-- Question Component -->
     <div class="bg-transparent">
@@ -80,12 +78,27 @@
 
       <!-- Multi-choice Question -->
       <div v-if="question.options">
-        <div v-for="(option, index) in getOptions(question.options)" :key="index">
-          <input type="radio" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
-          <label :for="option" class="px-2">
-            {{ option }}
-          </label>
+
+        <!-- Multi-answer  -->
+        <div v-if="question.correct_answers.includes(',')">
+          <div v-for="(option, index) in getOptions(question.options)" :key="index">
+            <input type="checkbox" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
+            <label :for="option" class="px-2">
+              {{ option }}
+            </label>
+          </div>
         </div>
+
+        <!-- Single-answer -->
+        <div v-else>
+          <div v-for="(option, index) in getOptions(question.options)" :key="index">
+            <input type="radio" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
+            <label :for="option" class="px-2">
+              {{ option }}
+            </label>
+          </div>
+        </div>
+
       </div>
       <!-- -------- -->
 
@@ -97,7 +110,7 @@
 
       <!-- True/False Question -->
       <div v-else-if="!question.options && typeof(question.correct_answer) === 'number'">
-        <select name="true false" class="rounded-md text-black pr-4 my-2" @change="changeAnswer($event, qNum + 1)">
+        <select name="true false" class="rounded-md text-black pl-2 pr-4 my-2" @change="changeAnswer($event, qNum + 1)">
           <option value="default" selected disabled>True/False</option>
           <option value="0"> False </option>
           <option value="1"> True </option>

@@ -10,6 +10,7 @@ class Quiz extends Model
     use HasFactory;
     protected $table = 'quizzes';
     protected $fillable = ['title', 'due_date'];
+    protected $appends = ['multi', 'subjective', 'truefalse'];
 
     public function classroom()
     {

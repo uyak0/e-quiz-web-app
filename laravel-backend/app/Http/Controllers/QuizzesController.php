@@ -12,9 +12,15 @@ class QuizzesController extends Controller
     public function index(int $id): JsonResponse
     {
         $quiz = Quiz::find($id);
-        $multiChoiceQuestions = $quiz->multiChoiceQuestions;
-        $trueFalseQuestions = $quiz->trueFalseQuestions;
-        $subjectiveQuestions = $quiz->subjectiveQuestions;
+        $multiChoiceQuestions = $quiz->multiChoiceQuestions()->select([
+            'description', 'correct_answers', 'options', 'question_no'
+        ])->get();
+        $trueFalseQuestions = $quiz->trueFalseQuestions()->select([
+            'description', 'correct_answer', 'question_no'
+        ])->get();
+        $subjectiveQuestions = $quiz->subjectiveQuestions()->select([
+            'description', 'correct_answers', 'question_no'
+        ])->get();
 
         $questions = new Collection();
         $questions = $questions->merge($multiChoiceQuestions);
