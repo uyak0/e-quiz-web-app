@@ -8,11 +8,12 @@
 
   let quiz = ref([])
   let userAnswers = ref([])
+  let checkedAnswers = ref(0)
 
   async function getQuiz() {
     const res = await axios.get(API + 'quiz/' + route.params.quizId)
     quiz.value = res.data
-    console.log(res.data)
+    console.log(quiz.value)
   }
 
   function getOptions(options) {
@@ -24,6 +25,7 @@
     const answer = event.target.value
     const existingAnswer = userAnswers.value.find((answer) => answer.questionNum === qNum)
     const index = userAnswers.value.indexOf(existingAnswer)
+    console.log(userAnswers.value)
 
     if (!existingAnswer) {
       userAnswers.value.push({ questionNum: qNum, answer: answer })
@@ -41,8 +43,9 @@
 
   function submit() {
     let confirmSubmit = true;
+    const questions = quiz.value[0]
     
-    if (userAnswers.value.length !== quiz.value.length) {
+    if (userAnswers.value.length !== quiz.value[0].length) {
       alert('Please answer all questions before submitting!')
     } else {
       confirmSubmit = confirm('Are you sure you want to submit your answers?')
@@ -51,13 +54,16 @@
     if (confirmSubmit) {
       for (let i = 0; i < userAnswers.value.length; i++) {
         const answer = userAnswers.value[i].answer
-        const correctAnswer = quiz.value[i].correct_answer     // true/false questions have undefined data type of correct_answer for some reason
-        const correctAnswers = quiz.value[i].correct_answers
-        if (answer == correctAnswer || answer == correctAnswers) { 
-           
-          console.log('Correct')
-        } else {
-          console.log('Incorrect')
+        const correctAnswer = questions[i].correct_answer             
+        const correctAnswers = questions[i].correct_answers
+
+        if (questions[i].type === 'subjective' && questions[i].case_sensitive == 0) {   // for case insensitive SUBJECTIVE QUESTIONs 
+          if (answer.toLowerCase() === correctAnswers.toLowerCase()) checkedAnswers.value++
+          else continue 
+        } 
+        else {  // everything else doesn't need specific checks 
+          if (answer == correctAnswer || answer == correctAnswers) checkedAnswers.value++              
+          else continue 
         }
       }
     }
@@ -69,21 +75,24 @@
 </script>
 
 <template>
-  <div v-for="(question, qNum) in quiz" :key="qNum"
-    class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
+  <h1 class="text-4xl p-4">{{quiz.quiz_name}}</h1>
+  <div v-for="(question, qNum) in quiz[0]" :key="qNum" class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
     <!-- Question Component -->
     <div class="bg-transparent">
       <h1 class="text-2xl font-bold" :class="{ 'text-green-400': isDone(qNum + 1) }"> #{{ qNum + 1 }}</h1>
-      <p>{{ question.description }}</p>
+      <div class="flex flex-row gap-x-12">
+        <p>{{ question.description }}</p>
+        <p v-if="question.case_sensitive == 1" class="text-red-500">* Case sensitive</p>
+      </div>
 
       <!-- Multi-choice Question -->
-      <div v-if="question.options">
+      <div v-if="question.type === 'multi_choice'">
 
         <!-- Multi-answer  -->
         <div v-if="question.correct_answers.includes(',')">
           <div v-for="(option, index) in getOptions(question.options)" :key="index">
-            <input type="checkbox" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
-            <label :for="option" class="px-2">
+            <input type="checkbox" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
+            <label :for="option + qNum" class="px-2">
               {{ option }}
             </label>
           </div>
@@ -92,8 +101,8 @@
         <!-- Single-answer -->
         <div v-else>
           <div v-for="(option, index) in getOptions(question.options)" :key="index">
-            <input type="radio" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
-            <label :for="option" class="px-2">
+            <input type="radio" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
+            <label :for="option + qNum" class="px-2">
               {{ option }}
             </label>
           </div>
@@ -103,13 +112,13 @@
       <!-- -------- -->
 
       <!-- Subjective Question -->
-      <div v-else-if="!question.options && typeof(question.correct_answers) === 'string'">
+      <div v-else-if="question.type === 'subjective'">
         <input type="text" placeholder="Type your answer here..." class="text-black rounded-md px-2 my-2" @change="changeAnswer($event, qNum + 1)"> 
       </div>
       <!-- ----- -->
 
       <!-- True/False Question -->
-      <div v-else-if="!question.options && typeof(question.correct_answer) === 'number'">
+      <div v-else-if="question.type === 'true_false'">
         <select name="true false" class="rounded-md text-black pl-2 pr-4 my-2" @change="changeAnswer($event, qNum + 1)">
           <option value="default" selected disabled>True/False</option>
           <option value="0"> False </option>

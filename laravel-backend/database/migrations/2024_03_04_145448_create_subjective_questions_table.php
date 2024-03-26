@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('description');
             $table->string('correct_answers')->nullable();
             $table->integer('question_no');
+            $table->boolean('case_sensitive')->default(false);
             $table->foreignId('quiz_id')->references('id')->on('quizzes');
         });
     }
