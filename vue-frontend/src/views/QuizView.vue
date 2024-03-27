@@ -1,10 +1,11 @@
 <script setup>
   import { ref, onMounted, watchEffect } from 'vue';
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios';
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute()
+  const router = useRouter()
 
   let quiz = ref([])
   let userAnswers = ref([])
@@ -66,6 +67,8 @@
           else continue 
         }
       }
+
+      router.push({ name: 'QuizResult', params: { quiz: quiz.value, userAnswers: userAnswers.value }})
     }
   }
 

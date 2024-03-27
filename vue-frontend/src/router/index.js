@@ -134,6 +134,16 @@ const router = createRouter({
                       name: 'quiz',
                       component: () => import('@/views/QuizView.vue'),
                       meta: { title: 'Quiz' }
+                    },
+                    {
+                      path: 'result',
+                      name: 'quizResult',
+                      component: () => import('@/views/QuizResultView.vue'),
+                      meta: { title: 'Quiz Result' },
+                      props: { 
+                        quiz: true,
+                        userAnswers: true 
+                      }
                     }
                   ]
                 },
