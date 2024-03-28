@@ -41,20 +41,14 @@
     questionProps.value.splice(index, 1);
   };
 
-  function submitQuizCreation() {
+  async function submitQuizCreation() {
     const data = {
       title: quizProps.value.title,
       due_date: formatDate(quizProps.value.due_date),
       classroom_id: route.params.classroomId
     }
 
-    axios.post(API + 'quiz/create', data)
-      .then(response => {
-        console.log(response.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    const res = await axios.post(API + 'quiz/create', data)
   }
 </script>
 

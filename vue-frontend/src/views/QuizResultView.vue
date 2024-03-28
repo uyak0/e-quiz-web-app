@@ -1,18 +1,7 @@
 <script setup>
   import { ref } from 'vue' 
-  
-  const props = defineProps([
-    userAnswers: {
-      questionNum: Number,
-      answer: String
-    },
-    quiz: {
-      questionNum: Number,
-      question: String,
-      options: Array,
-      correctAnswer: String
-    },
-  ])
+  import axios from 'axios';
+
 </script>
 <template>
   {{ console.log(userAnswers) }}

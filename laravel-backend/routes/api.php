@@ -9,6 +9,7 @@ use App\Http\Controllers\ClassroomsController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\UserQuizAnswersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,4 +54,5 @@ Route::group(['prefix' => 'student'], function() {
 Route::group(['prefix' => 'quiz'], function() {
     Route::get('/{id?}', [QuizzesController::class, 'index']);
     Route::post('/create', [QuizzesController::class, 'store']);
+    Route::post('/answer-submit', [UserQuizAnswersController::class, 'store']);
 });

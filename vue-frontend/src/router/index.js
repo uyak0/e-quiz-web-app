@@ -16,9 +16,7 @@ async function inClassroom(id) {
       }
     }) 
 
-    if (inClass.data.status) {
-      return true
-    }
+    if (inClass.data.status) return true 
   }
   catch (error) {
     console.log(error) 
@@ -140,10 +138,7 @@ const router = createRouter({
                       name: 'quizResult',
                       component: () => import('@/views/QuizResultView.vue'),
                       meta: { title: 'Quiz Result' },
-                      props: { 
-                        quiz: true,
-                        userAnswers: true 
-                      }
+                      props: true
                     }
                   ]
                 },

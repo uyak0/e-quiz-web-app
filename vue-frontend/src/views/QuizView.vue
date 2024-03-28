@@ -42,7 +42,7 @@
     return this.userAnswers.some(answer => answer.questionNum === qNum);
   }
 
-  function submit() {
+  async function submit() {
     let confirmSubmit = true;
     const questions = quiz.value[0]
     
@@ -53,22 +53,31 @@
     }
 
     if (confirmSubmit) {
-      for (let i = 0; i < userAnswers.value.length; i++) {
-        const answer = userAnswers.value[i].answer
-        const correctAnswer = questions[i].correct_answer             
-        const correctAnswers = questions[i].correct_answers
-
-        if (questions[i].type === 'subjective' && questions[i].case_sensitive == 0) {   // for case insensitive SUBJECTIVE QUESTIONs 
-          if (answer.toLowerCase() === correctAnswers.toLowerCase()) checkedAnswers.value++
-          else continue 
-        } 
-        else {  // everything else doesn't need specific checks 
-          if (answer == correctAnswer || answer == correctAnswers) checkedAnswers.value++              
-          else continue 
-        }
+      const data = {
+        quiz_id: route.params.quizId,
+        user_id: route.params.userId,
+        user_answers: userAnswers.value 
       }
+      const res = await axios.post(API + 'quiz/answer-submit', data)
 
-      router.push({ name: 'QuizResult', params: { quiz: quiz.value, userAnswers: userAnswers.value }})
+      // for (let i = 0; i < userAnswers.value.length; i++) {
+      //   const answer = userAnswers.value[i].answer
+      //   const correctAnswer = questions[i].correct_answer             
+      //   const correctAnswers = questions[i].correct_answers
+
+      //   if (questions[i].type === 'subjective' && questions[i].case_sensitive == 0) {   // for case insensitive SUBJECTIVE QUESTIONs 
+      //     if (answer.toLowerCase() === correctAnswers.toLowerCase()) checkedAnswers.value++
+      //     else continue 
+      //   } 
+      //   else {  // everything else doesn't need specific checks 
+      //     if (answer == correctAnswer || answer == correctAnswers) checkedAnswers.value++              
+      //     else continue 
+      //   }
+      // }
+
+      router.push({ 
+        name: 'quizResult', 
+      })
     }
   }
 
