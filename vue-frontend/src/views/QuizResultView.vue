@@ -64,7 +64,7 @@
 
       <!-- Multi-choice Question -->
       <div v-if="question.type === 'multi_choice'"> 
-        <p class="text-white" :class="{ 'text-green-500': isCorrectAnswer(qNum) }" v-cloak> You chose: {{ quizAnswers[qNum].answer }}</p>
+        <p class="text-red-500" :class="{ 'text-green-500': isCorrectAnswer(qNum) }" v-cloak> You chose: {{ quizAnswers[qNum].answer }}</p>
         <p v-if="!isCorrectAnswer(qNum)" class="text-white"> Correct Answer: {{ question.correct_answers }}</p>
         <div v-for="(option, index) in getOptions(question.options)" :key="index">
           <label :for="option + qNum" class="px-2">

@@ -63,21 +63,6 @@
       }
       const res = await axios.post(API + 'quiz/answer-submit', data)
 
-      // for (let i = 0; i < userAnswers.value.length; i++) {
-      //   const answer = userAnswers.value[i].answer
-      //   const correctAnswer = questions[i].correct_answer             
-      //   const correctAnswers = questions[i].correct_answers
-
-      //   if (questions[i].type === 'subjective' && questions[i].case_sensitive == 0) {   // for case insensitive SUBJECTIVE QUESTIONs 
-      //     if (answer.toLowerCase() === correctAnswers.toLowerCase()) checkedAnswers.value++
-      //     else continue 
-      //   } 
-      //   else {  // everything else doesn't need specific checks 
-      //     if (answer == correctAnswer || answer == correctAnswers) checkedAnswers.value++              
-      //     else continue 
-      //   }
-      // }
-
       router.push({ 
         name: 'quizResult', 
         query: { quizId: route.params.quizId }
