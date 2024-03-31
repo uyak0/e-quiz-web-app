@@ -52,7 +52,8 @@ Route::group(['prefix' => 'student'], function() {
 });
 
 Route::group(['prefix' => 'quiz'], function() {
-    Route::get('/{id?}', [QuizzesController::class, 'index']);
+    Route::get('/', [QuizzesController::class, 'index']);
     Route::post('/create', [QuizzesController::class, 'store']);
     Route::post('/answer-submit', [UserQuizAnswersController::class, 'store']);
+    Route::get('/answer-get', [UserQuizAnswersController::class, 'get']);
 });

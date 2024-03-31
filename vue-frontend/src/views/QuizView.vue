@@ -11,8 +11,11 @@
   let userAnswers = ref([])
   let checkedAnswers = ref(0)
 
-  async function getQuiz() {
-    const res = await axios.get(API + 'quiz/' + route.params.quizId)
+  async function getQuizData() {
+    const data = {
+      quiz_id: route.params.quizId
+    }
+    const res = await axios.get(API + 'quiz/', { params: data })
     quiz.value = res.data
     console.log(quiz.value)
   }
@@ -48,7 +51,7 @@
     
     if (userAnswers.value.length !== quiz.value[0].length) {
       alert('Please answer all questions before submitting!')
-    } else {
+   r} else {
       confirmSubmit = confirm('Are you sure you want to submit your answers?')
     }
 
@@ -56,7 +59,7 @@
       const data = {
         quiz_id: route.params.quizId,
         user_id: route.params.userId,
-        user_answers: userAnswers.value 
+        user_answers: JSON.stringify(userAnswers.value)
       }
       const res = await axios.post(API + 'quiz/answer-submit', data)
 
@@ -77,12 +80,13 @@
 
       router.push({ 
         name: 'quizResult', 
+        query: { quizId: route.params.quizId }
       })
     }
   }
 
   onMounted(() => {
-    getQuiz()
+    getQuizData()
   })
 </script>
 
