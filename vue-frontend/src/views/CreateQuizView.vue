@@ -13,7 +13,7 @@
   const route = useRoute()
 
   let questionProps= ref([
-      { questionType: 'mcq' }
+    { questionType: 'mcq' }
   ]) // first question defaults
 
   let quizProps = ref({
@@ -23,7 +23,7 @@
     classroom_id: route.params.classroomId
   })
 
-  const formatDate = (date) => {
+  function formatDate(date) {
     const day = date.getDate()
     const month = date.getMonth() + 1
     const year = date.getFullYear()
@@ -73,7 +73,7 @@
           <QuestionTypeDDL v-model="item.questionType" />
         </div>
         <!-- Delete Button -->
-        <div @click="deleteQuestion" class="text-2xl cursor-pointer hover:text-red-600">
+        <div @click="deleteQuestion()" class="text-2xl cursor-pointer hover:text-red-600">
           ⓧ 
         </div>
       </div>
