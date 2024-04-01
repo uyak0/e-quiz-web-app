@@ -33,9 +33,9 @@ class QuizzesController extends Controller
         });
     }
 
-    public function index(int $id): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $quiz = Quiz::find($id);
+        $quiz = Quiz::find($request->quiz_id);
 
         $multiChoiceFields = ['question_no', 'description', 'options', 'correct_answers'];
         $trueFalseFields = ['question_no', 'description', 'correct_answer'];
