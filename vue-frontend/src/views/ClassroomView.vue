@@ -4,6 +4,7 @@
   import axios from "axios";
   import {useRoute, useRouter} from "vue-router";
   import {onMounted, ref} from "vue";
+  import feather from 'feather-icons'; 
 
   const route = useRoute()
   const router = useRouter()
@@ -11,6 +12,7 @@
 
   const classroomQuizzes = ref([])
   const classroomDetails = ref([])
+  const classroomDesc = ref('')
   const userRole = route.params.userRole 
   
   async function getClassroomData() {
@@ -41,6 +43,15 @@
       router.push('/' + route.params.userRole + '/' + route.params.userId + '/home')
     }
   }
+
+  function changeDesc() {
+    axios.put(API + 'classroom/update-desc', {
+      classroom_id: route.params.classroomId,
+      description: classroomDesc.value
+    })
+    classroomDetails.value.description = classroomDesc.value
+    classroomDesc.value = ''
+  }
   
   onMounted(() => {
     getClassroomData()
@@ -57,10 +68,13 @@
       <div name="title and desc" class="w-full px-2 flex flex-row justify-between">
         <div>
           <h1 class="text-6xl">{{classroomDetails.name}}</h1>
+          <button v-if="userRole === 'teacher'" class="text-xl">
+            <vue-feather type="edit"></vue-feather>
+          </button>
           <h3 class="text-4xl">{{classroomDetails.description}}</h3>
-          <div class="flex items-center my-4">
-            <input type="text" class="text-black flex-grow bg-transparent py-2 px-2 outline-none" placeholder="Add a description...">
-            <button class="text-white px-4 py-2 hover:bg-gray-300 rounded-r-lg transition-colors duration-200">↵</button>
+          <div v-if="!classroomDetails.description" class="flex items-center my-4">
+            <input type="text" v-model="classroomDesc" class="text-black flex-grow bg-transparent py-2 px-2 outline-none" placeholder="Add a description...">
+            <button v-if="classroomDesc" @click="changeDesc" class="text-white px-4 py-2 hover:bg-gray-300 rounded-r-lg transition-colors duration-200">↵</button>
           </div>
         </div>
         <span>

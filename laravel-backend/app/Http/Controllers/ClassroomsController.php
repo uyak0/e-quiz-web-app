@@ -22,6 +22,18 @@ class ClassroomsController extends Controller
         }
     }
 
+    public function updateDescription(Request $request): JsonResponse
+    {
+        $classroom = Classroom::find($request->classroom_id);
+        $classroom->description = $request->description;
+        $classroom->save();
+
+        return response() -> json([
+            'status' => 'success',
+            'message' => 'Classroom description updated successfully!'
+        ]);
+    }
+
     public function deleteClassroom(int $id)
     {
         Classroom::find($id)->users()->detach();

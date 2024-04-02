@@ -52,8 +52,12 @@
     try {
       const res = await axios.post(API + 'classroom/create', classroomData)
       if (res.data.status === 'success') {
-        alert('Classroom created successfully, redirecting...')
-        router.push(res.data.classroom_id) 
+        router.push({
+          name: 'classroom', 
+          params: {
+            classroomId: res.data.classroom_id
+          }
+        }) 
       }
     } catch (err) {
       console.log(err)
