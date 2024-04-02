@@ -31,6 +31,7 @@ Route::group(['prefix' => 'classroom'], function() {
     Route::delete('/{id}', [ClassroomsController::class, 'deleteClassroom']);
     Route::post('/create', [ClassroomsController::class, 'createClassroom']);
     Route::put('/update-desc', [ClassroomsController::class, 'updateDescription']);
+    Route::put('/update-name', [ClassroomsController::class, 'updateName']);
     Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
 });
 

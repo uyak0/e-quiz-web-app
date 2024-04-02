@@ -12,11 +12,15 @@
   const classroomQuizzes = ref([])
   const classroomDetails = ref([])
   const classroomDesc = ref('')
+  const classroomName = ref('')
+
   const userRole = route.params.userRole 
   
   async function getClassroomData() {
     const res = await axios.get(API + 'classroom/' + route.params.classroomId)
     classroomDetails.value = res.data;
+    classroomName.value = res.data.name
+    classroomDesc.value = res.data.description
   }
 
   async function getQuizzes() {
@@ -31,9 +35,7 @@
     if (confirmDlt) {
       confirmDlt2 = prompt("Type the classroom's name to proceed: ")
     }
-    else {
-      return
-    }
+    else return 
 
     if (confirmDlt2 !== classroomDetails.value.name) {
       return alert('Classroom name does not match, aborting...')
@@ -46,26 +48,36 @@
     }
   }
 
-  function addDesc() {
-    axios.put(API + 'classroom/update-desc', {
-      classroom_id: route.params.classroomId,
-      description: classroomDesc.value
-    })
-    classroomDetails.value.description = classroomDesc.value
-    classroomDesc.value = ''
-  }
 
   const showName = ref(true)
   const showDesc = ref(true)
+  const showNameEditBtn = ref(true)
+  const showDescEditBtn = ref(true)
 
-  function changeName() {
-    showName.value = false 
+  async function changeName() {
+    let confirmChange = confirm('Are you sure you want to change the classroom name?')
+    if (!confirmChange) return
+
+    await axios.put(API + 'classroom/update-name', {
+      classroom_id: route.params.classroomId,
+      name: classroomName.value 
+    })
+    showName.value = true
+    showNameEditBtn.value = true
+  }
+
+  async function changeDesc() {
+    let confirmChange = confirm('Are you sure you want to change the classroom description?')
+    if (!confirmChange) return
+
+    await axios.put(API + 'classroom/update-desc', {
+      classroom_id: route.params.classroomId,
+      description: classroomDesc.value
+    })
+    showDesc.value = true
+    showDescEditBtn.value = true
   }
   
-  function changeDesc() {
-    showDesc.value = false 
-  }
-
   onMounted(() => {
     getClassroomData()
     getQuizzes();
@@ -79,20 +91,31 @@
   <div class="w-full justify-center flex">
     <div class="w-3/4 bg-slate-500 h-screen">
       <div name="title and desc" class="w-full px-2 flex flex-row justify-between">
-        <div>
+        <div name="classroom details">
           <div name="name" class="flex flex-row">
-            <h1 class="text-6xl" v-show="showName">{{classroomDetails.name}}</h1>
-            <input type="text" v-if="!showName" v-model="classroomDetails.name" class="text-black flex-grow bg-transparent py-2 px-2 outline-none text-2xl" placeholder="Add a name...">
-            <vue-feather @click="changeName" size="18" type="edit" v-if="userRole === 'teacher'" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
-            <vue-feather @click="showName = true" size="18" type="x" v-if="userRole === 'teacher' && !showName" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+            <h1 class="text-6xl" v-show="showName">{{ classroomName }}</h1>
+            <div v-if="!showName">
+              <input type="text" v-model="classroomName" class="text-black flex-grow bg-transparent py-2 px-2 outline-none text-2xl" placeholder="Add a name...">
+              <button @click="changeName" class="text-white">
+                <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
+              </button>
+            </div>
+            <vue-feather v-show="showNameEditBtn" @click="showName = false; showNameEditBtn = false" size="18" type="edit" v-if="userRole === 'teacher'" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+            <vue-feather @click="showName = true; showNameEditBtn = true" size="18" type="x" v-if="userRole === 'teacher' && !showName" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
           </div>
-          <div name="description" class="flex flex-row">
-            <h3 class="text-4xl" v-show="showDesc">{{classroomDetails.description}}</h3>
-            <input type="text" v-if="!showDesc" v-model="classroomDetails.description" class="text-black flex-grow bg-transparent py-2 px-2 outline-none" placeholder="Add a description...">
-            <vue-feather @click="changeDesc" size="18" type="edit" v-if="userRole === 'teacher'" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
-            <vue-feather @click="showDesc = true" size="18" type="x" v-if="userRole === 'teacher' && !showDesc" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+
+          <div v-if="classroomDetails.description" name="description" class="flex flex-row">
+            <h3 class="text-4xl" v-show="showDesc">{{ classroomDesc }}</h3>
+            <div v-if="!showDesc">
+              <input type="text" v-model="classroomDesc" class="text-black flex-grow bg-transparent py-2 px-2 outline-none" placeholder="Add a description...">
+              <button @click="changeDesc" class="text-white">
+                <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
+              </button>
+            </div>
+            <vue-feather v-show="showDescEditBtn" @click="showDesc = false; showDescEditBtn = false" size="18" type="edit" v-if="userRole === 'teacher'" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+            <vue-feather @click="showDesc = true; showDescEditBtn = true" size="18" type="x" v-if="userRole === 'teacher' && !showDesc" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
           </div>
-          <div v-if="!classroomDetails.description" class="flex items-center my-4">
+          <div v-else-if="!classroomDetails.description" class="flex items-center my-4">
             <input type="text" v-model="classroomDesc" class="text-black flex-grow bg-transparent py-2 px-2 outline-none" placeholder="Add a description...">
             <button v-if="classroomDesc" @click="addDesc" class="text-white px-4 py-2 hover:bg-gray-300 rounded-r-lg transition-colors duration-200">↵</button>
           </div>
@@ -101,9 +124,11 @@
           <button class="rounded-md w-10 bg-red-500 text-black">
             <vue-feather type="trash-2" v-if="userRole === 'teacher'" @click="deleteClassroom"/> 
           </button>
-          <RouterLink v-if="userRole === 'teacher'" :to="{name: 'createQuiz'}" class="bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-2xl"> 
-            + Create a Quiz 
-          </RouterLink>
+          <button class="bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-2xl px-4">
+            <RouterLink v-if="userRole === 'teacher'" :to="{name: 'createQuiz'}" class=""> 
+              + Create a Quiz 
+            </RouterLink>
+          </button>
         </span>
       </div>
 
