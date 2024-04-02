@@ -1,10 +1,9 @@
 <script setup>
   import TopBar from "@/components/TopBar.vue";
-  import DeleteIcon from "@/components/icons/DeleteIcon.vue";
   import axios from "axios";
   import {useRoute, useRouter} from "vue-router";
   import {onMounted, ref} from "vue";
-  import feather from 'feather-icons'; 
+  import VueFeather from "vue-feather";
 
   const route = useRoute()
   const router = useRouter()
@@ -32,6 +31,9 @@
     if (confirmDlt) {
       confirmDlt2 = prompt("Type the classroom's name to proceed: ")
     }
+    else {
+      return
+    }
 
     if (confirmDlt2 !== classroomDetails.value.name) {
       return alert('Classroom name does not match, aborting...')
@@ -44,7 +46,7 @@
     }
   }
 
-  function changeDesc() {
+  function addDesc() {
     axios.put(API + 'classroom/update-desc', {
       classroom_id: route.params.classroomId,
       description: classroomDesc.value
@@ -52,7 +54,18 @@
     classroomDetails.value.description = classroomDesc.value
     classroomDesc.value = ''
   }
+
+  const showName = ref(true)
+  const showDesc = ref(true)
+
+  function changeName() {
+    showName.value = false 
+  }
   
+  function changeDesc() {
+    showDesc.value = false 
+  }
+
   onMounted(() => {
     getClassroomData()
     getQuizzes();
@@ -67,18 +80,27 @@
     <div class="w-3/4 bg-slate-500 h-screen">
       <div name="title and desc" class="w-full px-2 flex flex-row justify-between">
         <div>
-          <h1 class="text-6xl">{{classroomDetails.name}}</h1>
-          <button v-if="userRole === 'teacher'" class="text-xl">
-            <vue-feather type="edit"></vue-feather>
-          </button>
-          <h3 class="text-4xl">{{classroomDetails.description}}</h3>
+          <div name="name" class="flex flex-row">
+            <h1 class="text-6xl" v-show="showName">{{classroomDetails.name}}</h1>
+            <input type="text" v-if="!showName" v-model="classroomDetails.name" class="text-black flex-grow bg-transparent py-2 px-2 outline-none text-2xl" placeholder="Add a name...">
+            <vue-feather @click="changeName" size="18" type="edit" v-if="userRole === 'teacher'" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+            <vue-feather @click="showName = true" size="18" type="x" v-if="userRole === 'teacher' && !showName" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+          </div>
+          <div name="description" class="flex flex-row">
+            <h3 class="text-4xl" v-show="showDesc">{{classroomDetails.description}}</h3>
+            <input type="text" v-if="!showDesc" v-model="classroomDetails.description" class="text-black flex-grow bg-transparent py-2 px-2 outline-none" placeholder="Add a description...">
+            <vue-feather @click="changeDesc" size="18" type="edit" v-if="userRole === 'teacher'" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+            <vue-feather @click="showDesc = true" size="18" type="x" v-if="userRole === 'teacher' && !showDesc" class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+          </div>
           <div v-if="!classroomDetails.description" class="flex items-center my-4">
             <input type="text" v-model="classroomDesc" class="text-black flex-grow bg-transparent py-2 px-2 outline-none" placeholder="Add a description...">
-            <button v-if="classroomDesc" @click="changeDesc" class="text-white px-4 py-2 hover:bg-gray-300 rounded-r-lg transition-colors duration-200">↵</button>
+            <button v-if="classroomDesc" @click="addDesc" class="text-white px-4 py-2 hover:bg-gray-300 rounded-r-lg transition-colors duration-200">↵</button>
           </div>
         </div>
         <span>
-          <DeleteIcon class="w-10" v-if="userRole === 'teacher'" @click="deleteClassroom"/> 
+          <button class="rounded-md w-10 bg-red-500 text-black">
+            <vue-feather type="trash-2" v-if="userRole === 'teacher'" @click="deleteClassroom"/> 
+          </button>
           <RouterLink v-if="userRole === 'teacher'" :to="{name: 'createQuiz'}" class="bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-2xl"> 
             + Create a Quiz 
           </RouterLink>
