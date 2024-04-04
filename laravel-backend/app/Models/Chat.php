@@ -30,4 +30,21 @@ class Chat extends Model
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
+
+    public static function getMessagesQueryBetweenTwoUsers($request, $sender_id, $receiver_id)
+    {
+        //select * from messages where ((sender_id=1 and receiver_id = 2) or (receiver_id = 1 and sender_id =2))
+        $query = self::with(['sender', 'receiver'])->where(function($q) use($request, $sender_id, $receiver_id) {
+            $q->where(function($sub) use ($sender_id, $receiver_id) {
+                $sub->where('sender_id', $sender_id)
+                    ->where('receiver_id', $receiver_id);
+            })
+             ->orWhere(function($sub) use ($sender_id, $receiver_id) {
+                 $sub->where('receiver_id', $sender_id)
+                     ->where('sender_id', $receiver_id);
+             });
+        });
+
+        return $query;
+    }
 }

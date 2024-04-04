@@ -30,6 +30,7 @@ Route::group(['prefix' => 'classroom'], function() {
     Route::delete('/{id}', [ClassroomsController::class, 'deleteClassroom']);
     Route::post('/create', [ClassroomsController::class, 'createClassroom']);
     Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
+    
 });
 
 Route::group(['prefix' => 'user'], function() {
@@ -55,8 +56,9 @@ Route::group(['prefix' => 'quiz'], function() {
     Route::post('/create', [QuizzesController::class, 'store']);
 });
 
-Route::get("/online-users", [UserController::class, "getOnlineUsers"]);
+Route::get("online-users", [UserController::class, "getOnlineUsers"]);
 
 Route::group(['prefix' => 'messages', 'middleware' => 'auth'], function() {
+    Route::get ("/", [ChatController::class, "index"]);
     Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
 });

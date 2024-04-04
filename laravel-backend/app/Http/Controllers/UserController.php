@@ -54,7 +54,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function getOnlineUser(){
+    public function getOnlineUsers(){
         if(!auth()->check()) {
             return response()->json(data:['users'=>[]]);
         }
