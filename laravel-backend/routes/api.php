@@ -9,6 +9,7 @@ use App\Http\Controllers\ClassroomsController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\UserQuizAnswersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,8 @@ Route::group(['prefix' => 'classroom'], function() {
     Route::get('/{id?}', [ClassroomsController::class, 'index']);
     Route::delete('/{id}', [ClassroomsController::class, 'deleteClassroom']);
     Route::post('/create', [ClassroomsController::class, 'createClassroom']);
+    Route::put('/update-desc', [ClassroomsController::class, 'updateDescription']);
+    Route::put('/update-name', [ClassroomsController::class, 'updateName']);
     Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
     
 });
@@ -52,8 +55,10 @@ Route::group(['prefix' => 'student'], function() {
 });
 
 Route::group(['prefix' => 'quiz'], function() {
-    Route::get('/{id?}', [QuizzesController::class, 'index']);
+    Route::get('/', [QuizzesController::class, 'index']);
     Route::post('/create', [QuizzesController::class, 'store']);
+    Route::post('/answer-submit', [UserQuizAnswersController::class, 'store']);
+    Route::get('/answer-get', [UserQuizAnswersController::class, 'get']);
 });
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);

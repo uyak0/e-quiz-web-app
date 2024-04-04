@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subjective_questions', function (Blueprint $table) {
+        Schema::create('user_quiz_answers', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
-            $table->string('correct_answers')->nullable();
-            $table->integer('question_no');
-            $table->boolean('case_sensitive')->default(false);
-            $table->foreignId('quiz_id')->references('id')->on('quizzes');
+            $table->foreignId('quiz_id')->constrained(table: 'quizzes')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained(table: 'users')->onDelete('cascade');
+            $table->longText('user_answers');
+            $table->timestamps();
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('user_quiz_answers');
     }
 };

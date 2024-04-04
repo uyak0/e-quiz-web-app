@@ -13,7 +13,12 @@
   const route = useRoute()
 
   let questionProps= ref([
-      { questionType: 'mcq' }
+    { 
+      questionType: 'mcq',
+      questionDesc: '',
+      correctAnswers: [''], 
+      options: '',
+    }
   ]) // first question defaults
 
   let quizProps = ref({
@@ -23,7 +28,7 @@
     classroom_id: route.params.classroomId
   })
 
-  const formatDate = (date) => {
+  function formatDate(date) {
     const day = date.getDate()
     const month = date.getMonth() + 1
     const year = date.getFullYear()
@@ -31,6 +36,12 @@
     const newDate = `${year}-${month}-${day}` 
     const time = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
     return newDate + ' ' + time
+  }
+
+  function addCorrectAnswer(type, index, correctAnswers) {
+    questionProps.value[index].correctAnswers = correctAnswers
+
+    console.log(questionProps.value)
   }
 
   function addQuestion() {
@@ -41,20 +52,15 @@
     questionProps.value.splice(index, 1);
   };
 
-  function submitQuizCreation() {
+  async function submitQuizCreation() {
     const data = {
       title: quizProps.value.title,
       due_date: formatDate(quizProps.value.due_date),
-      classroom_id: route.params.classroomId
+      classroom_id: route.params.classroomId,
+      questions: questionProps.value
     }
 
-    axios.post(API + 'quiz/create', data)
-      .then(response => {
-        console.log(response.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    const res = await axios.post(API + 'quiz/create', data)
   }
 </script>
 
@@ -79,14 +85,14 @@
           <QuestionTypeDDL v-model="item.questionType" />
         </div>
         <!-- Delete Button -->
-        <div @click="deleteQuestion" class="text-2xl cursor-pointer hover:text-red-600">
+        <div @click="deleteQuestion()" class="text-2xl cursor-pointer hover:text-red-600">
           ⓧ 
         </div>
       </div>
     
       <!-- Multi-choice Question -->
       <div v-if="item.questionType==='mcq'">
-        <MCQuestion />
+        <MCQuestion @add-answer="addCorrectAnswer('mcq', index, correctAnswers)" />
       </div>
 
       <!-- Subjective Question -->

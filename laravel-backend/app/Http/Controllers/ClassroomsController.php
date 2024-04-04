@@ -22,6 +22,38 @@ class ClassroomsController extends Controller
         }
     }
 
+    public function updateName(Request $request): JsonResponse
+    {
+        if (auth()->user()->roles->first()->name) {
+            $classroom = Classroom::find($request->classroom_id);
+            $classroom->name = $request->name;
+            $classroom->save();
+
+            return response() -> json([
+                'status' => 'success',
+                'message' => 'Classroom name updated successfully!'
+            ]);
+        }
+        else {
+            return response() -> json([
+                'status' => 'error',
+                'message' => 'You are not authorized to update the classroom name!'
+            ]);
+        }
+    }
+
+    public function updateDescription(Request $request): JsonResponse
+    {
+        $classroom = Classroom::find($request->classroom_id);
+        $classroom->description = $request->description;
+        $classroom->save();
+
+        return response() -> json([
+            'status' => 'success',
+            'message' => 'Classroom description updated successfully!'
+        ]);
+    }
+
     public function deleteClassroom(int $id)
     {
         Classroom::find($id)->users()->detach();

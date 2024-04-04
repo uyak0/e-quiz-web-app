@@ -1,21 +1,30 @@
 <script setup>
-  import { ref } from "vue";
+  import { ref, watchEffect } from "vue";
 
-  const correctAnswers = ref([
-    { answer: '' }    // array with answer as key
-  ])
-  const options = ref([
-    { option: '' }    // same thing
-  ])
+  const emit = defineEmits([
+    'addAnswer', 
+    'removeAnswer',
+    'addOption',
+    'removeOption',
+  ]);
 
-  // button for adding another correct option
-  const addCorrectAnswer = () => {
-    correctAnswers.value.push({ answer: '' })   // pushes empty answer into the array
+  const correctAnswers = ref([''])
+  const options = ref([''])
+
+  function addCorrectAnswer(index, e) {
+    correctAnswers.value.splice(index, 1, e.target.value)
+    console.log(correctAnswers.value)
+    emit('addAnswer', correctAnswers)
   }
 
-  const addOption = () => {
-    options.value.push({ option: '' })
+
+  function addOption() {
+    options.value.length++
+    emit('addOption')
   }
+  
+  watchEffect(() => {
+  })
 </script>
 <template>
   <div class="mx-4 flex flex-col">
@@ -24,8 +33,8 @@
 
     <!-- Correct answers -->
     <div v-for="(correctAnswer, index) in correctAnswers" :key="index">
-      <input type="text" v-model="correctAnswer.answer" placeholder="Type correct answer here..." class="bg-transparent w-2/5">
-      <button @click="addCorrectAnswer" class="rounded-full border-2 border-dotted px-2 mx-2 text-3xl"> + </button>
+      <input type="text" @change="addCorrectAnswer(index, $event)" placeholder="Type correct answer here..." class="bg-transparent w-2/5">
+      <button @click="correctAnswers.length++" class="rounded-full border-2 border-dotted px-2 mx-2 text-3xl"> + </button>
     </div>
 
     <!-- Other answers -->
