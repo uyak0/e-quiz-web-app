@@ -13,7 +13,12 @@
   const route = useRoute()
 
   let questionProps= ref([
-    { questionType: 'mcq' }
+    { 
+      questionType: 'mcq',
+      questionDesc: '',
+      correctAnswers: [''], 
+      options: '',
+    }
   ]) // first question defaults
 
   let quizProps = ref({
@@ -33,6 +38,12 @@
     return newDate + ' ' + time
   }
 
+  function addCorrectAnswer(type, index, correctAnswers) {
+    questionProps.value[index].correctAnswers = correctAnswers
+
+    console.log(questionProps.value)
+  }
+
   function addQuestion() {
     questionProps.value.push({ questionType: 'mcq' })
   };
@@ -45,7 +56,8 @@
     const data = {
       title: quizProps.value.title,
       due_date: formatDate(quizProps.value.due_date),
-      classroom_id: route.params.classroomId
+      classroom_id: route.params.classroomId,
+      questions: questionProps.value
     }
 
     const res = await axios.post(API + 'quiz/create', data)
@@ -80,7 +92,7 @@
     
       <!-- Multi-choice Question -->
       <div v-if="item.questionType==='mcq'">
-        <MCQuestion />
+        <MCQuestion @add-answer="addCorrectAnswer('mcq', index, correctAnswers)" />
       </div>
 
       <!-- Subjective Question -->
