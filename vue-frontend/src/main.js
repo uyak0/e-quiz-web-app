@@ -11,13 +11,6 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-app.config.globalProperties.getStorageItem = (key) => {
-  if (localStorage.getItem(key)) {
-    return localStorage.getItem(key)
-  } else {
-    return sessionStorage.getItem(key)
-  }
-}
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Chat;
+use App\Events\MessageSent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -41,19 +42,20 @@ class ChatController extends Controller
             'message_content' => 'required|string',
             'receiver_id' => 'required|exists:users,id', // Ensure receiver_id exists in the users table
         ]);
-    
+
         // Create a new Chat instance with validated data
         $chat = new Chat();
         $chat->sender_id = auth()->user()->id;
         $chat->receiver_id = $validatedData['receiver_id'];
         $chat->message = $validatedData['message_content'];
         $chat->save();
-    
+
         // Fetch the updated chat with sender and receiver details
         $updatedChat = Chat::with(['sender', 'receiver'])->find($chat->id);
-    
+
+        broadcast(new MessageSent(auth()->user(), $chat))->toOthers();
         return response()->json(['status' => true, 'chat' => $updatedChat], 201);
     }
 
-   
+
 }

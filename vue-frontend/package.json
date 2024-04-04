@@ -13,6 +13,7 @@
     "axios": "^1.6.7",
     "feather-icons": "^4.29.1",
     "pinia": "^2.1.7",
+    "pusher-js": "^8.4.0-rc2",
     "vue": "^3.3.11",
     "vue-feather": "^2.0.0",
     "vue-loader": "^17.3.1",

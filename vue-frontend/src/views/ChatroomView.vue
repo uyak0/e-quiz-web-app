@@ -123,6 +123,7 @@ import axios from 'axios';
 import ThreeDotsIcon from "@/components/icons/ThreeDotsIcon.vue";
 import {useRoute, useRouter } from "vue-router";
 import { ref, onMounted, provide, reactive} from 'vue'; // Import onMounted to fetch data when the component is mounted
+import Pusher from 'pusher-js';
 
 
 const API = import.meta.env.VITE_LARAVEL_API;
@@ -142,7 +143,18 @@ const API = import.meta.env.VITE_LARAVEL_API;
     const selectedUser = ref(null)
     const chatContentRef = ref(null);
 
+// Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
 
+    var pusher = new Pusher('128bc3f025453c080729', {
+      cluster: 'ap1'
+    });
+
+    var channel = pusher.subscribe('chat');
+    channel.bind('message-sent', (data) => {
+        console.log(data); 
+        getMessages()
+    });
         const chatPanels = reactive ({panels:[]});
 
         async function getUser() {
