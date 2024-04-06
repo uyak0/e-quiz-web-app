@@ -121,8 +121,8 @@
           </div>
         </div>
         <span>
-          <button class="rounded-md w-10 bg-red-500 text-black">
-            <vue-feather type="trash-2" v-if="userRole === 'teacher'" @click="deleteClassroom"/> 
+          <button class="group rounded-md w-10 hover:bg-red-800 bg-red-500 text-black">
+            <vue-feather class="group-hover:text-white" type="trash-2" v-if="userRole === 'teacher'" @click="deleteClassroom"/> 
           </button>
           <button class="bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-2xl px-4">
             <RouterLink v-if="userRole === 'teacher'" :to="{name: 'createQuiz'}" class=""> 

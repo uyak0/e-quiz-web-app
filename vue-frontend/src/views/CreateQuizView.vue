@@ -17,7 +17,7 @@
       questionType: 'mcq',
       questionDesc: '',
       correctAnswers: [''], 
-      options: '',
+      options: [''],
     }
   ]) // first question defaults
 
@@ -38,9 +38,18 @@
     return newDate + ' ' + time
   }
 
-  function addCorrectAnswer(type, index, correctAnswers) {
+  function addCorrectAnswer(index, correctAnswers) {
     questionProps.value[index].correctAnswers = correctAnswers
+    console.log(questionProps.value)
+  }
 
+  function addOptions(index, options) {
+    questionProps.value[index].options = options
+    console.log(questionProps.value)
+  }
+  
+  function changeDesc(index, desc) {
+    questionProps.value[index].questionDesc = desc
     console.log(questionProps.value)
   }
 
@@ -51,6 +60,7 @@
   function deleteQuestion(index) {
     questionProps.value.splice(index, 1);
   };
+
 
   async function submitQuizCreation() {
     const data = {
@@ -92,7 +102,7 @@
     
       <!-- Multi-choice Question -->
       <div v-if="item.questionType==='mcq'">
-        <MCQuestion @add-answer="addCorrectAnswer('mcq', index, correctAnswers)" />
+        <MCQuestion @add-answer="(answers) => addCorrectAnswer(index, answers)" @add-option="(options) => addOptions(index, options)" @add-desc="(desc) => changeDesc(index, desc)"/>
       </div>
 
       <!-- Subjective Question -->
