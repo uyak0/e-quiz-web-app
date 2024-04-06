@@ -10,7 +10,15 @@
         },
 
         methods: {
-
+            darkToggle() {
+                if (localStorage.getItem('theme') === 'dark') {
+                    localStorage.setItem('theme', 'light')
+                    document.body.classList.remove('dark')
+                } else {
+                    localStorage.setItem('theme', 'dark')
+                    document.body.classList.add('dark')
+                }
+            }
         }
     }
 </script>
