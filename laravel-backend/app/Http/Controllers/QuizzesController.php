@@ -62,7 +62,36 @@ class QuizzesController extends Controller
         $quiz = Quiz::create([
             'title' => $request->title,
             'due_date' => $request->due_date,
-        ])->classroom()->save($request->classroom_id);
+            'classroom_id' => $request->classroom_id,
+        ]);
+
+        foreach($request->questions as $index=>$question) {
+            switch($question['questionType']) {
+                case 'mcq':
+                    $quiz->multiChoiceQuestions()->create([
+                        'question_no' => $index + 1,
+                        'description' => $question['questionDesc'],
+                        'options' => $question['options'],
+                        'correct_answers' => json_decode((string)$question['correctAnswers']),
+                    ]);
+                break;
+                case 'tfq':
+                    $quiz->trueFalseQuestions()->create([
+                        'question_no' => $index + 1,
+                        'description' => $question['questionDesc'],
+                        'correct_answer' => $question['correctAnswer'],
+                    ]);
+                break;
+                case 'sub':
+                    $quiz->subjectiveQuestions()->create([
+                        'question_no' => $index + 1,
+                        'description' => $question['questionDesc'],
+                        'correct_answers' => $question['correctAnswers'],
+                        'case_sensitive' => $question['caseSensitive'],
+                    ]);
+                break;
+            }
+        }
 
         return response()->json([
             'message' => 'Quiz created successfully',

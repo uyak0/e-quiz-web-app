@@ -5,9 +5,7 @@
   const emit = defineEmits([
     'addDesc',
     'addAnswer', 
-    'removeAnswer',
     'addOption',
-    'removeOption',
   ]);
 
   const questionDesc = ref('')
@@ -29,9 +27,6 @@
 </script>
 <template>
   <div class="mx-4 flex flex-col">
-    <!-- Question Title -->
-    <input type="text" @change="emit('addDesc', questionDesc)" v-model="questionDesc" placeholder="Type Question here..." class="placeholder:text-slate-600 bg-transparent w-full">
-
     <!-- Correct answers -->
     <div v-for="(correctAnswer, index) in correctAnswers" :key="index" class="my-1 flex-row flex">
       <input type="text" @change="addCorrectAnswer(index, $event)" placeholder="Type correct answer here..." class="overflow-ellipsis placeholder:text-slate-600 bg-transparent ">
