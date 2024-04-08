@@ -8,6 +8,7 @@
   import TFQuestion from "@/components/Quiz Creation/TFQuestion.vue";
   import { useRoute } from 'vue-router'
   import axios from 'axios'
+  import VueFeather from 'vue-feather'
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute()
@@ -16,8 +17,6 @@
     { 
       questionType: 'mcq',
       questionDesc: '',
-      correctAnswers: [''], 
-      options: '',
     }
   ]) // first question defaults
 
@@ -38,9 +37,29 @@
     return newDate + ' ' + time
   }
 
-  function addCorrectAnswer(type, index, correctAnswers) {
-    questionProps.value[index].correctAnswers = correctAnswers
+  function addCorrectAnswer(index, correctAnswers) {
+    if (questionProps.value[index].questionType === 'mcq') {
+      questionProps.value[index].correctAnswers = correctAnswers
+    }
+    else {
+      delete questionProps.value[index].correctAnswers
+      questionProps.value[index].correctAnswer = correctAnswers
+    }
+    console.log(questionProps.value)
+  }
 
+  function isCaseSensitive(index, value) {
+    questionProps.value[index].caseSensitive = value 
+    console.log(questionProps.value)
+  }
+
+  function addOptions(index, options) {
+    questionProps.value[index].options = options
+    console.log(questionProps.value)
+  }
+  
+  function changeDesc(index, desc) {
+    questionProps.value[index].questionDesc = desc
     console.log(questionProps.value)
   }
 
@@ -52,11 +71,12 @@
     questionProps.value.splice(index, 1);
   };
 
+
   async function submitQuizCreation() {
     const data = {
       title: quizProps.value.title,
       due_date: formatDate(quizProps.value.due_date),
-      classroom_id: route.params.classroomId,
+      classroom_id: Number(route.params.classroomId),
       questions: questionProps.value
     }
 
@@ -85,24 +105,24 @@
           <QuestionTypeDDL v-model="item.questionType" />
         </div>
         <!-- Delete Button -->
-        <div @click="deleteQuestion()" class="text-2xl cursor-pointer hover:text-red-600">
-          ⓧ 
-        </div>
+        <vue-feather @click="deleteQuestion()" class="text-2xl cursor-pointer hover:text-red-600" type="x-circle" />
       </div>
+      <!-- Question Description -->
+      <input type="text" v-model="item.questionDesc" placeholder="Type Question here..." class="placeholder:text-slate-600 bg-transparent w-full mb-4 overflow-visible outline-none border-b-[1px] border-b-slate-300">
     
       <!-- Multi-choice Question -->
       <div v-if="item.questionType==='mcq'">
-        <MCQuestion @add-answer="addCorrectAnswer('mcq', index, correctAnswers)" />
+        <MCQuestion @add-answer="(answers) => addCorrectAnswer(index, answers)" @add-option="(options) => addOptions(index, options)" @add-desc="(desc) => changeDesc(index, desc)"/>
       </div>
 
       <!-- Subjective Question -->
       <div v-else-if="item.questionType==='sub'">
-        <SubjectiveQuestion />
+        <SubjectiveQuestion :question-num="index" @add-answer="(answer) => addCorrectAnswer(index, answer)" @case-sensitive="(value) => isCaseSensitive(index, value)" />
       </div>
 
       <!-- True/False Question -->
       <div v-else-if="item.questionType==='tfq'">
-        <TFQuestion />
+        <TFQuestion @change-answer="(answer) => addCorrectAnswer(index, answer)"/>
       </div>
     </div>
 

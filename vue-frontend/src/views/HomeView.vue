@@ -24,7 +24,7 @@ import HomeLogo from '@/components/HomeLogo.vue';
 </script>
 
 <template>
-  <div class="absolute top-0 -z-10 w-screen h-screen bg-cover bg-[url('/src/assets/HomePageBG.png')] opacity-10"></div>
+  <img src="/src/assets/HomePageBG.png" class="absolute top-0 -z-10 w-screen h-screen bg-cover opacity-10">
   <nav class="z-10 font-jetBrains top-0 left-0 absolute w-full">
     <RouterLink to="/login" class="hover:bg-red-800 float-right bg-red-500 text-white font-bold border-0 rounded-md text-2xl px-3 mx-2 my-2">Login</RouterLink>
     <RouterLink to="/signup" class="hover:bg-slate-800 float-right text-white border-0 rounded-md text-xl px-3 mx-2 my-3">Sign Up</RouterLink>

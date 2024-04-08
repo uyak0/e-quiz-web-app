@@ -10,8 +10,9 @@ class MultiChoiceQuestion extends Model
 {
     use HasFactory;
     protected $table = 'multi_choice_questions';
-    protected $fillable = ['description', 'options', 'question_no', 'correct_answer'];
+    protected $fillable = ['description', 'options', 'question_no', 'correct_answers'];
     protected $casts = ['options' => 'array'];
+    public $timestamps = false;
 
     public function quiz(): BelongsTo
     {

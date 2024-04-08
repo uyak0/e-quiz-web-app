@@ -19,6 +19,16 @@
   const classroomCode = ref('')
   const classroomName = ref('');
   const classroomDesc = ref('');
+
+  // function darkToggle() {
+  //   if (localStorage.getItem('theme') === 'dark') {
+  //     localStorage.setItem('theme', 'light')
+  //     document.body.classList.remove('dark')
+  //   } else {
+  //     localStorage.setItem('theme', 'dark')
+  //     document.body.classList.add('dark')
+  //   }
+  // }
 </script>
 
 <template>
@@ -42,9 +52,9 @@
     </div>
     
     <div name="theme and user" class="flex flex-row gap-10">
-      <div class="place-items-center place-self-center">
-        <ToggleTheme @dark-toggle="darkToggle"/> 
-      </div>
+      <!-- <div class="place-items-center place-self-center"> -->
+      <!--   <ToggleTheme v-model="darkToggle" @dark-toggle="darkToggle"/>  -->
+      <!-- </div> -->
 
       <RouterLink :to="{ name: 'userProfile' }">
         <div class="flex justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
