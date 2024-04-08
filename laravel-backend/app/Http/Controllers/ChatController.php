@@ -53,6 +53,8 @@ class ChatController extends Controller
         // Fetch the updated chat with sender and receiver details
         $updatedChat = Chat::with(['sender', 'receiver'])->find($chat->id);
 
+      
+
         broadcast(new MessageSent(auth()->user(), $chat))->toOthers();
         return response()->json(['status' => true, 'chat' => $updatedChat], 201);
     }

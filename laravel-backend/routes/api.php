@@ -67,3 +67,4 @@ Route::group(['prefix' => 'messages', 'middleware' => 'auth'], function() {
     Route::get ("/", [ChatController::class, "index"]);
     Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
 });
+

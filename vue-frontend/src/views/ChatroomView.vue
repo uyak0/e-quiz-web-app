@@ -122,8 +122,9 @@
 import axios from 'axios';
 import ThreeDotsIcon from "@/components/icons/ThreeDotsIcon.vue";
 import {useRoute, useRouter } from "vue-router";
-import { ref, onMounted, provide, reactive} from 'vue'; // Import onMounted to fetch data when the component is mounted
+import { ref, onMounted, provide, reactive, watch} from 'vue'; // Import onMounted to fetch data when the component is mounted
 import Pusher from 'pusher-js';
+import Echo from 'laravel-echo';
 
 
 const API = import.meta.env.VITE_LARAVEL_API;
@@ -143,18 +144,31 @@ const API = import.meta.env.VITE_LARAVEL_API;
     const selectedUser = ref(null)
     const chatContentRef = ref(null);
 
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        authEndpoint: "http://localhost:8000/broadcasting/auth", // Adjusted
+        forceTLS: true,
+    });
+
+console.log(window.Echo);
+
 // Enable pusher logging - don't include this in production
     Pusher.logToConsole = true;
 
-    var pusher = new Pusher('128bc3f025453c080729', {
-      cluster: 'ap1'
+    var pusher = new Pusher('ade31aeb069b61153931', {
+      cluster: 'ap1',
+      channelAuthorization: {
+        endpoint: "http://localhost:8000/broadcasting/auth",
+      },
     });
 
-    var channel = pusher.subscribe('chat');
+    var channel = pusher.subscribe('chatroom');
     channel.bind('message-sent', (data) => {
         console.log(data); 
-        getMessages()
-    });
+        
+    }); 
         const chatPanels = reactive ({panels:[]});
 
         async function getUser() {
@@ -190,18 +204,21 @@ const API = import.meta.env.VITE_LARAVEL_API;
                 isChatOpen.value = true; // Open the chat pane
 
                 chatPanels.panels.push(userPanel);
+                
+                getMessages(); // Fetch messages for the selected user immediately after opening the chat panel
+
                 return true;
             }
             // if the panel already opened
             const index = chatPanels.panels.findIndex(panel => panel.selectedUser.id === user.id);
             chatPanels.panels[index] = {...chatPanels.panels[index], emittedMessage};
 
-            selectedUser.value = user; // Set the selected user
-            isChatOpen.value = true; // Open the chat pane
+            selectedUser.value = user; // Set the selected user again in case it's a different user
+            isChatOpen.value = true; // Ensure the chat pane is open
+
+            getMessages(); // Fetch messages for the newly selected user
 
             console.log(chatPanels.panels);
-
-            getMessages()
 
             return false; 
         }
@@ -273,11 +290,19 @@ const API = import.meta.env.VITE_LARAVEL_API;
 
         // Fetch user data when the component is mounted
         onMounted(() => {
+             
+
             getUser(userId)
             getOnlineUsers()
-            showChatPanel
-            hideChatPanel
-            console.log
+
+            window.Echo.private(`chatroom`)
+             .listen('.message-sent', (e) => {
+                console.log(e.message);
+                
+                scrollToChatBottom();
+              });
+            
+            
         })
     
         
