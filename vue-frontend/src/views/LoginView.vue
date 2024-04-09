@@ -29,7 +29,6 @@
     }
 
     try {
-      await axios.get('sanctum/csrf-cookie');
       const loginResponse = await axios.post(API + 'auth/login', loginData)
 
       console.log(loginResponse.data)

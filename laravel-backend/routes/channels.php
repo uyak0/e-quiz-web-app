@@ -16,14 +16,14 @@ use App\Models\Chat;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
+// Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+//     return (int) $user->id === (int) $id;
+// });
 
-Broadcast::channel('user.{userId}', function ($user, $userId) {
-    return $user->id === $userId;
-});
+// Broadcast::channel('user.{userId}', function ($user, $userId) {
+//     return $user->id === $userId;
+// });
 
 Broadcast::channel('chatroom.{senderId}', function($user, $senderId) {
-    return $user->id === Chat::where('sender_id', $senderId)->first()->sender_id;
+    return true; 
 });

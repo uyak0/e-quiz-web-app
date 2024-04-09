@@ -50,6 +50,12 @@ const router = createRouter({
       component: ()=> import('@/views/ChatroomView.vue'),
       meta: {
         title: 'Chatroom'
+      },
+      beforeEnter: async (to, from) => {
+        const auth = await checkAuth()
+        if (auth.status) {
+          return true
+        }
       }
     },
     {

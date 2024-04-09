@@ -63,7 +63,7 @@ Route::group(['prefix' => 'quiz'], function() {
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);
 
-Route::group(['prefix' => 'messages', 'middleware' => 'auth'], function() {
+Route::group(['prefix' => 'messages'], function() {
     Route::get ("/", [ChatController::class, "index"]);
     Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
 });

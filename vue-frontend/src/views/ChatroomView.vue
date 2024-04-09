@@ -123,12 +123,15 @@ import axios from 'axios';
 import ThreeDotsIcon from "@/components/icons/ThreeDotsIcon.vue";
 import {useRoute, useRouter } from "vue-router";
 import { ref, onMounted, provide, reactive, watch} from 'vue'; // Import onMounted to fetch data when the component is mounted
+
 import Pusher from 'pusher-js';
 import Echo from 'laravel-echo';
 
 
-const API = import.meta.env.VITE_LARAVEL_API;
 
+const API = import.meta.env.VITE_LARAVEL_API;
+const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_APP_CLUSTER;
+const PUSHER_APP_KEY = import.meta.env.VITE_PUSHER_APP_KEY;
     
     const emits = defineEmits(['onCloseChat'])
     const route = useRoute();
@@ -144,31 +147,44 @@ const API = import.meta.env.VITE_LARAVEL_API;
     const selectedUser = ref(null)
     const chatContentRef = ref(null);
 
-    window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: import.meta.env.VITE_PUSHER_APP_KEY,
-        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-        authEndpoint: "http://localhost:8000/broadcasting/auth", // Adjusted
-        forceTLS: true,
-    });
-
-console.log(window.Echo);
-
 // Enable pusher logging - don't include this in production
     Pusher.logToConsole = true;
 
-    var pusher = new Pusher('ade31aeb069b61153931', {
-      cluster: 'ap1',
-      channelAuthorization: {
-        endpoint: "http://localhost:8000/broadcasting/auth",
-      },
+    window.Pusher = Pusher;
+
+    // Echo Initialization
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: PUSHER_APP_KEY,
+        cluster: PUSHER_CLUSTER,
+        forceTLS: true,
+        encrypted: true,
+        authorizer: (channel, options) => {
+            return {
+                authorize: async (socketId, callback) => {
+                    await axios.post('http://localhost:8000/broadcasting/auth', {
+                        socket_id: socketId,
+                        channel_name: channel.name
+                    })
+                        .then(response => {
+                            callback(null, response.data);
+                        })
+                        .catch(error => {
+                            callback(error);
+                        });
+                }
+            };
+        },
     });
 
-    var channel = pusher.subscribe('chatroom');
-    channel.bind('message-sent', (data) => {
-        console.log(data); 
-        
-    }); 
+    console.log(window.Echo)
+
+    window.Echo.private(`chatroom.${userId}`)
+        .listen('.message-sent', (e) => {
+            console.log(e.message);
+
+        });
+
         const chatPanels = reactive ({panels:[]});
 
         async function getUser() {
@@ -290,19 +306,10 @@ console.log(window.Echo);
 
         // Fetch user data when the component is mounted
         onMounted(() => {
-             
 
             getUser(userId)
             getOnlineUsers()
 
-            window.Echo.private(`chatroom`)
-             .listen('.message-sent', (e) => {
-                console.log(e.message);
-                
-                scrollToChatBottom();
-              });
-            
-            
         })
     
         
