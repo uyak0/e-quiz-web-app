@@ -22,6 +22,11 @@
 
   function getOptions(options) {
     const separatedOptions = options.split(', ')
+
+    for (let i = separatedOptions.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [separatedOptions[i], separatedOptions[j]] = [separatedOptions[j], separatedOptions[i]];
+      }
     return separatedOptions
   }
 

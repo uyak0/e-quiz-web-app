@@ -48,7 +48,6 @@
     }
   }
 
-
   const showName = ref(true)
   const showDesc = ref(true)
   const showNameEditBtn = ref(true)
@@ -133,13 +132,21 @@
       </div>
 
 
-    <div v-for="(item, index) of classroomQuizzes" v-if="userRole === 'student'" :key="index" class="flex flex-col">
-      <!-- <RouterLink :to="{}" class="rounded-md shadow-sm"> Quiz </RouterLink> -->
-      <RouterLink :to="{path: route.params.classroomId + '/quiz/' + item.id}" class="border-gray-600 hover:bg-gray-400 ease-in-out duration-500 mx-10 flex flex-col rounded-md shadow-md bg-gray-500 p-2 cursor-pointer">
-        <h1 class="text-4xl">{{item.title}}</h1>
-        <h3 class="text-2xl">{{item.description}}</h3>
-      </RouterLink>
-    </div>
+      <div v-for="(item, index) of classroomQuizzes" v-if="userRole === 'student'" :key="index" class="flex flex-col">
+        <!-- <RouterLink :to="{}" class="rounded-md shadow-sm"> Quiz </RouterLink> -->
+        <RouterLink :to="{path: route.params.classroomId + '/quiz/' + item.id}" class="border-gray-600 hover:bg-gray-400 ease-in-out duration-500 mx-10 flex flex-col rounded-md shadow-md bg-gray-500 p-2 cursor-pointer">
+          <h1 class="text-4xl">{{item.title}}</h1>
+          <h3 class="text-2xl">{{item.description}}</h3>
+        </RouterLink>
+      </div>
+
+      <div v-for="(item, index) of classroomQuizzes" v-if="userRole === 'teacher'" :key="index" class="py-2 flex flex-col">
+        <!-- <RouterLink :to="{}" class="rounded-md shadow-sm"> Quiz </RouterLink> -->
+        <RouterLink :to="{path: route.params.classroomId + '/quiz/' + item.id}" class="border-gray-600 hover:bg-gray-400 ease-in-out duration-500 mx-10 flex flex-col rounded-md shadow-md bg-gray-500 p-2 cursor-pointer">
+          <h1 class="text-4xl">{{item.title}}</h1>
+          <h3 class="text-2xl">{{item.description}}</h3>
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>

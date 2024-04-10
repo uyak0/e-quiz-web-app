@@ -1,17 +1,18 @@
 <script setup>
   import VueDatePicker from '@vuepic/vue-datepicker'
   import '@vuepic/vue-datepicker/dist/main.css'
-  import { reactive, onMounted, ref, watchEffect} from 'vue'
+  import { reactive, onMounted, ref, watchEffect } from 'vue'
   import MCQuestion from '@/components/Quiz Creation/MCQuestion.vue'
   import QuestionTypeDDL from '@/components/Quiz Creation/QuestionTypeDDL.vue'
   import SubjectiveQuestion from "@/components/Quiz Creation/SubjectiveQuestion.vue";
   import TFQuestion from "@/components/Quiz Creation/TFQuestion.vue";
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios'
   import VueFeather from 'vue-feather'
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute()
+  const router = useRouter()
 
   let questionProps= ref([
     { 
@@ -26,16 +27,6 @@
     questions: questionProps.value,
     classroom_id: route.params.classroomId
   })
-
-  function formatDate(date) {
-    const day = date.getDate()
-    const month = date.getMonth() + 1
-    const year = date.getFullYear()
-
-    const newDate = `${year}-${month}-${day}` 
-    const time = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
-    return newDate + ' ' + time
-  }
 
   function addCorrectAnswer(index, correctAnswers) {
     if (questionProps.value[index].questionType === 'mcq') {
@@ -71,17 +62,39 @@
     questionProps.value.splice(index, 1);
   };
 
+  function quit() {
+    let res = confirm('Are you sure you want to quit quiz creation? Any unsaved changes will be lost!')
+    if (res) router.push({ name: 'classroom' })
+  }
 
   async function submitQuizCreation() {
+    if (quizProps.value.title === '') {
+      alert('Please enter a title for the quiz')
+      return
+    }
+
+    if (quizProps.value.due_date < Date.now()){
+      alert('Due date cannot be earlier than the current date!')
+    }
+
+    if (questionProps.value.length < 1) {
+      alert('Please add at least one question to the quiz')
+      return
+    }
+
     const data = {
       title: quizProps.value.title,
-      due_date: formatDate(quizProps.value.due_date),
+      due_date: quizProps.value.due_date.toISOString().slice(0, 19).replace('T', ' '),
       classroom_id: Number(route.params.classroomId),
       questions: questionProps.value
     }
 
     const res = await axios.post(API + 'quiz/create', data)
+    if (res.data.status === 'success') {
+      router.push('/teacher/' + route.params.userId + '/classroom/' + route.params.classroomId)
+    }
   }
+
 </script>
 
 <template>
@@ -99,7 +112,7 @@
     <!-- Question Component -->
     <div v-for="(item, index) of questionProps" :key="index"
          class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
-      <div class="wrapper flex mb-2">
+      <div class="wrapper flex flex-row mb-2 justify-between">
         <h1 class="text-2xl w-1/2">Question #{{ index + 1 }}</h1>
         <div class="mx-4">
           <QuestionTypeDDL v-model="item.questionType" />
@@ -133,8 +146,8 @@
 
     <!-- Submit and Cancel buttons -->
     <div class="mx-4 text-md">
-      <button @click="submitQuizCreation" class="rounded-md bg-blue-500 hover:bg-grey-600 float-right px-2">Create Quiz</button>
-      <button class="bg-transparent float-right mx-2">Cancel</button>
+      <button @click="submitQuizCreation" class="disabled:bg-blue-800 rounded-md bg-blue-500 hover:bg-grey-600 float-right px-2">Create Quiz</button>
+      <button @click="quit" class="bg-transparent float-right mx-2">Cancel</button>
     </div>
   </div>
 

@@ -10,7 +10,8 @@ class SubjectiveQuestion extends Model
 {
     use HasFactory;
     protected $table = 'subjective_questions';
-    protected $fillable = ['description', 'question_no', 'correct_answer', 'case_sensitive'];
+    protected $fillable = ['description', 'question_no', 'correct_answers', 'case_sensitive'];
+    public $timestamps = false;
 
     public function quiz(): BelongsTo
     {
