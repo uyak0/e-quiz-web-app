@@ -42,7 +42,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="font-semibold">{{ user.name }}</p>
-                            <p class="text-gray-500">OK</p> <!-- Assuming there's a 'status' property in the user object -->
+                            <p class="text-gray-500">OK</p> 
                         </div>
                     </div>
                 </div>
