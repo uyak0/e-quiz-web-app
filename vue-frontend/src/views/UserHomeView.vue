@@ -127,7 +127,7 @@
   <Modal v-if="userRole==='student'" v-model="modalEnabled">
     <form @submit.prevent class="bg-gray-600 rounded-md w-1/4 p-4 h-fit place-self-center">
       <p class="text-2xl text-bold">Enter classroom code</p>
-      <input ref="modalInput" v-model="classroomCode" type="text" placeholder="Classroom Code" class="border-2 w-full border-gray-300 rounded-md p-2 my-2" />
+      <input ref="modalInput" v-model="classroomCode" type="text" placeholder="Classroom Code" class="text-black border-2 w-full border-gray-300 rounded-md p-2 my-2" />
       <div class="float-right flex flex-row">
         <button @click="joinClassroom" class="bg-blue-400 rounded-md hover:bg-sky-200 text-black ease-in-out duration-300 px-4 py-1 mx-4 mt-1"> Join classroom </button>
         <button @click="modalEnabled = !modalEnabled"> Cancel </button>
@@ -139,8 +139,8 @@
     <form @submit.prevent class="bg-gray-600 rounded-md w-1/4 p-4 h-fit place-self-center">
       <p class="text-2xl text-bold"> Create Classroom </p>
       <div class="flex flex-col text-black">
-        <input ref="modalInput" type="text" v-model="classroomName" placeholder="Classroom Name" class="border-2 border-gray-300 rounded-md p-2 my-2">
-        <input type="text" v-model="classroomDesc" placeholder="Description" class="border-2 border-gray-300 rounded-md p-2 my-2">
+        <input ref="modalInput" type="text" v-model="classroomName" placeholder="Classroom Name" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
+        <input type="text" v-model="classroomDesc" placeholder="Description" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
       </div>
 
       <div class="float-right flex flex-row">

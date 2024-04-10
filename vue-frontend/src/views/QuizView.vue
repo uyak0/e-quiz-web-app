@@ -11,37 +11,62 @@
   let userAnswers = ref([])
   let checkedAnswers = ref(0)
 
+  function shuffleOptions(options) {
+    for (let i = options.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [options[i], options[j]] = [options[j], options[i]];
+    }
+    return options 
+  }
+
+  function getOptions(questions) {
+    for (let qNum in questions) {
+      let question = questions[qNum]
+      if (question.type !== 'multi_choice') continue 
+      else {
+        const separatedOptions = question.options.split(', ')
+        question.options = shuffleOptions(separatedOptions)
+      }
+    }
+  }
+
   async function getQuizData() {
     const data = {
       quiz_id: route.params.quizId
     }
     const res = await axios.get(API + 'quiz/', { params: data })
     quiz.value = res.data
-    console.log(quiz.value)
-  }
-
-  function getOptions(options) {
-    const separatedOptions = options.split(', ')
-
-    for (let i = separatedOptions.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [separatedOptions[i], separatedOptions[j]] = [separatedOptions[j], separatedOptions[i]];
-      }
-    return separatedOptions
+    getOptions(quiz.value[0])
   }
 
   function changeAnswer(event, qNum) {
     const answer = event.target.value
     const existingAnswer = userAnswers.value.find((answer) => answer.questionNum === qNum)
     const index = userAnswers.value.indexOf(existingAnswer)
+    const question = quiz.value[0][qNum - 1]
     console.log(userAnswers.value)
 
+    // this code fucking suck
     if (!existingAnswer) {
-      userAnswers.value.push({ questionNum: qNum, answer: answer })
-    } else {
-      userAnswers.value.splice(index, 1, { questionNum: qNum, answer: answer })
-      if (answer == '') {     // for catching empty SUBJECTIVE QUESTION's answers
-        userAnswers.value.splice(index, 1,)
+      if (question.type === 'multi_choice') {   
+        userAnswers.value.push({ questionNum: qNum, answer: [answer] })     //this fucking suck
+      }
+      else {
+        userAnswers.value.push({ questionNum: qNum, answer: answer })
+      }
+    } 
+    else { // if answer already exists
+      if (question.type === 'multi_choice' && event.target.checked) {
+        userAnswers.value[index].answer.push(answer)
+      }
+      else if (question.type === 'multi_choice' && !event.target.checked) {
+        userAnswers.value[index].answer.splice(userAnswers.value[index].answer.indexOf(answer), 1)
+      }
+      else if (question.type === 'subjective' && answer == '') {
+        userAnswers.value.splice(index, 1)
+      }
+      else if (question.type === 'subjective') {
+        userAnswers.value.splice(index, 1, { questionNum: qNum, answer: answer })
       }
     }
   }
@@ -51,12 +76,12 @@
   }
 
   async function submit() {
-    let confirmSubmit = true;
+    let confirmSubmit;
     const questions = quiz.value[0]
     
     if (userAnswers.value.length !== quiz.value[0].length) {
       alert('Please answer all questions before submitting!')
-   r} else {
+    } else {
       confirmSubmit = confirm('Are you sure you want to submit your answers?')
     }
 
@@ -96,7 +121,8 @@
 
         <!-- Multi-answer  -->
         <div v-if="question.correct_answers.includes(',')">
-          <div v-for="(option, index) in getOptions(question.options)" :key="index">
+
+          <div v-for="(option, index) in question.options" :key="index">
             <input type="checkbox" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
             <label :for="option + qNum" class="px-2">
               {{ option }}
