@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserQuizAnswers;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class UserQuizAnswersController extends Controller
@@ -26,7 +27,8 @@ class UserQuizAnswersController extends Controller
             'user_id' => $request->user_id,
             'user_answers' => $request->user_answers
         ]);
-        return response()->json($userQuizAnswers, 201); 
+
+        return response()->json($userQuizAnswers, 201);
     }
 
     public function get(Request $request)
@@ -35,6 +37,16 @@ class UserQuizAnswersController extends Controller
             where('quiz_id', $request->quiz_id)
             ->where('user_id', auth()->user()->id)
             ->latest()->first();
-        return response()->json($userQuizAnswers->user_answers);
+        return response()->json([
+            'user_answers' => $userQuizAnswers->user_answers,
+            'timestamp' => $userQuizAnswers->created_at
+        ]);
+    }
+
+    public function rewardPoints(Request $request)
+    {
+        if (UserQuizAnswers::where('quiz_id', $request->quiz_id)->where('user_id', auth()->user()->id)->exists()) {
+            Student::where('user_id', auth()->user()->id)->increment('points', $request->correct_answers * 100);
+        }
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\UserQuizAnswersController;
+use App\Models\UserQuizAnswers;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,7 @@ Route::group(['prefix' => 'auth'], function() {
 
 Route::group(['prefix' => 'student'], function() {
     Route::put('{userId}/classroom-join/{classroomId}', [ClassroomsController::class, 'joinClassroom']);
+    Route::get('/points', [StudentsController::class, 'getPoints']);
 });
 
 Route::group(['prefix' => 'quiz'], function() {
@@ -59,6 +61,7 @@ Route::group(['prefix' => 'quiz'], function() {
     Route::post('/create', [QuizzesController::class, 'store']);
     Route::post('/answer-submit', [UserQuizAnswersController::class, 'store']);
     Route::get('/answer-get', [UserQuizAnswersController::class, 'get']);
+    Route::post('/reward-points', [UserQuizAnswersController::class, 'rewardPoints']);
 });
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);

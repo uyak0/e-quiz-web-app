@@ -38,8 +38,8 @@ class QuizzesController extends Controller
         $quiz = Quiz::find($request->quiz_id);
 
         $multiChoiceFields = ['question_no', 'description', 'options', 'correct_answers'];
-        $trueFalseFields = ['question_no', 'description'];
-        $subjectiveFields = ['question_no', 'description', 'case_sensitive'];
+        $trueFalseFields = ['question_no', 'description', 'correct_answer'];
+        $subjectiveFields = ['question_no', 'description', 'case_sensitive', 'correct_answers'];
 
         $multiChoiceQuestions = $this->mapQuestions($quiz->multiChoiceQuestions, 'multi_choice', $multiChoiceFields);
         $trueFalseQuestions = $this->mapQuestions($quiz->trueFalseQuestions, 'true_false', $trueFalseFields);
@@ -76,7 +76,7 @@ class QuizzesController extends Controller
                         $quiz->multiChoiceQuestions()->create([
                             'question_no' => $index + 1,
                             'description' => $question['questionDesc'],
-                            'options' => implode(', ',$allOptions), 
+                            'options' => implode(', ',$allOptions),
                             'correct_answers' => implode(', ',$question['correctAnswers']),
                         ]);
                     break;

@@ -1,9 +1,8 @@
 <script setup>
   import ToggleTheme from './ToggleTheme.vue';
   import UserAvatar from './UserAvatar.vue';
-  import Modal from './Modal.vue';
   import { useRoute } from 'vue-router';
-  import { onMounted, ref, watchEffect } from 'vue';
+  import { onBeforeMount, onMounted, ref, watchEffect } from 'vue';
   import axios from 'axios';
 
   const API = import.meta.env.VITE_LARAVEL_API
@@ -12,6 +11,8 @@
   const pageName = route.meta.title 
   const userId = route.params.userId
   const userRole = route.params.userRole
+  const userName = ref('')
+  const studentPoints = ref(0)
 
   const enableButton = defineModel('enableButton')
   const emit = defineEmits(['modalEnabled'])
@@ -20,6 +21,15 @@
   const classroomName = ref('');
   const classroomDesc = ref('');
 
+  async function getUserData() {
+    const res = await axios.get(API + 'user/', { params: { id: userId } })
+    userName.value = res.data.name 
+  }
+
+  async function getPoints() {
+    const res = await axios.get(API + 'student/points', { params: { id: userId } })
+    studentPoints.value = res.data
+  }
   // function darkToggle() {
   //   if (localStorage.getItem('theme') === 'dark') {
   //     localStorage.setItem('theme', 'light')
@@ -29,6 +39,11 @@
   //     document.body.classList.add('dark')
   //   }
   // }
+
+  onMounted(() => {
+    getUserData()
+    getPoints()
+  })
 </script>
 
 <template>
@@ -37,11 +52,13 @@
       <RouterLink :to="{ name: 'userHome' }"> E-Quizz </RouterLink>
 
       <!--Create/join classroom button-->
-      <button @click="emit('modalEnabled')" v-if="userRole === 'student' && enableButton" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
-        + Join a classroom 
+      <button @click="emit('modalEnabled')" v-if="userRole === 'student' && enableButton"
+        class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
+        + Join a classroom
       </button>
 
-      <button @click="emit('modalEnabled')" v-else-if="userRole === 'teacher' && enableButton" class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2"> 
+      <button @click="emit('modalEnabled')" v-else-if="userRole === 'teacher' && enableButton"
+        class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
         + Create a classroom
       </button>
     </div>
@@ -50,12 +67,19 @@
     <div class="hidden sm:block font-firaSans font-bold">
       {{ pageName }}
     </div>
-    
-    <div name="theme and user" class="flex flex-row gap-10">
+
+    <div name="theme and user" class="flex flex-row gap-3">
       <!-- <div class="place-items-center place-self-center"> -->
       <!--   <ToggleTheme v-model="darkToggle" @dark-toggle="darkToggle"/>  -->
       <!-- </div> -->
 
+      <div>
+        <p class="text-sm font-bold text-right pr-2">{{ userName }}</p>
+        <span class="flex flex-row">
+          <p class="bg-red-500 rounded-md px-2 text-gray-900 float-right text-sm">{{ userRole }}</p>
+          <p class="text-sm tracking-wide px-2 text-gray-900 h-fit place-self-center bg-pink-300 rounded-md mx-2 text-center">{{ studentPoints }}pts</p>
+        </span>
+      </div>
       <RouterLink :to="{ name: 'userProfile' }">
         <div class="flex justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
           <UserAvatar />
