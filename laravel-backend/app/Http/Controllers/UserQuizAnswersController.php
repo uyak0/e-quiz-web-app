@@ -25,7 +25,8 @@ class UserQuizAnswersController extends Controller
         $userQuizAnswers = UserQuizAnswers::create([
             'quiz_id' => $request->quiz_id,
             'user_id' => $request->user_id,
-            'user_answers' => $request->user_answers
+            'user_answers' => $request->user_answers,
+            'rewarded' => false 
         ]);
 
         return response()->json($userQuizAnswers, 201);
@@ -45,8 +46,19 @@ class UserQuizAnswersController extends Controller
 
     public function rewardPoints(Request $request)
     {
-        if (UserQuizAnswers::where('quiz_id', $request->quiz_id)->where('user_id', auth()->user()->id)->exists()) {
+        if (UserQuizAnswers::where('quiz_id', $request->quiz_id)
+                            ->where('user_id', auth()->user()->id)
+                            ->where('rewarded', false)
+                            ->latest()
+                            ->exists()) {
             Student::where('user_id', auth()->user()->id)->increment('points', $request->correct_answers * 100);
+            UserQuizAnswers::where('quiz_id', $request->quiz_id)
+                            ->where('user_id', auth()->user()->id)
+                            ->latest()->first()->update(['rewarded' => true]);
+            return response()->json(['message' => 'Points rewarded']);
+        }
+        else {
+            return response()->json(['message' => 'Points already awarded']);
         }
     }
 }

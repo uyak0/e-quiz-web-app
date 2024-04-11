@@ -44,11 +44,13 @@
     const existingAnswer = userAnswers.value.find((answer) => answer.questionNum === qNum)
     const index = userAnswers.value.indexOf(existingAnswer)
     const question = quiz.value[0][qNum - 1]
+    const multiAnswer = event.target.type === 'checkbox'
+    const singleAnswer = event.target.type === 'radio'
     console.log(userAnswers.value)
 
     // this code fucking suck
     if (!existingAnswer) {
-      if (question.type === 'multi_choice') {   
+      if (event.target.type === 'checkbox' || singleAnswer) {   
         userAnswers.value.push({ questionNum: qNum, answer: [answer] })     //this fucking suck
       }
       else {
@@ -56,17 +58,17 @@
       }
     } 
     else { // if answer already exists
-      if (question.type === 'multi_choice' && event.target.checked) {
+      if (event.target.type == 'checkbox' && event.target.checked) {
         userAnswers.value[index].answer.push(answer)
       }
-      else if (question.type === 'multi_choice' && !event.target.checked) {
+      else if (event.target.type === 'checkbox' && !event.target.checked) {
         userAnswers.value[index].answer.splice(userAnswers.value[index].answer.indexOf(answer), 1)
       }
       else if (question.type === 'subjective' && answer == '') {
         userAnswers.value.splice(index, 1)
       }
-      else if (question.type === 'subjective') {
-        userAnswers.value.splice(index, 1, { questionNum: qNum, answer: answer })
+      else if (singleAnswer) {
+        userAnswers.value.splice(index, 1, { questionNum: qNum, answer: [answer] })
       }
     }
   }
@@ -121,7 +123,6 @@
 
         <!-- Multi-answer  -->
         <div v-if="question.correct_answers.includes(',')">
-
           <div v-for="(option, index) in question.options" :key="index">
             <input type="checkbox" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
             <label :for="option + qNum" class="px-2">
@@ -132,7 +133,7 @@
 
         <!-- Single-answer -->
         <div v-else>
-          <div v-for="(option, index) in getOptions(question.options)" :key="index">
+          <div v-for="(option, index) in question.options" :key="index">
             <input type="radio" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
             <label :for="option + qNum" class="px-2">
               {{ option }}

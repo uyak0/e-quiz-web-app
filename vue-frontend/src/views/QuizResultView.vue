@@ -1,7 +1,9 @@
 <script setup>
-  import { onBeforeMount, onMounted, onUpdated, ref } from 'vue' 
+  import { nextTick, onBeforeMount, onBeforeUpdate, onMounted, onUpdated, ref, watchEffect } from 'vue' 
   import axios from 'axios';
+  import { sleep as sleep } from '@/functions/sleep.js'
   import { useRoute } from 'vue-router'
+  import TopBar from '@/components/TopBar.vue';
 
   const quiz = ref([])
   const userAnswers = ref([])
@@ -10,13 +12,14 @@
   const route = useRoute()
 
   const API = import.meta.env.VITE_LARAVEL_API;
+
   async function getQuizResult() {
     const data = {
       quiz_id: route.query.quizId
     } 
     const res = await axios.get(API + 'quiz/answer-get', { params: data })
     userAnswers.value = JSON.parse(res.data.user_answers)
-    submittedTime.value = new Date(res.data.timestamp).toDateString()
+    submittedTime.value = new Date(res.data.timestamp).toLocaleString()
   }
 
   async function getQuizData() {
@@ -56,31 +59,42 @@
   }
 
   function getUserCorrectAnswers() {
-    userCorrectAnswers.value = document.querySelectorAll('p.text-green-500').length;
+    userCorrectAnswers.value = document.querySelectorAll('p.text-green-500').length + document.querySelectorAll('div.text-green-500').length
+    console.log('function is called')
   }
 
   async function rewardPoints() {
-    const data = {
-      correct_answers: userCorrectAnswers.value,
-      quiz_id: route.query.quizId
+    if (userCorrectAnswers.value === 0) return
+    else {
+      const data = {
+        correct_answers: userCorrectAnswers.value,
+        quiz_id: route.query.quizId
+      }
+      const res = await axios.post(API + 'quiz/reward-points/', data)
     }
-    const res = await axios.post(API + 'quiz/reward-points/', data)
   }
-  onMounted(() => {
-    getQuizData()
-    getQuizResult()
+
+  function alertPoints() {
+    alert('Congratulations! You have earned ' + (userCorrectAnswers.value * 100) + ' points!')
+  }
+
+  onBeforeMount(async () => {
+    await getQuizData()
+    await getQuizResult()
+    await rewardPoints()
+    alertPoints()
   })
 
   onUpdated(() => {
     getUserCorrectAnswers()
-    rewardPoints()
   })
 </script>
 <template>
-  <div class="px-2">
+  <TopBar />
+  <div class="px-4 py-2">
     <h1 class="text-3xl font-bold">{{ quiz['quiz_name'] ? quiz['quiz_name']: '' }}</h1>
     <p class="text-lg">Submitted at: {{ submittedTime }}</p>
-    <p class="text-lg" v-cloak>Score: {{ userCorrectAnswers }}/{{ quiz[0] ? quiz[0].length: 0 }}</p>
+    <p class="text-lg">Score: {{ userCorrectAnswers }}/{{ quiz[0] ? quiz[0].length: 0 }}</p>
     <p> You've earned: {{ userCorrectAnswers * 100 }} points </p>
   </div>
   <div v-for="(question, qNum) in quiz[0]" :key="qNum" class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
