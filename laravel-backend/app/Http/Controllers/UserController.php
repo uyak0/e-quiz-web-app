@@ -59,7 +59,7 @@ class UserController extends Controller
             return response()->json(data:['users'=>[]]);
         }
 
-        $user = User::where('id', "!=", auth()->user()->id)->get();
+        $user = User::with('unseenMessages')->where('id', "!=", auth()->user()->id)->get();
         
         return response()->json(data: ['users'=> $user]);
     }

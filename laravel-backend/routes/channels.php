@@ -24,6 +24,6 @@ use App\Models\Chat;
 //     return $user->id === $userId;
 // });
 
-Broadcast::channel('chatroom.{senderId}', function($user, $senderId) {
-    return true; 
+Broadcast::channel('chatroom.{receiverId}', function($user, $receiverId) {
+    return $user->id === (int) $receiverId;
 });

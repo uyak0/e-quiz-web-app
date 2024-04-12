@@ -64,4 +64,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(Student::class);
     }
+
+    public function unseenMessages()
+    {
+        return $this->hasMany(Chat::class, 'sender_id')
+                ->where('seen', 1)
+                ->where('receiver_id', auth()->user()->id);
+    }
 }

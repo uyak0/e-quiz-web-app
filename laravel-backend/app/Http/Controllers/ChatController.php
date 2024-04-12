@@ -21,13 +21,13 @@ class ChatController extends Controller
 
         // display top 10 messages for user
         $result = $messagesQuery->orderBy('created_at', 'DESC')
-                        ->limit($request->limit ?? 10)
+                        ->limit($request->limit ?? 20)
                         ->get();
 
         if($result->count()) {
             foreach ($result as $msg) {
                 if((int) $msg->receiver_id === auth()->user()->id) {
-                    $msg->update(['is_read' => 0]);
+                    $msg->update(['seen' => 0]);
                 }
             }
         }
@@ -53,10 +53,19 @@ class ChatController extends Controller
         // Fetch the updated chat with sender and receiver details
         $updatedChat = Chat::with(['sender', 'receiver'])->find($chat->id);
 
-      
-
         broadcast(new MessageSent(auth()->user(), $chat))->toOthers();
         return response()->json(['status' => true, 'chat' => $updatedChat], 201);
+    }
+
+    public function update($id)
+    {
+        $chat = Chat::find($id);
+
+        $chat ->seen = 0;
+
+        $chat->save();
+
+        return response()->json(['status' => true, 'chat' => $chat]);
     }
 
 
