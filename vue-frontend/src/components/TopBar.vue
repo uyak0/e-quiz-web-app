@@ -51,7 +51,9 @@
 <template>
   <div class="sticky font-jetBrains flex flex-rows text-2xl justify-between px-2 py-1 bg-gray-600 place-items-center">
     <div name="left modules" class="">
-      <RouterLink :to="{ name: 'userHome' }"> E-Quizz </RouterLink>
+      <RouterLink v-if="route.name !== 'quizResult'" :to="{ name: 'userHome' }"> E-Quizz </RouterLink>
+      <RouterLink v-else :to="{ name: 'classroom' }" class="bg-blue-400 rounded-md px-2 hover:bg-blue-700 hover:text-black"> Back to Classroom </RouterLink>
+
 
       <!--Create/join classroom button-->
       <button @click="emit('modalEnabled')" v-if="userRole === 'student' && enableButton"

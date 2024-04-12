@@ -10,6 +10,7 @@
   const userCorrectAnswers = ref(0)
   const submittedTime = ref()
   const route = useRoute()
+  const userRole = route.params.userRole 
 
   const API = import.meta.env.VITE_LARAVEL_API;
 
