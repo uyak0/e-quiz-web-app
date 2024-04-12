@@ -185,8 +185,9 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                       <tr v-for="(student, index) in topStudents" :key="index">
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-nowrap flex-row flex gap-2">
                           <div class="text-sm text-gray-900">{{ student.name }}</div>
+                          <vue-feather v-if="index == 0" type="star" size="20" fill="yellow" stroke="black" />
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div class="text-sm text-gray-500">{{ student.points }}</div>

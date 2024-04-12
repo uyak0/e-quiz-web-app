@@ -163,6 +163,9 @@ class ClassroomsController extends Controller
             ];
         });
 
-        return response()->json($students);
+        // Sort the students by points in descending order
+        $sortedStudents = $students->sortByDesc('points');
+
+        return response()->json($sortedStudents->values()->all());
     }
 }
