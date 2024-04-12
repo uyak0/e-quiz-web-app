@@ -78,7 +78,7 @@
       <div>
         <p class="text-sm font-bold text-right pr-2">{{ userName }}</p>
         <span class="flex flex-row">
-          <p class="bg-red-500 rounded-md px-2 text-gray-900 float-right text-sm">{{ userRole }}</p>
+          <p class="bg-red-500 rounded-md px-2 text-gray-900 float-right text-sm" :class="{ 'bg-red-500': userRole === 'teacher', 'bg-green-500': userRole === 'student' }">{{ userRole }}</p>
           <p v-if="userRole === 'student'" class="text-sm tracking-wide px-2 text-gray-900 h-fit place-self-center bg-pink-300 rounded-md mx-2 text-center">{{ studentPoints }}pts</p>
         </span>
       </div>

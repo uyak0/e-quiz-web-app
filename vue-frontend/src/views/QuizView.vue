@@ -113,6 +113,7 @@
   onBeforeMount(() => {
     if (localStorage.getItem('prevUserAnswers')) {
       userAnswers.value = JSON.parse(localStorage.getItem('prevUserAnswers'))
+      localStorage.removeItem('prevUserAnswers')
     }
   })
 
