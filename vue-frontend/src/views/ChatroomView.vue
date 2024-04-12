@@ -9,7 +9,7 @@
               <img :src="fileLink('UserProfile.png')" class="w-12 h-12 rounded-full border-2 border-blue-400" alt="user">
               <span class="font-semibold text-xl pl-1 text-black">{{ userData?.name }}</span>
             </div>
-            <div class="relative inline-block text-left group">
+            <!-- <div class="relative inline-block text-left group">
               <three-dots-icon class="w-6 h-6 cursor-pointer"></three-dots-icon>
               <div class="origin-top-right absolute right-0 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 hidden group-hover:block">
                 <div class="py-1">
@@ -17,7 +17,7 @@
                   <a href="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" @click="logout">Logout</a>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="col-span-2 text-right">
@@ -366,8 +366,8 @@ const PUSHER_APP_KEY = import.meta.env.VITE_PUSHER_APP_KEY;
         }
 
         
-        function navigateToProfile() {
-            router.push({ path: `/${userRole}/${userId}/profile` });
+        async function navigateToProfile() {
+            router.push({ name: 'userProfile' });
         }
 
         watch(()=>emittedMessage, (newMessage, oldMessage)=>{
