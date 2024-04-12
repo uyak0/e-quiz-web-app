@@ -75,7 +75,9 @@
   }
 
   function alertPoints() {
-    alert('Congratulations! You have earned ' + (userCorrectAnswers.value * 100) + ' points!')
+    if (route.params.userRole === 'student' && userCorrectAnswers.value !== 0) {
+      alert('Congratulations! You have earned ' + (userCorrectAnswers.value * 100) + ' points!')
+    }
   }
 
   onBeforeMount(async () => {
@@ -95,7 +97,7 @@
     <h1 class="text-3xl font-bold">{{ quiz['quiz_name'] ? quiz['quiz_name']: '' }}</h1>
     <p class="text-lg">Submitted at: {{ submittedTime }}</p>
     <p class="text-lg">Score: {{ userCorrectAnswers }}/{{ quiz[0] ? quiz[0].length: 0 }}</p>
-    <p> You've earned: {{ userCorrectAnswers * 100 }} points </p>
+    <p v-if="userRole==='student'"> You've earned: {{ userCorrectAnswers * 100 }} points </p>
   </div>
   <div v-for="(question, qNum) in quiz[0]" :key="qNum" class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
 

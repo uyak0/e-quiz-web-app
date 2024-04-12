@@ -34,7 +34,7 @@ Route::group(['prefix' => 'classroom'], function() {
     Route::put('/update-desc', [ClassroomsController::class, 'updateDescription']);
     Route::put('/update-name', [ClassroomsController::class, 'updateName']);
     Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
-    
+    Route::get('/top-students/{classroomId}', [ClassroomsController::class, 'topStudents']);
 });
 
 Route::group(['prefix' => 'user'], function() {

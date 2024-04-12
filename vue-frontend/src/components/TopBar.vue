@@ -27,8 +27,10 @@
   }
 
   async function getPoints() {
-    const res = await axios.get(API + 'student/points', { params: { id: userId } })
-    studentPoints.value = res.data
+    if (userRole === 'student') {
+      const res = await axios.get(API + 'student/points', { params: { id: userId } })
+      studentPoints.value = res.data
+    }
   }
   // function darkToggle() {
   //   if (localStorage.getItem('theme') === 'dark') {
@@ -77,7 +79,7 @@
         <p class="text-sm font-bold text-right pr-2">{{ userName }}</p>
         <span class="flex flex-row">
           <p class="bg-red-500 rounded-md px-2 text-gray-900 float-right text-sm">{{ userRole }}</p>
-          <p class="text-sm tracking-wide px-2 text-gray-900 h-fit place-self-center bg-pink-300 rounded-md mx-2 text-center">{{ studentPoints }}pts</p>
+          <p v-if="userRole === 'student'" class="text-sm tracking-wide px-2 text-gray-900 h-fit place-self-center bg-pink-300 rounded-md mx-2 text-center">{{ studentPoints }}pts</p>
         </span>
       </div>
       <RouterLink :to="{ name: 'userProfile' }">

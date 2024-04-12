@@ -51,7 +51,7 @@
           <p class="text-2xl sm:text-4xl sm:my-4 mx-4">{{ user.email }}</p>
           <span class="flex flex-row gap-2 mx-4 font-jetBrains">
             <p class="w-fit text-xl sm:text-2xl px-2 bg-red-500 rounded-md text-gray-900" :class="{'bg-green-400 text-green-800': userRole === 'student' }" >{{ userRole }}</p>
-            <p class="w-fit text-xl sm:text-2xl px-2 bg-pink-300 rounded-md text-gray-900">{{ studentPoints }}pts</p>
+            <p v-if="userRole === 'student'" class="w-fit text-xl sm:text-2xl px-2 bg-pink-300 rounded-md text-gray-900">{{ studentPoints }}pts</p>
           </span>
         </span>
       </div>

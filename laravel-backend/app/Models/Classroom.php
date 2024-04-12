@@ -18,6 +18,11 @@ class Classroom extends Model
         return $this->belongsToMany(User::class, 'user_classrooms');
     }
 
+    public function students()
+    {
+        return $this->hasManyThrough('App\Models\Student', 'App\Models\User');
+    }
+
     public function quizzes(): HasMany
     {
         return $this->hasMany(Quiz::class);

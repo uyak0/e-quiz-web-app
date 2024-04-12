@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Models\Classroom;
 use App\Models\User;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
+use PHPUnit\TestRunner\TestResult\Collector;
 
 class ClassroomsController extends Controller
 {
@@ -141,5 +144,25 @@ class ClassroomsController extends Controller
         $classroom = Classroom::find($classroomId);
         $quizzes = $classroom->quizzes;
         return response() -> json($quizzes);
+    }
+
+    public function topStudents(int $id): JsonResponse
+    {
+        $classroom = Classroom::find($id);
+        $users = $classroom->users;
+
+        $students = $users->filter(function ($user) {
+            return $user->student !== null;
+        })->map(function ($user) {
+            $student = $user->student;
+            $studentPoints = $student->points; // Assuming 'value' is the column that stores the points
+
+            return [
+                'name' => $student->user->name,
+                'points' => $studentPoints,
+            ];
+        });
+
+        return response()->json($students);
     }
 }

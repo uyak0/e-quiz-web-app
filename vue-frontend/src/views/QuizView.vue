@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, watchEffect } from 'vue';
+  import { ref, onMounted, watchEffect, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios';
 
@@ -50,7 +50,7 @@
 
     // this code fucking suck
     if (!existingAnswer) {
-      if (event.target.type === 'checkbox' || singleAnswer) {   
+      if (multiAnswer || singleAnswer) {   
         userAnswers.value.push({ questionNum: qNum, answer: [answer] })     //this fucking suck
       }
       else {
@@ -61,7 +61,7 @@
       if (event.target.type == 'checkbox' && event.target.checked) {
         userAnswers.value[index].answer.push(answer)
       }
-      else if (event.target.type === 'checkbox' && !event.target.checked) {
+      else if (multiAnswer && !event.target.checked) {
         userAnswers.value[index].answer.splice(userAnswers.value[index].answer.indexOf(answer), 1)
       }
       else if (question.type === 'subjective' && answer == '') {
@@ -75,6 +75,14 @@
 
   function isDone(qNum) {
     return this.userAnswers.some(answer => answer.questionNum === qNum);
+  }
+
+  function quit() {
+    let res = confirm("Are you sure you want to leave? Don't worry, you can still come back!")
+    if (res) {
+      localStorage.setItem('prevUserAnswers', JSON.stringify(userAnswers.value))
+      router.push({ name: 'classroom' })
+    }
   }
 
   async function submit() {
@@ -101,6 +109,12 @@
       })
     }
   }
+
+  onBeforeMount(() => {
+    if (localStorage.getItem('prevUserAnswers')) {
+      userAnswers.value = JSON.parse(localStorage.getItem('prevUserAnswers'))
+    }
+  })
 
   onMounted(() => {
     getQuizData()
@@ -163,7 +177,7 @@
     </div>
   </div>
   <div class="text-lg">
-    <button class="px-2">Cancel</button>
+    <button @click="quit" class="px-2">Cancel</button>
     <button @click="submit" class="hover:bg-blue-800 hover:text-white ease-in-out duration-300 rounded-md bg-blue-500 px-2">Submit answers</button>
   </div>
 </template>
