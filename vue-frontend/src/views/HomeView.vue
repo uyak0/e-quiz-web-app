@@ -28,7 +28,7 @@ import HomeLogo from '@/components/HomeLogo.vue';
   <nav class="z-10 font-jetBrains top-0 left-0 absolute w-full">
     <RouterLink to="/login" class="hover:bg-red-800 float-right bg-red-500 text-white font-bold border-0 rounded-md text-2xl px-3 mx-2 my-2">Login</RouterLink>
     <RouterLink to="/signup" class="hover:bg-slate-800 float-right text-white border-0 rounded-md text-xl px-3 mx-2 my-3">Sign Up</RouterLink>
-    <RouterLink to="/about" class="hover:bg-slate-800 float-right text-white border-0 rounded-md text-xl px-3 mx-2 my-3">About Us</RouterLink>
+    <!-- <RouterLink to="/about" class="hover:bg-slate-800 float-right text-white border-0 rounded-md text-xl px-3 mx-2 my-3">About Us</RouterLink> -->
   </nav>
 
   <div class="z-10 flex flex-col justify-center h-screen px-6">

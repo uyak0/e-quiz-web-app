@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, watchEffect, onBeforeMount } from 'vue';
+  import { ref, onMounted, reactive, watchEffect, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios';
 

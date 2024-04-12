@@ -1,7 +1,6 @@
 <script setup>
-  import { nextTick, onBeforeMount, onBeforeUpdate, onMounted, onUpdated, ref, watchEffect } from 'vue' 
+  import { onBeforeMount, onUpdated, ref } from 'vue' 
   import axios from 'axios';
-  import { sleep as sleep } from '@/functions/sleep.js'
   import { useRoute } from 'vue-router'
   import TopBar from '@/components/TopBar.vue';
 

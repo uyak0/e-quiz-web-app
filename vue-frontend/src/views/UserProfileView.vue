@@ -3,8 +3,7 @@
   import UserAvatar from '@/components/UserAvatar.vue';
   import axios from 'axios';
   import { ref, onMounted } from 'vue';
-  import { RouterLink, useRoute, useRouter } from 'vue-router';
-  import { getStorageItem } from '@/functions/getStorageItem.js';
+  import { useRoute, useRouter } from 'vue-router';
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute();

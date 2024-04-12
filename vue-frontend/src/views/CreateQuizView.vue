@@ -1,7 +1,7 @@
 <script setup>
   import VueDatePicker from '@vuepic/vue-datepicker'
   import '@vuepic/vue-datepicker/dist/main.css'
-  import { reactive, onMounted, ref, watchEffect } from 'vue'
+  import { ref } from 'vue'
   import MCQuestion from '@/components/Quiz Creation/MCQuestion.vue'
   import QuestionTypeDDL from '@/components/Quiz Creation/QuestionTypeDDL.vue'
   import SubjectiveQuestion from "@/components/Quiz Creation/SubjectiveQuestion.vue";

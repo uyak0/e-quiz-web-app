@@ -1,7 +1,7 @@
 <script setup>
   import HomeLogo from '@/components/HomeLogo.vue';
   import axios from 'axios';
-  import { onMounted, ref, watchEffect, reactive } from 'vue';
+  import { ref, watchEffect, reactive } from 'vue';
   import { useRouter } from 'vue-router';
 
   let username = ref('')

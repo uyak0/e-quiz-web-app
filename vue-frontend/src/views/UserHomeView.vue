@@ -4,8 +4,8 @@
   import Arrow from "@/components/Arrow.vue";
   import Modal from "@/components/Modal.vue";
   import axios from "axios";
-  import {onMounted, ref, watchEffect, nextTick} from "vue";
-  import {useRoute, useRouter } from "vue-router";
+  import { onMounted, ref, nextTick} from "vue";
+  import { useRoute, useRouter } from "vue-router";
 
   const API = import.meta.env.VITE_LARAVEL_API
   const route = useRoute()
