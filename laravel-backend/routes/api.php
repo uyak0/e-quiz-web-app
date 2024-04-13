@@ -64,11 +64,14 @@ Route::group(['prefix' => 'quiz'], function() {
     Route::post('/reward-points', [UserQuizAnswersController::class, 'rewardPoints']);
 });
 
+Route::group(['prefix' => 'assignment'], function() {
+});
+
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);
 
 Route::group(['prefix' => 'messages'], function() {
     Route::get ("/", [ChatController::class, "index"]);
     Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
-    Route::put ("/{id}", [ChatController::class, "update"]); 
+    Route::put ("/{id}", [ChatController::class, "update"]);
 });
 

@@ -123,62 +123,64 @@
 </script>
 
 <template>
-  <h1 class="text-4xl p-4">{{quiz.quiz_name}}</h1>
-  <div v-for="(question, qNum) in quiz[0]" :key="qNum" class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
-    <!-- Question Component -->
-    <div class="bg-transparent">
-      <h1 class="text-2xl font-bold" :class="{ 'text-green-400': isDone(qNum + 1) }"> #{{ qNum + 1 }}</h1>
-      <div class="flex flex-row gap-x-12">
-        <p>{{ question.description }}</p>
-        <p v-if="question.case_sensitive == 1" class="text-red-500">* Case sensitive</p>
-      </div>
-
-      <!-- Multi-choice Question -->
-      <div v-if="question.type === 'multi_choice'">
-
-        <!-- Multi-answer  -->
-        <div v-if="question.correct_answers.includes(',')">
-          <div v-for="(option, index) in question.options" :key="index">
-            <input type="checkbox" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
-            <label :for="option + qNum" class="px-2">
-              {{ option }}
-            </label>
-          </div>
+  <div class="bg-soft-white dark:bg-soft-black h-screen text-black dark:text-darkMode">
+    <h1 class="text-4xl p-4">{{quiz.quiz_name}}</h1>
+    <div v-for="(question, qNum) in quiz[0]" :key="qNum" class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
+      <!-- Question Component -->
+      <div class="bg-transparent">
+        <h1 class="text-2xl font-bold" :class="{ 'text-green-400': isDone(qNum + 1) }"> #{{ qNum + 1 }}</h1>
+        <div class="flex flex-row gap-x-12">
+          <p>{{ question.description }}</p>
+          <p v-if="question.case_sensitive == 1" class="text-red-500">* Case sensitive</p>
         </div>
 
-        <!-- Single-answer -->
-        <div v-else>
-          <div v-for="(option, index) in question.options" :key="index">
-            <input type="radio" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
-            <label :for="option + qNum" class="px-2">
-              {{ option }}
-            </label>
+        <!-- Multi-choice Question -->
+        <div v-if="question.type === 'multi_choice'">
+
+          <!-- Multi-answer  -->
+          <div v-if="question.correct_answers.includes(',')">
+            <div v-for="(option, index) in question.options" :key="index">
+              <input type="checkbox" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
+              <label :for="option + qNum" class="px-2">
+                {{ option }}
+              </label>
+            </div>
           </div>
+
+          <!-- Single-answer -->
+          <div v-else>
+            <div v-for="(option, index) in question.options" :key="index">
+              <input type="radio" :id="option + qNum" :name="qNum" :value="option" @input="changeAnswer($event, qNum + 1)">
+              <label :for="option + qNum" class="px-2">
+                {{ option }}
+              </label>
+            </div>
+          </div>
+
         </div>
+        <!-- -------- -->
+
+        <!-- Subjective Question -->
+        <div v-else-if="question.type === 'subjective'">
+          <input type="text" placeholder="Type your answer here..." class="text-black rounded-md px-2 my-2" @change="changeAnswer($event, qNum + 1)"> 
+        </div>
+        <!-- ----- -->
+
+        <!-- True/False Question -->
+        <div v-else-if="question.type === 'true_false'">
+          <select name="true false" class="rounded-md text-black pl-2 pr-4 my-2" @change="changeAnswer($event, qNum + 1)">
+            <option value="default" selected disabled>True/False</option>
+            <option value="0"> False </option>
+            <option value="1"> True </option>
+          </select>
+        </div>
+        <!-- ----- -->
 
       </div>
-      <!-- -------- -->
-
-      <!-- Subjective Question -->
-      <div v-else-if="question.type === 'subjective'">
-        <input type="text" placeholder="Type your answer here..." class="text-black rounded-md px-2 my-2" @change="changeAnswer($event, qNum + 1)"> 
-      </div>
-      <!-- ----- -->
-
-      <!-- True/False Question -->
-      <div v-else-if="question.type === 'true_false'">
-        <select name="true false" class="rounded-md text-black pl-2 pr-4 my-2" @change="changeAnswer($event, qNum + 1)">
-          <option value="default" selected disabled>True/False</option>
-          <option value="0"> False </option>
-          <option value="1"> True </option>
-        </select>
-      </div>
-      <!-- ----- -->
-      
     </div>
-  </div>
-  <div class="text-lg">
-    <button @click="quit" class="px-2">Cancel</button>
-    <button @click="submit" class="hover:bg-blue-800 hover:text-white ease-in-out duration-300 rounded-md bg-blue-500 px-2">Submit answers</button>
+    <div class="text-lg">
+      <button @click="quit" class="px-2">Cancel</button>
+      <button @click="submit" class="hover:bg-blue-800 hover:text-white ease-in-out duration-300 rounded-md bg-blue-500 px-2">Submit answers</button>
+    </div>
   </div>
 </template>

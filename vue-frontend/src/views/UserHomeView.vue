@@ -77,78 +77,79 @@
 </script>
 
 <template>
-  <TopBar @modal-enabled="enableModal" v-model:enable-button="joinOrCreateClassroomBtn"/>
+  <div class="h-screen dark:bg-soft-black bg-soft-white">
+    <TopBar @modal-enabled="enableModal" v-model:enable-button="joinOrCreateClassroomBtn"/>
 
-  <!-- Arrow pointing to "Join Classroom" button -->
-  <div v-if="userRole === 'student' && classrooms.length === 0" class="absolute flex flex-rows left-32">
-    <Arrow class="w-16"/>
-    <p class="pt-11">Click here to join a classroom!</p>
-  </div>
-
-  <div v-if="userRole === 'teacher' && classrooms.length === 0" class="absolute flex flex-rows left-32">
-    <Arrow class="w-16"/>
-    <p class="pt-11">Click here to create a classroom!</p>
-  </div>
-  <!-- ----- -->
-
-  <div v-if="classrooms.length === 0" class="flex justify-center h-screen">
-    <div class="wrapper flex flex-col justify-center">
-      <p class="text-2xl text-center">No classrooms found!</p>
+    <!-- Arrow pointing to "Join Classroom" button -->
+    <div v-if="userRole === 'student' && classrooms.length === 0" class="absolute flex flex-rows left-32">
+      <Arrow class="w-16"/>
+      <p class="pt-11">Click here to join a classroom!</p>
     </div>
-  </div>
 
-  <!-- List of Classroom Boxes -->
-  <div v-else class="flex justify-center">
-    <div class="sm:w-3/4 w-full flex flex-col sm:flex-row sm:flex-wrap content-start">
-      <div v-for="(item, index) of classrooms" :key="index" class="h-fit">
-        <Classroom v-model="classrooms[index]" /> 
-      </div>
-
-      <!-- Join Classroom (for classrooms no.>= 1)-->
-      <button @click="enableModal" v-if="classrooms.length && userRole === 'student'" class="cursor-pointer hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
-        <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
-          <p class="place-self-center font-bold">+</p>
-          <p class="place-self-center font-bold text-center">Join More Classrooms</p>
-        </div>
-      </button>
-
-      <!-- Create Classroom -->
-      <button @click="enableModal" v-else-if="classrooms.length && userRole === 'teacher'" class="hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
-        <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
-          <p class="place-self-center font-bold">+</p>
-          <p class="place-self-center font-bold text-center">Create More Classrooms</p>
-        </div>
-      </button>
+    <div v-if="userRole === 'teacher' && classrooms.length === 0" class="absolute flex flex-rows left-32">
+      <Arrow class="w-16"/>
+      <p class="pt-11">Click here to create a classroom!</p>
     </div>
+    <!-- ----- -->
+
+    <div v-if="classrooms.length === 0" class="flex justify-center h-screen">
+      <div class="wrapper flex flex-col justify-center">
+        <p class="text-2xl text-center">No classrooms found!</p>
+      </div>
+    </div>
+
+    <!-- List of Classroom Boxes -->
+    <div v-else class="flex justify-center">
+      <div class="sm:w-3/4 w-full flex flex-col sm:flex-row sm:flex-wrap content-start">
+        <div v-for="(item, index) of classrooms" :key="index" class="h-fit">
+          <Classroom v-model="classrooms[index]" /> 
+        </div>
+
+        <!-- Join Classroom (for classrooms no.>= 1)-->
+        <button @click="enableModal" v-if="classrooms.length && userRole === 'student'" class="cursor-pointer hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
+          <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
+            <p class="place-self-center font-bold">+</p>
+            <p class="place-self-center font-bold text-center">Join More Classrooms</p>
+          </div>
+        </button>
+
+        <!-- Create Classroom -->
+        <button @click="enableModal" v-else-if="classrooms.length && userRole === 'teacher'" class="hover:border-gray-900 hover:text-gray-900 dark:hover:border-gray-100 dark:hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
+          <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
+            <p class="place-self-center font-bold">+</p>
+            <p class="place-self-center font-bold text-center">Create More Classrooms</p>
+          </div>
+        </button>
+      </div>
+    </div>
+    <!-- --------- -->
+
+    <!-- Modals -->
+    <Modal v-if="userRole==='student'" v-model="modalEnabled">
+      <form @submit.prevent class="bg-gray-600 rounded-md w-1/4 p-4 h-fit place-self-center">
+        <p class="text-2xl text-bold">Enter classroom code</p>
+        <input ref="modalInput" v-model="classroomCode" type="text" placeholder="Classroom Code" class="text-black border-2 w-full border-gray-300 rounded-md p-2 my-2" />
+        <div class="float-right flex flex-row">
+          <button @click="joinClassroom" class="bg-blue-400 rounded-md hover:bg-sky-200 text-black ease-in-out duration-300 px-4 py-1 mx-4 mt-1"> Join classroom </button>
+          <button @click="modalEnabled = !modalEnabled"> Cancel </button>
+        </div>
+      </form>
+    </Modal>
+
+    <Modal v-else v-model="modalEnabled">
+      <form @submit.prevent class="bg-gray-600 rounded-md w-1/4 p-4 h-fit place-self-center">
+        <p class="text-2xl text-bold"> Create Classroom </p>
+        <div class="flex flex-col text-black">
+          <input ref="modalInput" type="text" v-model="classroomName" placeholder="Classroom Name" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
+          <input type="text" v-model="classroomDesc" placeholder="Description" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
+        </div>
+
+        <div class="float-right flex flex-row">
+          <button @click="createClassroom" class="bg-blue-400 rounded-md hover:bg-sky-200 text-black ease-in-out duration-300 p-2 m-2">Create Classroom</button>
+          <button @click="modalEnabled = !modalEnabled"> Cancel </button>
+        </div>
+      </form>
+    </Modal>
+    <!-- -----  -->
   </div>
-  <!-- --------- -->
-
-  <!-- Modals -->
-  <Modal v-if="userRole==='student'" v-model="modalEnabled">
-    <form @submit.prevent class="bg-gray-600 rounded-md w-1/4 p-4 h-fit place-self-center">
-      <p class="text-2xl text-bold">Enter classroom code</p>
-      <input ref="modalInput" v-model="classroomCode" type="text" placeholder="Classroom Code" class="text-black border-2 w-full border-gray-300 rounded-md p-2 my-2" />
-      <div class="float-right flex flex-row">
-        <button @click="joinClassroom" class="bg-blue-400 rounded-md hover:bg-sky-200 text-black ease-in-out duration-300 px-4 py-1 mx-4 mt-1"> Join classroom </button>
-        <button @click="modalEnabled = !modalEnabled"> Cancel </button>
-      </div>
-    </form>
-  </Modal>
-
-  <Modal v-else v-model="modalEnabled">
-    <form @submit.prevent class="bg-gray-600 rounded-md w-1/4 p-4 h-fit place-self-center">
-      <p class="text-2xl text-bold"> Create Classroom </p>
-      <div class="flex flex-col text-black">
-        <input ref="modalInput" type="text" v-model="classroomName" placeholder="Classroom Name" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
-        <input type="text" v-model="classroomDesc" placeholder="Description" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
-      </div>
-
-      <div class="float-right flex flex-row">
-        <button @click="createClassroom" class="bg-blue-400 rounded-md hover:bg-sky-200 text-black ease-in-out duration-300 p-2 m-2">Create Classroom</button>
-        <button @click="modalEnabled = !modalEnabled"> Cancel </button>
-      </div>
-    </form>
-  </Modal>
-  <!-- -----  -->
-
 </template>

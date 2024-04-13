@@ -133,6 +133,23 @@ const router = createRouter({
                   meta: { title: 'Classroom' },
                 },
                 {
+                  path: 'assignment',
+                  children: [
+                    {
+                      path: 'create',
+                      name: 'createAssignment',
+                      component: () => import('@/views/CreateAssignmentView.vue'),
+                      meta: { title: 'Create Assignment' }
+                    },
+                    {
+                      path: ':assignmentId',
+                      name: 'assignment',
+                      component: () => import('@/views/AssignmentView.vue'),
+                      meta: { title: 'Assignment' }
+                    },
+                  ]
+                },
+                {
                   path: 'quiz',
                   children: [
                     {

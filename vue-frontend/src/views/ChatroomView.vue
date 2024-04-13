@@ -174,8 +174,6 @@ const chatContentRef = ref(null);
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = true;
 
-window.Pusher = Pusher;
-
 // Echo Initialization
 window.Echo = new Echo({
   broadcaster: 'pusher',

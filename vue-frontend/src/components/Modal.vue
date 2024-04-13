@@ -1,6 +1,4 @@
 <script setup>
-  import { ref, watchEffect } from 'vue';
-
   const modalEnabled = defineModel()
   function closeModal() { modalEnabled.value = !modalEnabled.value }
 </script>
