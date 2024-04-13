@@ -16,9 +16,7 @@ async function inClassroom(id) {
       }
     }) 
 
-    if (inClass.data.status) {
-      return true
-    }
+    if (inClass.data.status) return true 
   }
   catch (error) {
     console.log(error) 
@@ -26,7 +24,7 @@ async function inClassroom(id) {
 }
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -44,6 +42,20 @@ const router = createRouter({
       meta: {
         requiresAuth: false,
         title: 'E-Quizz - About Us'
+      }
+    },
+    {
+      path: '/:userRole/:userId/chatroom',
+      name: 'Chatroom',
+      component: ()=> import('@/views/ChatroomView.vue'),
+      meta: {
+        title: 'Chatroom'
+      },
+      beforeEnter: async (to, from) => {
+        const auth = await checkAuth()
+        if (auth.status) {
+          return true
+        }
       }
     },
     {
@@ -134,6 +146,12 @@ const router = createRouter({
                       name: 'quiz',
                       component: () => import('@/views/QuizView.vue'),
                       meta: { title: 'Quiz' }
+                    },
+                    {
+                      path: 'result',
+                      name: 'quizResult',
+                      component: () => import('@/views/QuizResultView.vue'),
+                      meta: { title: 'Quiz Result' },
                     }
                   ]
                 },

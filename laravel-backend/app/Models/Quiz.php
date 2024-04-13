@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Quiz extends Model
 {
     use HasFactory;
     protected $table = 'quizzes';
-    protected $fillable = ['title', 'due_date'];
+    protected $fillable = ['classroom_id', 'title', 'due_date'];
 
     public function classroom()
     {

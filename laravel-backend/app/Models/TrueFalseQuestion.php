@@ -10,6 +10,7 @@ class TrueFalseQuestion extends Model
     use HasFactory;
     protected $table = 'true_false_questions';
     protected $fillable = ['description', 'question_no', 'correct_answer'];
+    public $timestamps = false;
 
     public function quiz()
     {

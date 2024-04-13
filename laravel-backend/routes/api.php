@@ -9,6 +9,8 @@ use App\Http\Controllers\ClassroomsController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\UserQuizAnswersController;
+use App\Models\UserQuizAnswers;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +31,10 @@ Route::group(['prefix' => 'classroom'], function() {
     Route::get('/{id?}', [ClassroomsController::class, 'index']);
     Route::delete('/{id}', [ClassroomsController::class, 'deleteClassroom']);
     Route::post('/create', [ClassroomsController::class, 'createClassroom']);
+    Route::put('/update-desc', [ClassroomsController::class, 'updateDescription']);
+    Route::put('/update-name', [ClassroomsController::class, 'updateName']);
     Route::get('/quizzes/{classroomId}', [ClassroomsController::class, 'classroomQuizzes']);
+    Route::get('/top-students/{classroomId}', [ClassroomsController::class, 'topStudents']);
 });
 
 Route::group(['prefix' => 'user'], function() {
@@ -48,9 +53,22 @@ Route::group(['prefix' => 'auth'], function() {
 
 Route::group(['prefix' => 'student'], function() {
     Route::put('{userId}/classroom-join/{classroomId}', [ClassroomsController::class, 'joinClassroom']);
+    Route::get('/points', [StudentsController::class, 'getPoints']);
 });
 
 Route::group(['prefix' => 'quiz'], function() {
-    Route::get('/{id?}', [QuizzesController::class, 'index']);
+    Route::get('/', [QuizzesController::class, 'index']);
     Route::post('/create', [QuizzesController::class, 'store']);
+    Route::post('/answer-submit', [UserQuizAnswersController::class, 'store']);
+    Route::get('/answer-get', [UserQuizAnswersController::class, 'get']);
+    Route::post('/reward-points', [UserQuizAnswersController::class, 'rewardPoints']);
 });
+
+Route::get("online-users", [UserController::class, "getOnlineUsers"]);
+
+Route::group(['prefix' => 'messages'], function() {
+    Route::get ("/", [ChatController::class, "index"]);
+    Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
+    Route::put ("/{id}", [ChatController::class, "update"]); 
+});
+

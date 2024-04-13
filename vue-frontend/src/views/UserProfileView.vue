@@ -3,8 +3,7 @@
   import UserAvatar from '@/components/UserAvatar.vue';
   import axios from 'axios';
   import { ref, onMounted } from 'vue';
-  import { RouterLink, useRoute, useRouter } from 'vue-router';
-  import { getStorageItem } from '@/functions/getStorageItem.js';
+  import { useRoute, useRouter } from 'vue-router';
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute();
@@ -12,11 +11,17 @@
   const user = ref({});
   const userId = route.params.userId
   const userRole = route.params.userRole
+  const studentPoints = ref(0)
 
   async function getUserData() {
     const userData = await axios.get(API + 'user/?id=' + userId)
     user.value = userData.data 
     console.log(userData.data)
+  }
+
+  async function getPoints() {
+    const res = await axios.get(API + 'student/points', { params: { id: userId } })
+    studentPoints.value = res.data
   }
 
   async function logOut() {
@@ -29,6 +34,7 @@
   }
   onMounted(() => {
     getUserData();
+    getPoints();
   })
 </script>
 
@@ -42,7 +48,10 @@
         <span class="py-2 flex flex-col place-self-center overflow-hidden">
           <p class="text-4xl sm:text-6xl font-bold sm:my-4 mx-4">{{ user.name }}</p>
           <p class="text-2xl sm:text-4xl sm:my-4 mx-4">{{ user.email }}</p>
-          <p class="text-xl sm:text-2xl mx-4 px-2 bg-red-500 rounded-md text-red-800" :class="{'bg-green-400 text-green-800': userRole === 'student' }" >{{ userRole }}</p>
+          <span class="flex flex-row gap-2 mx-4 font-jetBrains">
+            <p class="w-fit text-xl sm:text-2xl px-2 rounded-md text-gray-900" :class="{'bg-green-400': userRole === 'student', 'bg-red-500': userRole === 'teacher'}" >{{ userRole }}</p>
+            <p v-if="userRole === 'student'" class="w-fit text-xl sm:text-2xl px-2 bg-pink-300 rounded-md text-gray-900">{{ studentPoints }}pts</p>
+          </span>
         </span>
       </div>
 

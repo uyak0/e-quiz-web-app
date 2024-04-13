@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Models\Classroom;
 use App\Models\User;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
+use PHPUnit\TestRunner\TestResult\Collector;
 
 class ClassroomsController extends Controller
 {
@@ -20,6 +23,38 @@ class ClassroomsController extends Controller
         else {
             return $classroom->id;
         }
+    }
+
+    public function updateName(Request $request): JsonResponse
+    {
+        if (auth()->user()->roles->first()->name) {
+            $classroom = Classroom::find($request->classroom_id);
+            $classroom->name = $request->name;
+            $classroom->save();
+
+            return response() -> json([
+                'status' => 'success',
+                'message' => 'Classroom name updated successfully!'
+            ]);
+        }
+        else {
+            return response() -> json([
+                'status' => 'error',
+                'message' => 'You are not authorized to update the classroom name!'
+            ]);
+        }
+    }
+
+    public function updateDescription(Request $request): JsonResponse
+    {
+        $classroom = Classroom::find($request->classroom_id);
+        $classroom->description = $request->description;
+        $classroom->save();
+
+        return response() -> json([
+            'status' => 'success',
+            'message' => 'Classroom description updated successfully!'
+        ]);
     }
 
     public function deleteClassroom(int $id)
@@ -109,5 +144,28 @@ class ClassroomsController extends Controller
         $classroom = Classroom::find($classroomId);
         $quizzes = $classroom->quizzes;
         return response() -> json($quizzes);
+    }
+
+    public function topStudents(int $id): JsonResponse
+    {
+        $classroom = Classroom::find($id);
+        $users = $classroom->users;
+
+        $students = $users->filter(function ($user) {
+            return $user->student !== null;
+        })->map(function ($user) {
+            $student = $user->student;
+            $studentPoints = $student->points; // Assuming 'value' is the column that stores the points
+
+            return [
+                'name' => $student->user->name,
+                'points' => $studentPoints,
+            ];
+        });
+
+        // Sort the students by points in descending order
+        $sortedStudents = $students->sortByDesc('points');
+
+        return response()->json($sortedStudents->values()->all());
     }
 }

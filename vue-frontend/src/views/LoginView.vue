@@ -29,7 +29,6 @@
     }
 
     try {
-      await axios.get('sanctum/csrf-cookie');
       const loginResponse = await axios.post(API + 'auth/login', loginData)
 
       console.log(loginResponse.data)
@@ -65,7 +64,7 @@
       <!-- Email Input -->
       <div class="mb-4 text-gray-600">
         <label class="block text-gray-600">Email</label>
-        <input type="text" v-model="loginForm.email" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
+        <input tabindex="0" type="text" v-model="loginForm.email" placeholder="Email" class="placeholder:text-gray-300 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
       </div>
 
       <!-- Password Input -->
@@ -81,9 +80,9 @@
       </div>
 
       <!-- Forgot Password Link -->
-      <div class="mb-6 text-blue-500">
-        <RouterLink to="/forgot-password"> Forgot Password? </RouterLink>
-      </div>
+      <!-- <div class="mb-6 text-blue-500"> -->
+      <!--   <RouterLink to="/forgot-password"> Forgot Password? </RouterLink> -->
+      <!-- </div> -->
     
       <!-- Login Button -->
       <button :disabled="buttonDisabled" :class="{ 'bg-slate-300 hover:bg-slate-300': buttonDisabled }" type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Login</button>

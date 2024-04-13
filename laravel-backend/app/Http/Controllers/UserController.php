@@ -53,4 +53,14 @@ class UserController extends Controller
             'status' => false,
         ]);
     }
+
+    public function getOnlineUsers(){
+        if(!auth()->check()) {
+            return response()->json(data:['users'=>[]]);
+        }
+
+        $user = User::with('unseenMessages')->where('id', "!=", auth()->user()->id)->get();
+        
+        return response()->json(data: ['users'=> $user]);
+    }
 }

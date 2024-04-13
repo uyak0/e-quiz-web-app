@@ -13,4 +13,10 @@ class StudentsController extends Controller
         $students = Student::all();
         return response() -> json($students);
     }
+
+    public function getPoints(): JsonResponse 
+    {
+        $student = Student::where('user_id', auth()->user()->id)->first();
+        return response() -> json($student->points);
+    }
 }

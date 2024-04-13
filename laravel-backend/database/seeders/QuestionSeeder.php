@@ -42,19 +42,22 @@ class QuestionSeeder extends Seeder
                 'description' => 'What is the capital of Indonesia?',
                 'correct_answers' => 'Jakarta',
                 'question_no' => '4',
-                'quiz_id' => '1'
+                'quiz_id' => '1',
+                'case_sensitive' => 1
             ],
             [
                 'description' => 'What is the capital of Malaysia?',
                 'correct_answers' => 'Kuala Lumpur',
                 'question_no' => '5',
-                'quiz_id' => '1'
+                'quiz_id' => '1',
+                'case_sensitive' => 0
             ],
             [
                 'description' => 'What is the capital of Singapore?',
                 'correct_answers' => 'Singapore',
                 'question_no' => '6',
-                'quiz_id' => '1'
+                'quiz_id' => '1',
+                'case_sensitive' => 0
             ],
         ]);
 
