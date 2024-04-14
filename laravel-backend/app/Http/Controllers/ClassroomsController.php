@@ -155,7 +155,7 @@ class ClassroomsController extends Controller
             return $user->student !== null;
         })->map(function ($user) {
             $student = $user->student;
-            $studentPoints = $student->points; // Assuming 'value' is the column that stores the points
+            $studentPoints = $student->points;
 
             return [
                 'name' => $student->user->name,
@@ -164,7 +164,7 @@ class ClassroomsController extends Controller
         });
 
         // Sort the students by points in descending order
-        $sortedStudents = $students->sortByDesc('points');
+        $sortedStudents = $students->sortByDesc('points')->take(5);
 
         return response()->json($sortedStudents->values()->all());
     }

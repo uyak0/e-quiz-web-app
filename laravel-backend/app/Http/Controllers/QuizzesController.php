@@ -53,6 +53,7 @@ class QuizzesController extends Controller
         $sortedQuestions = $questions->sortBy('question_no')->values()->all();
         return response()->json([
             'quiz_name' => $quiz->title,
+            'due_date' => $quiz->due_date,
             $sortedQuestions
         ]);
     }

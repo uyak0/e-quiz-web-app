@@ -2,7 +2,7 @@
 import TopBar from '@/components/TopBar.vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import { Ref, ref } from 'vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 
@@ -20,11 +20,7 @@ interface Assignment {
 
 const route = useRoute()
 const userFiles = ref<UserFiles[]>([])
-const assignment = ref<Assignment>({
-  title: '',
-  due_date: new Date(),
-  classroom_id: route.params.classroomId
-})
+const assignment = ref<Assignment>()
 const API = import.meta.env.VITE_LARAVEL_API
 
 async function fileHandler(event: Event) {

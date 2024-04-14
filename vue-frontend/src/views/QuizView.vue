@@ -2,14 +2,17 @@
   import { ref, onMounted, reactive, watchEffect, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios';
+  import TopBar from '@/components/TopBar.vue';
+  import VueDatePicker from '@vuepic/vue-datepicker'
+  import '@vuepic/vue-datepicker/dist/main.css'
 
   const API = import.meta.env.VITE_LARAVEL_API;
   const route = useRoute()
   const router = useRouter()
+  const userRole = route.params.userRole
 
   let quiz = ref([])
   let userAnswers = ref([])
-  let checkedAnswers = ref(0)
 
   function shuffleOptions(options) {
     for (let i = options.length - 1; i > 0; i--) {
@@ -123,8 +126,16 @@
 </script>
 
 <template>
+  <TopBar />
   <div class="bg-soft-white dark:bg-soft-black h-screen text-black dark:text-darkMode">
-    <h1 class="text-4xl p-4">{{quiz.quiz_name}}</h1>
+    <div name="name and due date" class="flex justify-between place-items-center">
+      <h1 class="text-4xl p-4">{{quiz.quiz_name}}</h1>
+      <h1 v-if="userRole === 'student'" class="p-4">Due Date: {{ quiz.due_date }}</h1>
+      <div class="flex w-fit">
+        <p class="w-fit"> Due Date: </p>
+        <VueDatePicker v-if="userRole === 'teacher'" v-model="quiz.due_date" />
+      </div>
+    </div>
     <div v-for="(question, qNum) in quiz[0]" :key="qNum" class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
       <!-- Question Component -->
       <div class="bg-transparent">

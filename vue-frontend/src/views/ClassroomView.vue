@@ -5,6 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref, watchEffect } from "vue";
 import VueFeather from "vue-feather";
 import Modal from '@/components/Modal.vue'
+import { DateTime } from 'luxon';
 
 const route = useRoute()
 const router = useRouter()
@@ -95,6 +96,19 @@ function copyCode() {
   }, 2000)
 }
 
+function dateDiff(date) {
+  let now = DateTime.now() 
+  date = Date.parse(date)
+  let due = DateTime.fromMillis(date) 
+  let diff = due.toRelativeCalendar(now, { style: 'long' })
+  diff = diff.charAt(0).toUpperCase() + diff.slice(1)
+  return diff
+}
+
+function changeDue() {
+  console.log('change due')
+}
+
 onMounted(() => {
   getClassroomData()
   getQuizzes();
@@ -107,7 +121,7 @@ onMounted(() => {
 
     <div class="w-full place-items-center justify-center flex flex-col">
       <div name="title, desc and teacher btns"
-        class="rounded-md w-3/4 bg-gray-200 dark:bg-slate-700 m-4 px-4 pb-4 pt-1 flex lg:flex-row flex-col justify-between">
+        class="md:rounded-md w-full md:w-3/4 bg-gray-200 dark:bg-slate-700 md:m-4 px-4 pb-4 pt-1 flex lg:flex-row flex-col justify-between">
         <div name="classroom details" class="text-black dark:text-darkMode">
 
           <div name="name" class="flex flex-row py-3 overflow-hidden truncate">
@@ -129,10 +143,10 @@ onMounted(() => {
           </div>
 
           <div v-if="classroomDetails.description" name="description" class="flex flex-row">
-            <h3 class="text-4xl" v-show="showDesc">{{ classroomDesc }}</h3>
+            <h3 class="md:text-4xl text-lg" v-show="showDesc">{{ classroomDesc }}</h3>
             <div v-if="!showDesc">
               <input type="text" v-model="classroomDesc"
-                class="text-black text-4xl flex-grow bg-transparent py-2 outline-none"
+                class="text-black text-lg flex-grow bg-transparent py-2 outline-none"
                 placeholder="Add a description...">
               <button @click="changeDesc" class="text-white">
                 <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
@@ -197,73 +211,86 @@ onMounted(() => {
           </div>
           <h1 class="pb-2 text-2xl">What do you want to create?</h1>
           <span class="py-2 gap-2 flex flex-row *:rounded-md *:w-1/2 *:py-5 text-xl text-gray-900">
-            <button class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">
-              <RouterLink :to="{ name: 'createQuiz' }">
-                <vue-feather type="book-open" size="50" />
-                <h1>Quiz</h1>
-              </RouterLink>
-            </button>
-            <button class="bg-blue-400 hover:bg-blue-600 duration-300 hover:text-gray-200">
-              <RouterLink :to="{ name: 'createAssignment' }">
-                <vue-feather type="file-text" size="50" />
-                <h1>Assignment</h1>
-              </RouterLink>
-            </button>
+            <RouterLink :to="{ name: 'createQuiz' }" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">
+              <vue-feather type="book-open" size="50" />
+              <h1>Quiz</h1>
+            </RouterLink>
+            <RouterLink :to="{ name: 'createAssignment' }" class="bg-blue-400 hover:bg-blue-600 duration-300 hover:text-gray-200">
+              <vue-feather type="file-text" size="50" />
+              <h1>Assignment</h1>
+            </RouterLink>
           </span>
         </div>
       </Modal>
 
-      <div name="content" class="w-3/4 h-screen flex flex-row">
-
-        <!-- LEADERBOARD -->
-        <div v-if="topStudents.length" class="p-1">
-          <h1 class="text-lg text-gray-900 dark:text-darkMode">Classroom Leaderboard</h1>
-          <div class="flex flex-col w-fit">
-            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                  <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                      <tr>
-                        <th scope="col"
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th scope="col"
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Points
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                      <tr v-for="(student, index) in topStudents" :key="index"
-                        class="duration-300 ease-in-out *:hover:bg-gray-300">
-                        <td class="px-6 py-4 whitespace-nowrap flex-row flex gap-2">
-                          <div class="text-sm text-gray-900">{{ student.name }}</div>
-                          <vue-feather v-if="index == 0" type="star" size="20" fill="yellow" stroke="black" />
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-sm text-gray-500">{{ student.points }}</div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+      <div name="content" class="w-full md:w-3/4 place-items-center md:place-items-start h-screen flex flex-col md:flex-row">
+        <!-- SideBar -->
+        <div name="sidebar" class="md:w-fit w-full flex flex-col">
+          <!-- LEADERBOARD -->
+          <div v-if="topStudents.length" class="p-1 w-full md:w-auto px-2">
+            <h1 class="text-lg text-gray-900 dark:text-darkMode">Classroom Leaderboard</h1>
+            <div class="flex flex-col w-full">
+              <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                  <div class="shadow overflow-hidden border-b border-gray-200 dark:border-gray-700 rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                      <thead class="dark:bg-gray-700 bg-gray-50 *:text-gray-500 *:dark:text-darkMode">
+                        <tr>
+                          <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Name
+                          </th>
+                          <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Points
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="bg-white dark:bg-gray-700 divide-y dark:divide-gray-600 divide-gray-200">
+                        <tr v-for="(student, index) in topStudents" :key="index"
+                          class="duration-300 ease-in-out *:hover:bg-gray-300 *:dark:hover:bg-gray-800">
+                          <td class="px-6 py-4 whitespace-nowrap flex-row flex gap-2">
+                            <div class="text-sm text-gray-900 dark:text-darkMode">{{ student.name }}</div>
+                            <vue-feather v-if="index == 0" type="star" size="20" fill="yellow" stroke="black" />
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 dark:text-darkMode">{{ student.points }}</div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Quizzes -->
+          <div class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
+            <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
+            <div v-for="quiz of classroomQuizzes">
+              <div v-if="quiz.due_date > new Date().toISOString()" class="flex flex-col w-full">
+              <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id }}" class="group border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2 ">
+                <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
+                <h3 class="text-md">Due: {{ quiz.due_date }}</h3>
+                <h4 class="text-sm">{{ dateDiff(quiz.due_date) }}</h4>
+              </RouterLink>
               </div>
             </div>
           </div>
         </div>
 
-        <div v-for="(item, index) of classroomQuizzes" :key="index" class="py-2 flex flex-col w-full">
-          <!-- <RouterLink :to="{}" class="rounded-md shadow-sm"> Quiz </RouterLink> -->
-          <RouterLink :to="{ path: route.params.classroomId + '/quiz/' + item.id }"
-            class="hover:bg-gray-400 ease-in-out duration-200 ml-5 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
-            <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
-            <div class="w-full flex flex-row justify-between place-items-center">
-              <h1 class="text-4xl pb-2">{{ item.title }}</h1>
-              <h3 class="text-md">Due: {{ item.due_date }}</h3>
-            </div>
-          </RouterLink>
+        <div class="flex flex-col w-full">
+          <div v-for="(item, index) of classroomQuizzes" :key="index" class="py-2 flex flex-col w-full">
+            <RouterLink :to="{ name: 'quiz', params: { quizId: item.id }}"
+              class="hover:bg-gray-400 ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
+              <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
+              <div class="w-full flex flex-row justify-between place-items-center">
+                <h1 class="text-4xl pb-2">{{ item.title }}</h1>
+                <h3 class="text-md hover:underline" @click.stop.prevent="changeDue">Due: {{ item.due_date }}</h3>
+              </div>
+            </RouterLink>
+          </div>
         </div>
       </div>
     </div>
