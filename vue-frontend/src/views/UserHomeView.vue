@@ -114,7 +114,7 @@
         </button>
 
         <!-- Create Classroom -->
-        <button @click="enableModal" v-else-if="classrooms.length && userRole === 'teacher'" class="hover:border-gray-900 hover:text-gray-900 dark:hover:border-gray-100 dark:hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
+        <button @click="enableModal" v-else-if="classrooms.length && userRole === 'teacher'" class="hover:border-gray-900 hover:text-gray-900 dark:hover:border-gray-100 dark:hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden">
           <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
             <p class="place-self-center font-bold">+</p>
             <p class="place-self-center font-bold text-center">Create More Classrooms</p>

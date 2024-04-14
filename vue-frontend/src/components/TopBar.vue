@@ -70,7 +70,7 @@
         </RouterLink>
       </div>
 
-      <div>
+      <div name="name and role" class="hidden md:block">
         <p class="text-sm font-bold text-right pr-2">{{ userName }}</p>
         <span class="flex flex-row">
           <p class="rounded-md px-2 text-gray-900 float-right text-sm" :class="{ 'bg-red-500': userRole === 'teacher', 'bg-green-500': userRole === 'student' }">{{ userRole }}</p>
