@@ -1,6 +1,9 @@
 <script setup>
   import TopBar from '@/components/TopBar.vue';
   import UserAvatar from '@/components/UserAvatar.vue';
+  import NormalIcon from '@/components/icons/NormalIcon.vue';
+  import NoDisturbIcon from '@/components/icons/NoDisturbIcon.vue';
+  import InvisibleIcon from '@/components/icons/InvisibleIcon.vue';
   import axios from 'axios';
   import { ref, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
@@ -12,10 +15,12 @@
   const userId = route.params.userId
   const userRole = route.params.userRole
   const studentPoints = ref(0)
+  const mode = ref('normal'); //default is normal
 
   async function getUserData() {
     const userData = await axios.get(API + 'user/?id=' + userId)
     user.value = userData.data 
+    mode.value = userData.data.mode; // Set the user's mode
     console.log(userData.data)
   }
 
@@ -32,9 +37,22 @@
       router.push({ path: '/' })
     }
   }
+  async function updateMode() {
+    
+    try {
+      await axios.post(`${API}user/mode`, { mode: mode.value });
+      alert('Mode updated successfully.');
+    } catch (error) {
+      console.error('Error updating mode:', error);
+      alert('Failed to update mode.');
+    }
+  }
+
+  
   onMounted(() => {
     getUserData();
     getPoints();
+    
   })
 </script>
 
@@ -47,6 +65,11 @@
         <UserAvatar class="w-1/4 h-1/4 mx-8 my-8 rounded-full border border-sky-200" /> 
         <span class="py-2 flex flex-col place-self-center overflow-hidden">
           <p class="text-4xl sm:text-6xl font-bold sm:my-4 mx-4">{{ user.name }}</p>
+          <select v-model="mode" @change="updateMode" class="ml-4 inline-block text-black">
+            <option value="normal">Normal</option>
+            <option value="do not disturb">Do Not Disturb</option>
+            <option value="invisible">Invisible</option>
+          </select>
           <p class="text-2xl sm:text-4xl sm:my-4 mx-4">{{ user.email }}</p>
           <span class="flex flex-row gap-2 mx-4 font-jetBrains">
             <p class="w-fit text-xl sm:text-2xl px-2 rounded-md text-gray-900" :class="{'bg-green-400': userRole === 'student', 'bg-red-500': userRole === 'teacher'}" >{{ userRole }}</p>

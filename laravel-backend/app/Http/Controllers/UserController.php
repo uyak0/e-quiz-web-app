@@ -63,4 +63,18 @@ class UserController extends Controller
         
         return response()->json(data: ['users'=> $user]);
     }
+
+    public function updateMode(Request $request)
+    {
+        $request->validate(User::modeValidationRules());
+
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $user->mode = $request->mode;
+        $user->save();
+
+        return back()->with('success', 'Mode updated successfully.');
+    }
 }
+
+

@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'mode',
     ];
 
     /**
@@ -70,5 +71,27 @@ class User extends Authenticatable
         return $this->hasMany(Chat::class, 'sender_id')
                 ->where('seen', 1)
                 ->where('receiver_id', auth()->user()->id);
+    }
+
+    public static function modeValidationRules()
+    {
+        return [
+            'mode' => 'required|string|in:normal,do not disturb,invisible',
+        ];
+    }
+
+    public function setModeAttribute($value)
+    {
+        if (in_array($value, ['normal', 'do not disturb', 'invisible'])) {
+            $this->attributes['mode'] = $value;
+        } else {
+            // Handle invalid mode value, e.g., set to default or throw an exception
+            $this->attributes['mode'] = 'normal'; // Default value
+        }
+    }
+
+    public function scopeOfMode($query, $mode)
+    {
+        return $query->where('mode', $mode);
     }
 }

@@ -42,6 +42,7 @@ Route::group(['prefix' => 'user'], function() {
     Route::get('/role', [UserController::class, 'getUserRole']);
     Route::get('/classrooms/{id?}', [ClassroomsController::class, 'userClassrooms']);
     Route::get('/in-classroom', [UserController::class, 'inClassroom']);
+    Route::post('/mode', [UserController::class, 'updateMode'])->name('user.updateMode')->middleware('auth');
 });
 
 Route::group(['prefix' => 'auth'], function() {
@@ -72,6 +73,8 @@ Route::get("online-users", [UserController::class, "getOnlineUsers"]);
 Route::group(['prefix' => 'messages'], function() {
     Route::get ("/", [ChatController::class, "index"]);
     Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
-    Route::put ("/{id}", [ChatController::class, "update"]);
+    Route::put ("/{id}", [ChatController::class, "update"]); 
+    Route::post("/upload", [ChatController::class, "upload"]);
+    Route::post("/upload-document", [ChatController::class, "uploadDocument"]);
 });
 
