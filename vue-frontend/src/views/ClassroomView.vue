@@ -4,6 +4,8 @@ import axios from "axios";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref, watchEffect } from "vue";
 import VueFeather from "vue-feather";
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 import Modal from '@/components/Modal.vue'
 import { DateTime } from 'luxon';
 
@@ -20,6 +22,9 @@ const copied = ref(false)
 
 const createTaskModal = ref(false)
 const shareCodeModal = ref(false)
+const changeDueModal = ref(false)
+
+const newDueDate = ref(new Date()) 
 
 const userRole = route.params.userRole
 
@@ -97,16 +102,17 @@ function copyCode() {
 }
 
 function dateDiff(date) {
-  let now = DateTime.now() 
+  let now = DateTime.now()
   date = Date.parse(date)
-  let due = DateTime.fromMillis(date) 
+  let due = DateTime.fromMillis(date)
   let diff = due.toRelativeCalendar(now, { style: 'long' })
   diff = diff.charAt(0).toUpperCase() + diff.slice(1)
   return diff
 }
 
-function changeDue() {
-  console.log('change due')
+function changeDue(date) {
+  changeDueModal.value = true
+  newDueDate.value = Date.parse(date)
 }
 
 onMounted(() => {
@@ -119,180 +125,191 @@ onMounted(() => {
   <div class="bg-soft-white dark:bg-soft-black">
     <TopBar />
 
-    <div class="w-full place-items-center justify-center flex flex-col">
-      <div name="title, desc and teacher btns"
-        class="md:rounded-md w-full md:w-3/4 bg-gray-200 dark:bg-slate-700 md:m-4 px-4 pb-4 pt-1 flex lg:flex-row flex-col justify-between">
-        <div name="classroom details" class="text-black dark:text-darkMode">
+    <div class="flex justify-center">
+      <div class="w-full md:w-3/4 2xl:w-1/2 place-items-center justify-center flex flex-col">
+        <div name="title, desc and teacher btns"
+          class="md:rounded-md w-full justify-self-center bg-gray-200 dark:bg-slate-700 md:m-4 px-4 pb-4 pt-1 flex lg:flex-row flex-col justify-between">
+          <div name="classroom details" class="text-black dark:text-darkMode">
 
-          <div name="name" class="flex flex-row py-3 overflow-hidden truncate">
-            <h1 class="text-xl lg:text-6xl truncate" v-show="showName">{{ classroomName }}</h1>
-            <div v-if="!showName" class="flex flex-row">
-              <input type="text" v-model="classroomName"
-                class="text-xl lg:text-6xl text-black flex-grow bg-transparent outline-none"
-                placeholder="Add a name...">
-              <button @click="changeName" class="text-white">
-                <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
-              </button>
+            <div name="name" class="flex flex-row py-3 overflow-hidden truncate">
+              <h1 class="text-4xl lg:text-6xl truncate" v-show="showName">{{ classroomName }}</h1>
+              <div v-if="!showName" class="flex flex-row">
+                <input type="text" :value="classroomName" size="15"
+                  class="text-4xl lg:text-6xl text-black flex-grow bg-transparent outline-none"
+                  placeholder="Add a name...">
+                <button @click="changeName" class="text-white">
+                  <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
+                </button>
+              </div>
+              <vue-feather v-show="showNameEditBtn" @click="showName = false; showNameEditBtn = false" size="18"
+                type="edit" v-if="userRole === 'teacher'"
+                class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+              <vue-feather @click="showName = true; showNameEditBtn = true" size="18" type="x"
+                v-if="userRole === 'teacher' && !showName"
+                class="hover:cursor-pointer dark:hover:text-black hover:text-gray-500 duration-300 px-3"></vue-feather>
             </div>
-            <vue-feather v-show="showNameEditBtn" @click="showName = false; showNameEditBtn = false" size="18"
-              type="edit" v-if="userRole === 'teacher'"
-              class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
-            <vue-feather @click="showName = true; showNameEditBtn = true" size="18" type="x"
-              v-if="userRole === 'teacher' && !showName"
-              class="hover:cursor-pointer dark:hover:text-black hover:text-gray-500 duration-300 px-3"></vue-feather>
-          </div>
 
-          <div v-if="classroomDetails.description" name="description" class="flex flex-row">
-            <h3 class="md:text-4xl text-lg" v-show="showDesc">{{ classroomDesc }}</h3>
-            <div v-if="!showDesc">
+            <div v-if="classroomDetails.description" name="description" class="flex flex-row">
+              <h3 class="md:text-2xl text-lg" v-show="showDesc">{{ classroomDesc }}</h3>
+              <div v-if="!showDesc">
+                <input type="text" :value="classroomDesc"
+                  class="text-black md:text-2xl text-lg flex-grow bg-transparent py-2 outline-none"
+                  placeholder="Add a description...">
+                <button @click="changeDesc" class="text-white">
+                  <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
+                </button>
+              </div>
+              <vue-feather v-show="showDescEditBtn" @click="showDesc = false; showDescEditBtn = false" size="18"
+                type="edit" v-if="userRole === 'teacher'"
+                class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+              <vue-feather @click="showDesc = true; showDescEditBtn = true" size="18" type="x"
+                v-if="userRole === 'teacher' && !showDesc"
+                class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
+            </div>
+
+            <div v-else-if="!classroomDetails.description" class="flex items-center my-4">
               <input type="text" v-model="classroomDesc"
-                class="text-black text-lg flex-grow bg-transparent py-2 outline-none"
+                class="text-black text-4xl flex-grow bg-transparent py-2 outline-none"
                 placeholder="Add a description...">
               <button @click="changeDesc" class="text-white">
                 <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
               </button>
+              <vue-feather @click="showDesc = true; showDescEditBtn = true" size="18" type="x"
+                v-if="userRole === 'teacher' && !showDesc"
+                class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
             </div>
-            <vue-feather v-show="showDescEditBtn" @click="showDesc = false; showDescEditBtn = false" size="18"
-              type="edit" v-if="userRole === 'teacher'"
-              class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
-            <vue-feather @click="showDesc = true; showDescEditBtn = true" size="18" type="x"
-              v-if="userRole === 'teacher' && !showDesc"
-              class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
           </div>
 
-          <div v-else-if="!classroomDetails.description" class="flex items-center my-4">
-            <input type="text" v-model="classroomDesc"
-              class="text-black text-4xl flex-grow bg-transparent py-2 outline-none" placeholder="Add a description...">
-            <button @click="changeDesc" class="text-white">
-              <vue-feather type="corner-down-left" class="hover:bg-gray-300 rounded-r-md"></vue-feather>
+          <!-- Teacher buttons -->
+          <span name="teacher btns" v-if="userRole === 'teacher'"
+            class="md:flex-nowrap sm:flex-wrap py-2 gap-2 flex h-fit lg:flex-col">
+            <button class="flex group rounded-md hover:bg-red-800 bg-red-500 text-black w-fit h-fit self-end">
+              <vue-feather class="p-1 place-self-center group-hover:text-white" type="trash-2"
+                @click="deleteClassroom" />
             </button>
-            <vue-feather @click="showDesc = true; showDescEditBtn = true" size="18" type="x"
-              v-if="userRole === 'teacher' && !showDesc"
-              class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
-          </div>
-        </div>
-
-        <!-- Teacher buttons -->
-        <span name="teacher btns" v-if="userRole === 'teacher'"
-          class="md:flex-nowrap sm:flex-wrap py-2 gap-2 flex h-fit">
-          <button class="flex group rounded-md hover:bg-red-800 bg-red-500 text-black">
-            <vue-feather class="p-2 place-self-center group-hover:text-white" type="trash-2" @click="deleteClassroom" />
-          </button>
-          <button name="big button" @click="createTaskModal = true"
-            class="after:content-['+_Task'] md:after:content-['+_Create_a_Task'] text-center bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-md md:text-2xl px-4">
-          </button>
-          <button @click="shareCodeModal = true"
-            class="after:content-['+_Student'] md:after:content-['+_Add_a_Student'] text-center text-md md:text-2xl bg-gray-300 rounded-md px-2 text-gray-900">
-          </button>
-        </span>
-      </div>
-
-      <!-- MODALS -->
-      <Modal v-model="shareCodeModal">
-        <div class="place-self-center sm:w-full md:w-3/4 lg:w-1/4 text-center rounded-md h-fit bg-gray-600 text-gray-100 p-6">
-          <h1>Copy this code and share it to your students!</h1>
-          <!-- Copy to Clipboard -->
-          <div class="font-jetBrains mb-4 flex place-items-center w-full bg-gray-500 text-gray-900 rounded-md p-2">
-            <input type="text" :value="classroomDetails.code" class="text-4xl w-full bg-gray-500 text-gray-900"
-              readonly>
-            <vue-feather type="clipboard" class="text-gray-300 cursor-pointer" @click="copyCode"></vue-feather>
-          </div>
-          <span name="tooltip" v-show="copied"
-            class="relative z-50 bg-black after:content-[''] after:absolute after:top-full after:left-1/2 after:border-t-black after:border-x-transparent after:border-b-transparent after:border-4 rounded-md px-2">
-            Copied to clipboard!
+            <button name="big button" @click="createTaskModal = true"
+              class="after:content-['+_Task'] md:after:content-['+_Create_a_Task'] text-center bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-md md:text-lg px-4">
+            </button>
+            <button @click="shareCodeModal = true"
+              class="after:content-['+_Student'] md:after:content-['+_Add_a_Student'] text-center text-md md:text-lg bg-gray-300 rounded-md px-2 text-gray-900">
+            </button>
           </span>
         </div>
-      </Modal>
 
-      <Modal v-model="createTaskModal">
-        <div class="place-self-center sm:w-full md:w-3/4 lg:w-1/4 text-center rounded-md h-fit bg-gray-600 text-gray-100 p-6">
-          <div class="w-full flex flex-row justify-end">
-            <VueFeather type="x" @click="createTaskModal = false" class="w-fit hover:text-gray-500 cursor-pointer" />
-          </div>
-          <h1 class="pb-2 text-2xl">What do you want to create?</h1>
-          <span class="py-2 gap-2 flex flex-row *:rounded-md *:w-1/2 *:py-5 text-xl text-gray-900">
-            <RouterLink :to="{ name: 'createQuiz' }" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">
-              <vue-feather type="book-open" size="50" />
-              <h1>Quiz</h1>
-            </RouterLink>
-            <RouterLink :to="{ name: 'createAssignment' }" class="bg-blue-400 hover:bg-blue-600 duration-300 hover:text-gray-200">
-              <vue-feather type="file-text" size="50" />
-              <h1>Assignment</h1>
-            </RouterLink>
-          </span>
-        </div>
-      </Modal>
 
-      <div name="content" class="w-full md:w-3/4 place-items-center md:place-items-start h-screen flex flex-col md:flex-row">
-        <!-- SideBar -->
-        <div name="sidebar" class="md:w-fit w-full flex flex-col">
-          <!-- LEADERBOARD -->
-          <div v-if="topStudents.length" class="p-1 w-full md:w-auto px-2">
-            <h1 class="text-lg text-gray-900 dark:text-darkMode">Classroom Leaderboard</h1>
-            <div class="flex flex-col w-full">
-              <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                  <div class="shadow overflow-hidden border-b border-gray-200 dark:border-gray-700 rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                      <thead class="dark:bg-gray-700 bg-gray-50 *:text-gray-500 *:dark:text-darkMode">
-                        <tr>
-                          <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                            Points
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody class="bg-white dark:bg-gray-700 divide-y dark:divide-gray-600 divide-gray-200">
-                        <tr v-for="(student, index) in topStudents" :key="index"
-                          class="duration-300 ease-in-out *:hover:bg-gray-300 *:dark:hover:bg-gray-800">
-                          <td class="px-6 py-4 whitespace-nowrap flex-row flex gap-2">
-                            <div class="text-sm text-gray-900 dark:text-darkMode">{{ student.name }}</div>
-                            <vue-feather v-if="index == 0" type="star" size="20" fill="yellow" stroke="black" />
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900 dark:text-darkMode">{{ student.points }}</div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+        <div name="content" class="w-full place-items-center md:place-items-start h-screen flex flex-col md:flex-row">
+          <!-- SideBar -->
+          <div name="sidebar" class="md:w-fit w-full flex flex-col">
+            <!-- LEADERBOARD -->
+            <div v-if="topStudents.length" class="p-1 w-full md:w-auto px-2">
+              <h1 class="text-lg text-gray-900 dark:text-darkMode">Classroom Leaderboard</h1>
+              <div class="flex flex-col w-full">
+                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                  <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                    <div class="shadow overflow-hidden border-b border-gray-200 dark:border-gray-700 rounded-lg">
+                      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                        <thead class="dark:bg-gray-700 bg-gray-50 *:text-gray-500 *:dark:text-darkMode">
+                          <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                              Name
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                              Points
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-700 divide-y dark:divide-gray-600 divide-gray-200">
+                          <tr v-for="(student, index) in topStudents" :key="index"
+                            class="duration-300 ease-in-out *:hover:bg-gray-300 *:dark:hover:bg-gray-800">
+                            <td class="px-6 py-4 whitespace-nowrap flex-row flex gap-2">
+                              <div class="text-sm text-gray-900 dark:text-darkMode">{{ student.name }}</div>
+                              <vue-feather v-if="index == 0" type="star" size="20" fill="yellow" stroke="black" />
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              <div class="text-sm text-gray-900 dark:text-darkMode">{{ student.points }}</div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcoming Quizzes -->
+            <div v-if="classroomQuizzes.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
+              <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
+              <div class="border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2">
+                <div v-for="(quiz, index) of classroomQuizzes" :key="index">
+                  <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id } }"
+                    v-if="Date.parse(quiz.due_date) > Date.now()" class="pb-4 flex flex-col w-full group">
+                    <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
+                    <h3 class="text-md">Due: {{ quiz.due_date }}</h3>
+                    <h4 class="text-sm">{{ dateDiff(quiz.due_date) }}</h4>
+                  </RouterLink>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Upcoming Quizzes -->
-          <div class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
-            <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
-            <div v-for="quiz of classroomQuizzes">
-              <div v-if="quiz.due_date > new Date().toISOString()" class="flex flex-col w-full">
-              <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id }}" class="group border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2 ">
-                <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
-                <h3 class="text-md">Due: {{ quiz.due_date }}</h3>
-                <h4 class="text-sm">{{ dateDiff(quiz.due_date) }}</h4>
+          <div class="flex flex-col w-full">
+            <div v-for="(quiz, index) of classroomQuizzes" :key="index" class="py-2 flex flex-col w-full">
+              <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id } }"
+                class="hover:bg-gray-400 ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
+                <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
+                <div class="w-full flex flex-row justify-between place-items-center">
+                  <h1 class="text-4xl pb-2">{{ quiz.title }}</h1>
+                  <h3 v-show="!changeDueModal" class="text-md hover:underline" @click.stop.prevent="changeDue(quiz.due_date)">Due: {{ quiz.due_date }}</h3>
+                  <span v-show="changeDueModal" class="flex gap-1">
+                    <input type="date" v-model="newDueDate" v-show="changeDueModal" class="text-md hover:underline dark:bg-gray-600 dark:text-darkMode" @click.stop.prevent> 
+                    <input type="time" v-show="changeDueModal" :value="Date.parse(quiz.due_date)" @click.stop.prevent>
+                  </span>
+                </div>
               </RouterLink>
-              </div>
             </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col w-full">
-          <div v-for="(item, index) of classroomQuizzes" :key="index" class="py-2 flex flex-col w-full">
-            <RouterLink :to="{ name: 'quiz', params: { quizId: item.id }}"
-              class="hover:bg-gray-400 ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
-              <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
-              <div class="w-full flex flex-row justify-between place-items-center">
-                <h1 class="text-4xl pb-2">{{ item.title }}</h1>
-                <h3 class="text-md hover:underline" @click.stop.prevent="changeDue">Due: {{ item.due_date }}</h3>
-              </div>
-            </RouterLink>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- MODALS -->
+    <Modal v-model="shareCodeModal">
+      <div
+        class="place-self-center sm:w-full md:w-3/4 lg:w-1/4 text-center rounded-md h-fit bg-gray-600 text-gray-100 p-6">
+        <h1>Copy this code and share it to your students!</h1>
+        <!-- Copy to Clipboard -->
+        <div class="font-jetBrains mb-4 flex place-items-center w-full bg-gray-500 text-gray-900 rounded-md p-2">
+          <input type="text" :value="classroomDetails.code" class="text-4xl w-full bg-gray-500 text-gray-900" readonly>
+          <vue-feather type="clipboard" class="text-gray-300 cursor-pointer" @click="copyCode"></vue-feather>
+        </div>
+        <span name="tooltip" v-show="copied"
+          class="relative z-50 bg-black after:content-[''] after:absolute after:top-full after:left-1/2 after:border-t-black after:border-x-transparent after:border-b-transparent after:border-4 rounded-md px-2">
+          Copied to clipboard!
+        </span>
+      </div>
+    </Modal>
+
+    <Modal v-model="createTaskModal">
+      <div
+        class="place-self-center sm:w-full md:w-3/4 lg:w-1/4 text-center rounded-md h-fit bg-gray-600 text-gray-100 p-6">
+        <div class="w-full flex flex-row justify-end">
+          <VueFeather type="x" @click="createTaskModal = false" class="w-fit hover:text-gray-500 cursor-pointer" />
+        </div>
+        <h1 class="pb-2 text-2xl">What do you want to create?</h1>
+        <span class="py-2 gap-2 flex flex-row *:rounded-md *:w-1/2 *:py-5 text-xl text-gray-900">
+          <RouterLink :to="{ name: 'createQuiz' }" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">
+            <vue-feather type="book-open" size="50" />
+            <h1>Quiz</h1>
+          </RouterLink>
+          <RouterLink :to="{ name: 'createAssignment' }"
+            class="bg-blue-400 hover:bg-blue-600 duration-300 hover:text-gray-200">
+            <vue-feather type="file-text" size="50" />
+            <h1>Assignment</h1>
+          </RouterLink>
+        </span>
+      </div>
+    </Modal>
+
   </div>
 </template>

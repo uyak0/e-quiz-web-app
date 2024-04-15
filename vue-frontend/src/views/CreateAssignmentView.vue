@@ -20,11 +20,28 @@ interface Assignment {
 
 const route = useRoute()
 const userFiles = ref<UserFiles[]>([])
-const assignment = ref<Assignment>()
+const assignment = ref<Assignment>({
+  title: '',
+  due_date: Date.now(),
+  classroom_id: route.params.classroomId
+})
 const API = import.meta.env.VITE_LARAVEL_API
 
 async function fileHandler(event: Event) {
   const files = (event.target as HTMLInputElement).files
+  console.log(files)
+  for (let i=0; i<files.length; i++) {
+    userFiles.value.push({
+      name: files[i].name,
+      url: URL.createObjectURL(files[i]),
+      type: files[i].type
+    });
+  }
+}
+
+async function dropFileHandler(event: Event) {
+  console.log(event)
+  const files = (event as DragEvent).dataTransfer?.files 
   console.log(files)
   for (let i=0; i<files.length; i++) {
     userFiles.value.push({
@@ -40,10 +57,12 @@ async function fileHandler(event: Event) {
   <div class="text-gray-900 dark:text-darkMode bg-soft-white dark:bg-soft-black">
     <div class="bg-gray-100 dark:bg-slate-700 w-full md:w-3/4 mx-auto py-8 h-screen">
       <!-- Title and Date -->
-      <span class="mx-4 font-jetBrains flex flex-rows border-none">
+      <span class="mx-4 font-jetBrains flex border-none justify-between">
         <input type="text" id="title" name="title" v-model="assignment.title" placeholder="Type Title Here..."
           class="truncate text-xl md:text-5xl bg-transparent ">
-        <VueDatePicker v-model="assignment.due_date" />
+        <div class="w-fit">
+          <VueDatePicker v-model="assignment.due_date" />
+        </div>
       </span>
 
       <div class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
@@ -85,7 +104,7 @@ async function fileHandler(event: Event) {
                 <!-- <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p> -->
               </div>
               <input id="dropzone-file" type="file" class="hidden" 
-                @input.prevent="fileHandler($event)" @drop="fileHandler" multiple>
+                @input.prevent="fileHandler($event)" @dragover.prevent @drop.prevent="dropFileHandler($event)" multiple>
             </label>
           </div>
 

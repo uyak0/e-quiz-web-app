@@ -73,11 +73,12 @@
       return
     }
 
-    if (quizProps.value.due_date < Date.now()){
+    else if (quizProps.value.due_date < Date.now()){
       alert('Due date cannot be earlier than the current date!')
+      return
     }
 
-    if (questionProps.value.length < 1) {
+    else if (questionProps.value.length < 1) {
       alert('Please add at least one question to the quiz')
       return
     }
