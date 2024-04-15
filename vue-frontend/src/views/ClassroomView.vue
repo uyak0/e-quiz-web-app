@@ -14,6 +14,7 @@ const router = useRouter()
 const API = import.meta.env.VITE_LARAVEL_API
 
 const classroomQuizzes = ref([])
+const upcomingQuizzes = ref([])
 const classroomDetails = ref([])
 const classroomDesc = ref('')
 const classroomName = ref('')
@@ -38,9 +39,24 @@ async function getClassroomData() {
   classroomDesc.value = res.data.description
 }
 
+function getUpcoming() {
+  for (let i=0; i<classroomQuizzes.value.length; i++) {
+    if (DateTime.now() > Date.parse(classroomQuizzes.value[i].due_date)) {
+      upcomingQuizzes.value.push({
+        id: classroomQuizzes.value[i].id,
+        title: classroomQuizzes.value[i].title,
+        due: classroomQuizzes.value[i].due_date,
+        fromNow: dateDiff(classroomQuizzes.value[i].due_date)
+      })
+    } 
+  }
+  console.log(upcomingQuizzes.value)
+} 
+
 async function getQuizzes() {
   const res = await axios.get(API + 'classroom/quizzes/' + route.params.classroomId)
   classroomQuizzes.value = res.data;
+  getUpcoming();
 }
 
 async function deleteClassroom() {
@@ -114,6 +130,7 @@ function changeDue(date) {
   changeDueModal.value = true
   newDueDate.value = Date.parse(date)
 }
+
 
 onMounted(() => {
   getClassroomData()
@@ -241,12 +258,12 @@ onMounted(() => {
             <div v-if="classroomQuizzes.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
               <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
               <div class="border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2">
-                <div v-for="(quiz, index) of classroomQuizzes" :key="index">
+                <div v-for="(quiz, index) of upcomingQuizzes" :key="index">
                   <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id } }"
-                    v-if="Date.parse(quiz.due_date) > Date.now()" class="pb-4 flex flex-col w-full group">
+                     class="pb-4 flex flex-col w-full group">
                     <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
-                    <h3 class="text-md">Due: {{ quiz.due_date }}</h3>
-                    <h4 class="text-sm">{{ dateDiff(quiz.due_date) }}</h4>
+                    <h3 class="text-md">Due: {{ quiz.due }}</h3>
+                    <h4 class="text-sm">{{ quiz.fromNow }}</h4>
                   </RouterLink>
                 </div>
               </div>
