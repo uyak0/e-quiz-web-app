@@ -255,7 +255,7 @@ onMounted(() => {
             </div>
 
             <!-- Upcoming Quizzes -->
-            <div v-if="classroomQuizzes.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
+            <div v-if="upcomingQuizzes.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
               <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
               <div class="border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2">
                 <div v-for="(quiz, index) of upcomingQuizzes" :key="index">
