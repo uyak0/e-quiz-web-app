@@ -17,6 +17,8 @@
   const classroomCode = ref('')
   const classroomName = ref('')
   const classroomDesc = ref('')
+  const maxMembers = ref(null);
+  const selectedType = ref('anyone_can_join'); //default
 
   const joinOrCreateClassroomBtn = ref(true)
   const modalEnabled = ref(false)
@@ -45,9 +47,17 @@
   }
 
   async function createClassroom() {
+    if (!maxMembers.value || isNaN(maxMembers.value) || maxMembers.value <= 0) {
+      console.error("Invalid number")
+      alert("Classroom Size must be at least 1")
+      return;
+    }
+
     const classroomData = {
       classroom_name: classroomName.value,
       classroom_desc: classroomDesc.value,
+      maxMembers: maxMembers.value,
+      type: selectedType.value,
     }
     try {
       const res = await axios.post(API + 'classroom/create', classroomData)
@@ -137,19 +147,26 @@
     </Modal>
 
     <Modal v-else v-model="modalEnabled">
-      <form @submit.prevent class="bg-gray-600 rounded-md w-1/4 p-4 h-fit place-self-center">
-        <p class="text-2xl text-bold"> Create Classroom </p>
-        <div class="flex flex-col text-black">
-          <input ref="modalInput" type="text" v-model="classroomName" placeholder="Classroom Name" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
-          <input type="text" v-model="classroomDesc" placeholder="Description" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
-        </div>
+  <form @submit.prevent class="bg-gray-600 rounded-md w-2/4 p-5 h-fit place-self-center "> <!-- Adjusted width to 3/4 -->
+    <p class="text-3xl text-bold text-center"> Create new classroom </p>
+    <div class="flex flex-col text-black">
+      <input ref="modalInput" type="text" v-model="classroomName" placeholder="Classroom Name" class="text-black border-2 border-gray-300 rounded-md p-2 my-2">
+      <div class="flex flex-row space-x-4 my-4"> <!-- Added margin here -->
+        <input v-model="maxMembers" type="number" placeholder="Classroom Size (e.g. 30)" class="text-black border-2 border-gray-300 rounded-md p-2 flex-1" min="0" oninput="this.value = Math.abs(this.value)">
+        <select v-model="selectedType" class="text-black border-2 border-gray-300 rounded-md p-2 flex-1">
+          <option value="anyone_can_join">Anyone can join</option>
+          <option value="invite_only">Invite only</option>
+        </select>
+      </div>
+      <textarea v-model="classroomDesc" placeholder="Description (e.g. This is a description of the classroom...)" class="text-black border-2 border-gray-300 rounded-md p-2 my-2 h-60 resize-none break-words"></textarea> <!-- Adjusted height to h-64 -->
+    </div>
 
-        <div class="float-right flex flex-row">
-          <button @click="createClassroom" class="bg-blue-400 rounded-md hover:bg-sky-200 text-black ease-in-out duration-300 p-2 m-2">Create Classroom</button>
-          <button @click="modalEnabled = !modalEnabled"> Cancel </button>
-        </div>
-      </form>
-    </Modal>
+    <div class="float-right flex flex-row">
+      <button @click="createClassroom" class="bg-blue-400 rounded-md hover:bg-sky-200 text-black ease-in-out duration-300 p-2 m-2">Create Classroom</button>
+      <button @click="modalEnabled = !modalEnabled"> Cancel </button>
+    </div>
+  </form>
+</Modal>
     <!-- -----  -->
   </div>
 </template>

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\TestRunner\TestResult\Collector;
+use Illuminate\Support\Facades\DB;
 
 class ClassroomsController extends Controller
 {
@@ -83,6 +84,9 @@ class ClassroomsController extends Controller
                 'name' => $request->classroom_name,
                 'description' => $request->classroom_desc,
                 'code' => $code,
+                'type' => $request->type,
+                'max_members' => $request->maxMembers
+            
             ]);
 
             $this->joinClassroom(auth()->user()->id, $classroom->code);
@@ -168,4 +172,43 @@ class ClassroomsController extends Controller
 
         return response()->json($sortedStudents->values()->all());
     }
+
+    public function getClassroomData($classroomId)
+    {
+        $classroom = Classroom::find($classroomId);
+
+        if (!$classroom) {
+            return response()->json(['message' => 'Classroom not found'], 404);
+        }
+
+        // Count the number of users in the classroom
+        $memberCount = DB::table('user_classrooms')
+                        ->where('classroom_id', $classroomId)
+                        ->count();
+
+        // Prepare and return only the necessary data
+        $data = [
+            'maxMembers' => $classroom->max_members,
+            'memberCount' => $memberCount,
+        ];
+
+        return response()->json($data);
+    }
+
+    public function getClassroomUsers($classroomId)
+    {
+        $classroom = Classroom::with('users')->find($classroomId);
+
+        if (!$classroom) {
+            return response()->json(['message' => 'Classroom not found'], 404);
+        }
+
+        $users = $classroom->users->map(function ($user) {
+            return ['id' => $user->id, 'name' => $user->name];
+        });
+
+        return response()->json($users);
+    }
+
+    
 }

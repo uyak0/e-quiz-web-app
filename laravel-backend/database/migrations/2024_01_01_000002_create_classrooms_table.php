@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->string('code')->unique();
+            $table->enum('type', ['anyone_can_join', 'invite_only'])->default('anyone_can_join'); // New column for classroom type
+            $table->unsignedInteger('max_members')->nullable(); // New column for maximum members allowed
             $table->timestamps();
         });
     }

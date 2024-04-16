@@ -20,23 +20,32 @@ const classroomDesc = ref('')
 const classroomName = ref('')
 const topStudents = ref([])
 const copied = ref(false)
+const classroomUsers = ref([]); 
 
 const createTaskModal = ref(false)
 const shareCodeModal = ref(false)
 const changeDueModal = ref(false)
+const memberListModal = ref(false)
 
 const newDueDate = ref(new Date()) 
 
 const userRole = route.params.userRole
 
 async function getClassroomData() {
-  const res = await axios.get(API + 'classroom/' + route.params.classroomId)
-  const res2 = await axios.get(API + 'classroom/top-students/' + route.params.classroomId)
+  const [classroomRes, topStudentsRes, classroomDataRes] = await Promise.all([
+    axios.get(API + 'classroom/' + route.params.classroomId),
+    axios.get(API + 'classroom/top-students/' + route.params.classroomId),
+    axios.get(API + 'classroom/data/' + route.params.classroomId)
+  ]);
 
-  topStudents.value = res2.data;
-  classroomDetails.value = res.data;
-  classroomName.value = res.data.name
-  classroomDesc.value = res.data.description
+  topStudents.value = topStudentsRes.data;
+  classroomDetails.value = {
+    ...classroomRes.data,
+    memberCount: classroomDataRes.data.memberCount,
+    maxMembers: classroomDataRes.data.maxMembers
+  };
+  classroomName.value = classroomRes.data.name;
+  classroomDesc.value = classroomRes.data.description;
 }
 
 function getUpcoming() {
@@ -51,7 +60,7 @@ function getUpcoming() {
     } 
   }
   console.log(upcomingQuizzes.value)
-} 
+}
 
 async function getQuizzes() {
   const res = await axios.get(API + 'classroom/quizzes/' + route.params.classroomId)
@@ -108,6 +117,17 @@ async function changeDesc() {
   showDescEditBtn.value = true
 }
 
+async function openMemberListModal() {
+  try {
+    const response = await axios.get(API + 'classroom/users/' + route.params.classroomId);
+    classroomUsers.value = response.data;
+  } catch (error) {
+    console.error("Failed to fetch classroom users", error);
+  }
+  memberListModal.value = true;
+}
+
+
 function copyCode() {
   const code = classroomDetails.value.code
   navigator.clipboard.writeText(code)
@@ -130,7 +150,6 @@ function changeDue(date) {
   changeDueModal.value = true
   newDueDate.value = Date.parse(date)
 }
-
 
 onMounted(() => {
   getClassroomData()
@@ -183,6 +202,8 @@ onMounted(() => {
                 v-if="userRole === 'teacher' && !showDesc"
                 class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
             </div>
+            
+            
 
             <div v-else-if="!classroomDetails.description" class="flex items-center my-4">
               <input type="text" v-model="classroomDesc"
@@ -195,7 +216,16 @@ onMounted(() => {
                 v-if="userRole === 'teacher' && !showDesc"
                 class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
             </div>
+            <div name="classroom details" class="text-black dark:text-darkMode flex items-center">
+              <p class="text-xl">Members: {{ classroomDetails.memberCount }} / {{ classroomDetails.maxMembers }}</p>
+              <div class="ml-2 mt-2">
+                <button @click="openMemberListModal" class="hover:cursor-pointer hover:text-black duration-300">
+                  <vue-feather type="info" size="18"></vue-feather>
+                </button>
+              </div>
+            </div>
           </div>
+
 
           <!-- Teacher buttons -->
           <span name="teacher btns" v-if="userRole === 'teacher'"
@@ -327,6 +357,15 @@ onMounted(() => {
         </span>
       </div>
     </Modal>
+
+    <Modal v-model="memberListModal">
+    <div class="p-4 bg-red-300 w-3/4 h-fit place-self-center">
+      <h2 class="text-2xl font-bold mb-4 text-black">Member List</h2>
+      <ul>
+        <li v-for="user in classroomUsers" :key="user.id" class="text-black">{{ user.name }}</li>
+      </ul>
+    </div>
+  </Modal>
 
   </div>
 </template>

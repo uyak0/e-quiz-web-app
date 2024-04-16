@@ -11,7 +11,7 @@ class Classroom extends Model
 {
     use HasFactory;
     protected $table = 'classrooms';
-    protected $fillable = ['name', 'description', 'code'];
+    protected $fillable = ['name', 'description', 'code', 'type','max_members'];
 
     public function users(): BelongsToMany
     {
@@ -31,5 +31,10 @@ class Classroom extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(Assignment::class);
+    }
+
+    public function getMemberCountAttribute()  //dynamic member count
+    {
+        return $this->users()->count();
     }
 }
