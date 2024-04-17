@@ -86,7 +86,7 @@ class ClassroomsController extends Controller
                 'code' => $code,
                 'type' => $request->type,
                 'max_members' => $request->maxMembers
-            
+
             ]);
 
             $this->joinClassroom(auth()->user()->id, $classroom->code);
@@ -150,6 +150,13 @@ class ClassroomsController extends Controller
         return response() -> json($quizzes);
     }
 
+    public function classroomAssignments(int $classroomId): JsonResponse
+    {
+        $classroom = Classroom::find($classroomId);
+        $assignments = $classroom->assignments;
+        return response() -> json($assignments);
+    }
+
     public function topStudents(int $id): JsonResponse
     {
         $classroom = Classroom::find($id);
@@ -210,5 +217,5 @@ class ClassroomsController extends Controller
         return response()->json($users);
     }
 
-    
+
 }

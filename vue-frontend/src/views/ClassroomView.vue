@@ -14,6 +14,9 @@ const router = useRouter()
 const API = import.meta.env.VITE_LARAVEL_API
 
 const classroomQuizzes = ref([])
+const classroomAssignments = ref([])
+const classroomPosts = ref([])
+
 const upcomingQuizzes = ref([])
 const classroomDetails = ref([])
 const classroomDesc = ref('')
@@ -62,11 +65,26 @@ function getUpcoming() {
   console.log(upcomingQuizzes.value)
 }
 
-async function getQuizzes() {
-  const res = await axios.get(API + 'classroom/quizzes/' + route.params.classroomId)
-  classroomQuizzes.value = res.data;
+async function getPosts() {     // Classified assignments, quizzes as Posts
+  const quizzes = await axios.get(API + 'classroom/quizzes/' + route.params.classroomId)
+  const assignments = await axios.get(API + 'classroom/assignments/' + route.params.classroomId) 
+  classroomQuizzes.value = quizzes.data;
+  classroomQuizzes.value = classroomQuizzes.value.map(quiz => {
+    quiz.type = 'quiz'
+    return quiz
+  })
+
+  classroomAssignments.value = assignments.data;
+  classroomAssignments.value = classroomAssignments.value.map(assignment => {
+    assignment.type = 'assignment'
+    return assignment
+  })
+
+  classroomPosts.value = [...classroomQuizzes.value, ...classroomAssignments.value]
+  console.log(classroomPosts.value)
   getUpcoming();
 }
+
 
 async function deleteClassroom() {
   let confirmDlt = confirm('Are you sure you want to delete this classroom? \nThis action cannot be undone. All quizzes and students will be removed from this classroom as well!')
@@ -152,8 +170,8 @@ function changeDue(date) {
 }
 
 onMounted(() => {
-  getClassroomData()
-  getQuizzes();
+  getClassroomData();
+  getPosts();
 })
 </script>
 
@@ -301,23 +319,46 @@ onMounted(() => {
           </div>
 
           <div class="flex flex-col w-full">
-            <div v-for="(quiz, index) of classroomQuizzes" :key="index" class="py-2 flex flex-col w-full">
-              <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id } }"
-                class="hover:bg-gray-400 ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
-                <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
-                <div class="w-full flex flex-row justify-between place-items-center">
-                  <h1 class="text-4xl pb-2">{{ quiz.title }}</h1>
-                  <h3 v-show="!changeDueModal" class="text-md hover:underline"
-                    @click.stop.prevent="changeDue(quiz.due_date)">Due: {{ quiz.due_date }}</h3>
-                  <span v-show="changeDueModal" class="flex gap-1">
-                    <input type="date" v-model="newDueDate" v-show="changeDueModal"
-                      class="text-md hover:underline dark:bg-gray-600 dark:text-darkMode" @click.stop.prevent>
-                    <input type="time" v-show="changeDueModal" :value="Date.parse(quiz.due_date)" @click.stop.prevent>
-                  </span>
-                </div>
-              </RouterLink>
+            <div v-for="(post, index) of classroomPosts" :key="index" class="py-2 flex flex-col w-full">
+              <!-- Quizzes -->
+              <div v-if="post.type === 'quiz'">
+                <RouterLink :to="{ name: 'quiz', params: { quizId: post.id } }"
+                  class="hover:bg-gray-400 ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
+                  <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
+                  <div class="w-full flex flex-row justify-between place-items-center">
+                    <h1 class="text-4xl pb-2">{{ post.title }}</h1>
+                    <h3 v-show="!changeDueModal" class="text-md hover:underline"
+                      @click.stop.prevent="changeDue(post.due_date)">Due: {{ post.due_date }}</h3>
+                    <span v-show="changeDueModal" class="flex gap-1">
+                      <input type="date" v-model="newDueDate" v-show="changeDueModal"
+                        class="text-md hover:underline dark:bg-gray-600 dark:text-darkMode" @click.stop.prevent>
+                      <input type="time" v-show="changeDueModal" :value="Date.parse(post.due_date)" @click.stop.prevent>
+                    </span>
+                  </div>
+                </RouterLink>
+              </div>
+
+              <!-- Assignments -->
+              <div v-if="post.type === 'assignment'">
+                <RouterLink :to="{ name: 'assignment', params: { assignmentId: post.id } }"
+                  class="hover:bg-gray-400 ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
+                  <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Assignment</h1>
+                  <div class="w-full flex flex-row justify-between place-items-center">
+                    <h1 class="text-4xl pb-2">{{ post.title }}</h1>
+                    <h3 v-show="!changeDueModal" class="text-md hover:underline"
+                      @click.stop.prevent="changeDue(post.due_date)">Due: {{ post.due_date }}</h3>
+                    <span v-show="changeDueModal" class="flex gap-1">
+                      <input type="date" v-model="newDueDate" v-show="changeDueModal"
+                        class="text-md hover:underline dark:bg-gray-600 dark:text-darkMode" @click.stop.prevent>
+                      <input type="time" v-show="changeDueModal" :value="Date.parse(post.due_date)" @click.stop.prevent>
+                    </span>
+                  </div>
+                </RouterLink>
+              </div>
             </div>
           </div>
+
+          
         </div>
       </div>
     </div>

@@ -73,7 +73,7 @@ async function createAssignment() {
 
     // If userFiles.value is an array of File objects
     for (let i = 0; i < userFiles.value.length; i++) {
-        formData.append('files', userFiles.value[i].file);
+        formData.append('files[]', userFiles.value[i].file);
     }
 
     const response = await axios.post(`${API}assignment/create`,formData , {
