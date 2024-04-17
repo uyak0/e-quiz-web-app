@@ -102,32 +102,39 @@ class ClassroomsController extends Controller
     public function joinClassroom(int $userId, string $classroomCode): JsonResponse
     {
         $classroomId = $this->findId($classroomCode);
-        $classroomJoined = User::find($userId)->classrooms()->where('classroom_id', $classroomId)->exists();
+        $classroom = Classroom::find($classroomId);
 
+        if (!$classroom) {
+            return response()->json([
+                'status' => 'classroom not found',
+                'message' => 'Classroom not found! Check the code and try again'
+            ]);
+        }
+
+        $currentMemberCount = $classroom->users()->count();
+        if ($currentMemberCount >= $classroom->max_members) {
+            return response()->json([
+                'status' => 'classroom full',
+                'message' => 'This classroom is full and cannot accept more members.'
+            ]);
+        }
+
+        $classroomJoined = User::find($userId)->classrooms()->where('classroom_id', $classroomId)->exists();
         if ($classroomJoined) {
             return response()->json([
                 'status' => 'already joined',
                 'message' => 'You already joined this classroom!'
             ]);
         }
-        else if ($classroomId == 0) {
-            return response()->json([
-                'status' => 'classroom not found',
-                'message' => 'Classroom not found! Check the code and try again'
-            ]);
-        }
-        else if (!$classroomJoined){
-            $classroom = Classroom::find($classroomId);
-            $user = User::find($userId);
 
-            $user->classrooms()->attach($classroom);
+        $user = User::find($userId);
+        $user->classrooms()->attach($classroom);
 
-            return response()->json([
-                'status' => 'success',
-                'classroom_id' => $classroomId,
-                'message' => 'Classroom joined successfully'
-            ]);
-        }
+        return response()->json([
+            'status' => 'success',
+            'classroom_id' => $classroomId,
+            'message' => 'Classroom joined successfully'
+        ]);
     }
 
     public function userClassrooms(int $userId): JsonResponse
@@ -193,10 +200,11 @@ class ClassroomsController extends Controller
                         ->where('classroom_id', $classroomId)
                         ->count();
 
-        // Prepare and return only the necessary data
+        // Prepare and return only the necessary data, including the classroom type
         $data = [
             'maxMembers' => $classroom->max_members,
             'memberCount' => $memberCount,
+            'type' => $classroom->type, // Include the type of the classroom
         ];
 
         return response()->json($data);
@@ -215,6 +223,60 @@ class ClassroomsController extends Controller
         });
 
         return response()->json($users);
+    }
+
+    public function addStudentToClassroom(Request $request): JsonResponse
+    {
+        $classroom = Classroom::find($request->classroomId);
+        if (!$classroom) {
+            return response()->json(['message' => 'Classroom not found'], 404);
+        }
+
+        // Check if the classroom is full
+        $currentMemberCount = $classroom->users()->count();
+        if ($currentMemberCount >= $classroom->max_members) {
+            return response()->json(['message' => 'Classroom is full'], 409);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // Check if the user is already a member of the classroom
+        $isMember = $classroom->users()->where('user_id', $user->id)->exists();
+        if ($isMember) {
+            return response()->json(['message' => 'User is already a member of this classroom'], 409);
+        }
+
+        // Add the user to the classroom
+        $classroom->users()->attach($user->id);
+
+        return response()->json(['message' => 'Student added successfully to the classroom']);
+    }
+
+    public function removeStudent(Request $request): JsonResponse
+    {
+        $classroomId = $request->classroomId;
+        $userId = $request->userId;
+
+        // Find the classroom by ID
+        $classroom = Classroom::find($classroomId);
+
+        if (!$classroom) {
+            return response()->json(['status' => 'error', 'message' => 'Classroom not found'], 404);
+        }
+
+        // Check if the user is part of the classroom
+        $isMember = $classroom->users()->where('user_id', $userId)->exists();
+        if (!$isMember) {
+            return response()->json(['status' => 'error', 'message' => 'User not found in this classroom'], 404);
+        }
+
+        // Remove the user from the classroom
+        $classroom->users()->detach($userId);
+
+        return response()->json(['status' => 'success', 'message' => 'Student removed successfully']);
     }
 
 

@@ -39,6 +39,8 @@ Route::group(['prefix' => 'classroom'], function() {
     Route::get('/top-students/{classroomId}', [ClassroomsController::class, 'topStudents']);
     Route::get('/data/{classroomId}', [ClassroomsController::class, 'getClassroomData']);
     Route::get('/users/{classroomId}', [ClassroomsController::class, 'getClassroomUsers']);
+    Route::post('/addStudent', [ClassroomsController::class, 'addStudentToClassroom']);
+    Route::post('/removeStudent', [ClassroomsController::class,'removeStudent']);
 });
 
 Route::group(['prefix' => 'user'], function() {

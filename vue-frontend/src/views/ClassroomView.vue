@@ -29,6 +29,8 @@ const createTaskModal = ref(false)
 const shareCodeModal = ref(false)
 const changeDueModal = ref(false)
 const memberListModal = ref(false)
+const addStudentModal = ref(false)
+const newStudentEmail = ref('')
 
 const newDueDate = ref(new Date())
 
@@ -145,6 +147,46 @@ async function openMemberListModal() {
   memberListModal.value = true;
 }
 
+async function addStudent() {
+  if (!newStudentEmail.value) {
+    alert('Please enter an email address.');
+    return;
+  }
+  try {
+    const response = await axios.post(`${API}classroom/addStudent`, {
+      classroomId: route.params.classroomId,
+      email: newStudentEmail.value,
+    });
+    alert(response.data.message);
+    newStudentEmail.value = ''; // Reset the input field
+    addStudentModal.value = false; // Close the modal
+    
+  } catch (error) {
+    console.error(error);
+    alert('Failed to add student. Please try again.');
+  }
+}
+
+async function removeStudent(userId) {
+  try {
+    const response = await axios.post(`${API}classroom/removeStudent`, {
+      classroomId: route.params.classroomId,
+      userId: userId,
+    });
+    if (response.data.status === 'success') {
+      alert('Student removed successfully');
+      // Optionally refresh the member list here
+      openMemberListModal();
+    } else {
+      alert(response.data.message);
+    }
+  } catch (error) {
+    console.error(error);
+    alert('Failed to remove student. Please try again.');
+  }
+}
+
+
 
 function copyCode() {
   const code = classroomDetails.value.code
@@ -255,7 +297,7 @@ onMounted(() => {
             <button name="big button" @click="createTaskModal = true"
               class="after:content-['+_Task'] md:after:content-['+_Create_a_Task'] text-center bg-blue-400 hover:bg-blue-600 hover:text-black rounded-md text-md md:text-lg px-4">
             </button>
-            <button @click="shareCodeModal = true"
+            <button v-if="classroomDetails.type === 'anyone_can_join'" @click="shareCodeModal = true"
               class="after:content-['+_Student'] md:after:content-['+_Add_a_Student'] text-center text-md md:text-lg bg-gray-300 rounded-md px-2 text-gray-900">
             </button>
           </span>
@@ -402,11 +444,30 @@ onMounted(() => {
     </Modal>
 
     <Modal v-model="memberListModal">
-      <div class="p-4 bg-red-300 w-3/4 h-fit place-self-center">
-        <h2 class="text-2xl font-bold mb-4 text-black">Member List</h2>
-        <ul>
-          <li v-for="user in classroomUsers" :key="user.id" class="text-black">{{ user.name }}</li>
-        </ul>
+      <div class="modal-content p-4 bg-red-300 w-3/4 h-fit place-self-center">
+        <div>
+          <h2 class="text-2xl font-bold mb-4 text-black">Member List</h2>
+          <ul>
+            <li v-for="user in classroomUsers" :key="user.id" class="text-black flex justify-between">
+              {{ user.name }}
+              <button v-if="userRole === 'teacher' " @click="removeStudent(user.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                Remove
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="flex flex-row justify-end">
+          <button v-if="userRole === 'teacher'" @click="addStudentModal = true">+ Add New Student</button>
+          <button @click="memberListModal = false" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">Close</button>
+        </div>
+      </div>
+    </Modal>
+
+    <Modal v-model="addStudentModal">
+      <div class="modal-content bg-sky-500">
+        <h2>Add New Student</h2>
+        <input class="text-black" type="email" v-model="newStudentEmail" placeholder="Enter student's email">
+        <button @click="addStudent">Add Student</button>
       </div>
     </Modal>
 
