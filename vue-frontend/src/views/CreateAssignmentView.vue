@@ -13,11 +13,13 @@ const API = import.meta.env.VITE_LARAVEL_API
 interface UserFiles {
   name: string,
   url: string,
-  type: string
+  type: string,
+  file: File
 }
 
 interface Assignment {
   title: string,
+  description: string,
   due_date: DateTime,
   classroom_id: string | string[]
 }
@@ -28,6 +30,7 @@ const isDragOver = ref<Boolean>(false)
 const userFiles = ref<UserFiles[]>([])
 const assignment = ref<Assignment>({
   title: '',
+  description: '',
   due_date: DateTime.now(),
   classroom_id: route.params.classroomId
 })
@@ -38,7 +41,8 @@ async function fileHandler(event: Event) {
     userFiles.value.push({
       name: files[i].name,
       url: URL.createObjectURL(files[i]),
-      type: files[i].type
+      type: files[i].type,
+      file: files[i]
     });
   }
   console.log(userFiles.value)
@@ -51,16 +55,33 @@ async function dropFileHandler(event: Event) {
     userFiles.value.push({
       name: files[i].name,
       url: URL.createObjectURL(files[i]),
-      type: files[i].type
+      type: files[i].type,
+      file: files[i]
     });
   }
 }
 
 async function createAssignment() {
   try {
-    const response = await axios.post(`${API}/assignments`, assignment.value)
+
+    let formData = new FormData();
+
+    formData.append('title', assignment.value.title);
+    formData.append('description', assignment.value.description);
+    formData.append('due_date', assignment.value.due_date.toISO());
+    formData.append('classroom_id', route.params.classroomId);
+
+    // If userFiles.value is an array of File objects
+    for (let i = 0; i < userFiles.value.length; i++) {
+        formData.append('files', userFiles.value[i].file);
+    }
+
+    const response = await axios.post(`${API}assignment/create`,formData , {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     console.log(response.data)
-    router.push(`/classrooms/${route.params.classroomId}`)
   } catch (error) {
     console.error(error)
   }
@@ -81,7 +102,7 @@ async function createAssignment() {
 
       <div class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">
         <div class="flex flex-col">
-          <input type="text" placeholder="Type instructions here..."
+          <input v-model="assignment.description" type="text" placeholder="Type instructions here..."
             class="placeholder:text-slate-600 bg-transparent w-full mb-4 overflow-visible outline-none border-b-[1px] border-b-slate-300">
 
           <!-- Attachment List -->
@@ -135,7 +156,9 @@ async function createAssignment() {
 
           <!-- Submit Button -->
           <button @click="createAssignment"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+            Create Assignment
+          </button>
 
 
         </div>

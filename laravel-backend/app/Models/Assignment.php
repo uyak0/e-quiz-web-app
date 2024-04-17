@@ -8,7 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Assignment extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'description', 'due_date', 'files'];
+    protected $fillable = [
+        'title',
+        'description',
+        'due_date',
+        'files',
+        'classroom_id'
+    ];
 
     public function classroom()
     {

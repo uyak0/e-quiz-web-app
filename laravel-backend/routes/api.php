@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssignmentsController;
 use App\Http\Controllers\QuizzesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -68,6 +69,8 @@ Route::group(['prefix' => 'quiz'], function() {
 });
 
 Route::group(['prefix' => 'assignment'], function() {
+    Route::get('/', [AssignmentsController::class, 'index']);
+    Route::post('/create', [AssignmentsController::class, 'store']);
 });
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);
@@ -75,7 +78,7 @@ Route::get("online-users", [UserController::class, "getOnlineUsers"]);
 Route::group(['prefix' => 'messages'], function() {
     Route::get ("/", [ChatController::class, "index"]);
     Route::post ("/", [ChatController::class, "store"]) ->name("message.store");
-    Route::put ("/{id}", [ChatController::class, "update"]); 
+    Route::put ("/{id}", [ChatController::class, "update"]);
     Route::post("/upload", [ChatController::class, "upload"]);
     Route::post("/upload-document", [ChatController::class, "uploadDocument"]);
 });

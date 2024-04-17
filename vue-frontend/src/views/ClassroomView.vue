@@ -20,14 +20,14 @@ const classroomDesc = ref('')
 const classroomName = ref('')
 const topStudents = ref([])
 const copied = ref(false)
-const classroomUsers = ref([]); 
+const classroomUsers = ref([]);
 
 const createTaskModal = ref(false)
 const shareCodeModal = ref(false)
 const changeDueModal = ref(false)
 const memberListModal = ref(false)
 
-const newDueDate = ref(new Date()) 
+const newDueDate = ref(new Date())
 
 const userRole = route.params.userRole
 
@@ -49,15 +49,15 @@ async function getClassroomData() {
 }
 
 function getUpcoming() {
-  for (let i=0; i<classroomQuizzes.value.length; i++) {
-    if (DateTime.now() > Date.parse(classroomQuizzes.value[i].due_date)) {
+  for (let i = 0; i < classroomQuizzes.value.length; i++) {
+    if (DateTime.now() < Date.parse(classroomQuizzes.value[i].due_date)) {
       upcomingQuizzes.value.push({
         id: classroomQuizzes.value[i].id,
         title: classroomQuizzes.value[i].title,
         due: classroomQuizzes.value[i].due_date,
         fromNow: dateDiff(classroomQuizzes.value[i].due_date)
       })
-    } 
+    }
   }
   console.log(upcomingQuizzes.value)
 }
@@ -202,8 +202,8 @@ onMounted(() => {
                 v-if="userRole === 'teacher' && !showDesc"
                 class="hover:cursor-pointer hover:text-black duration-300 px-3"></vue-feather>
             </div>
-            
-            
+
+
 
             <div v-else-if="!classroomDetails.description" class="flex items-center my-4">
               <input type="text" v-model="classroomDesc"
@@ -290,7 +290,7 @@ onMounted(() => {
               <div class="border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2">
                 <div v-for="(quiz, index) of upcomingQuizzes" :key="index">
                   <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id } }"
-                     class="pb-4 flex flex-col w-full group">
+                    class="pb-4 flex flex-col w-full group">
                     <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
                     <h3 class="text-md">Due: {{ quiz.due }}</h3>
                     <h4 class="text-sm">{{ quiz.fromNow }}</h4>
@@ -307,9 +307,11 @@ onMounted(() => {
                 <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
                 <div class="w-full flex flex-row justify-between place-items-center">
                   <h1 class="text-4xl pb-2">{{ quiz.title }}</h1>
-                  <h3 v-show="!changeDueModal" class="text-md hover:underline" @click.stop.prevent="changeDue(quiz.due_date)">Due: {{ quiz.due_date }}</h3>
+                  <h3 v-show="!changeDueModal" class="text-md hover:underline"
+                    @click.stop.prevent="changeDue(quiz.due_date)">Due: {{ quiz.due_date }}</h3>
                   <span v-show="changeDueModal" class="flex gap-1">
-                    <input type="date" v-model="newDueDate" v-show="changeDueModal" class="text-md hover:underline dark:bg-gray-600 dark:text-darkMode" @click.stop.prevent> 
+                    <input type="date" v-model="newDueDate" v-show="changeDueModal"
+                      class="text-md hover:underline dark:bg-gray-600 dark:text-darkMode" @click.stop.prevent>
                     <input type="time" v-show="changeDueModal" :value="Date.parse(quiz.due_date)" @click.stop.prevent>
                   </span>
                 </div>
@@ -359,13 +361,13 @@ onMounted(() => {
     </Modal>
 
     <Modal v-model="memberListModal">
-    <div class="p-4 bg-red-300 w-3/4 h-fit place-self-center">
-      <h2 class="text-2xl font-bold mb-4 text-black">Member List</h2>
-      <ul>
-        <li v-for="user in classroomUsers" :key="user.id" class="text-black">{{ user.name }}</li>
-      </ul>
-    </div>
-  </Modal>
+      <div class="p-4 bg-red-300 w-3/4 h-fit place-self-center">
+        <h2 class="text-2xl font-bold mb-4 text-black">Member List</h2>
+        <ul>
+          <li v-for="user in classroomUsers" :key="user.id" class="text-black">{{ user.name }}</li>
+        </ul>
+      </div>
+    </Modal>
 
   </div>
 </template>
