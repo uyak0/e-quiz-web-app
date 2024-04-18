@@ -17,21 +17,14 @@ interface UserFiles {
   file: File
 }
 
-interface Assignment {
-  title: string,
-  description: string,
-  due_date: DateTime,
-  classroom_id: string | string[]
-}
-
 const route = useRoute()
 const router = useRouter()
 const isDragOver = ref<Boolean>(false)
 const userFiles = ref<UserFiles[]>([])
-const assignment = ref<Assignment>({
+const assignment = ref({
   title: '',
   description: '',
-  due_date: DateTime.now(),
+  due_date: new Date(),
   classroom_id: route.params.classroomId
 })
 
@@ -68,7 +61,7 @@ async function createAssignment() {
 
     formData.append('title', assignment.value.title);
     formData.append('description', assignment.value.description);
-    formData.append('due_date', assignment.value.due_date.toISO());
+    formData.append('due_date', DateTime.fromISO(assignment.value.due_date.toISOString()));
     formData.append('classroom_id', route.params.classroomId);
 
     // If userFiles.value is an array of File objects

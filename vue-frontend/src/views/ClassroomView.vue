@@ -54,13 +54,13 @@ async function getClassroomData() {
 }
 
 function getUpcoming() {
-  for (let i = 0; i < classroomQuizzes.value.length; i++) {
-    if (DateTime.now() < Date.parse(classroomQuizzes.value[i].due_date)) {
+  for (let i = 0; i < classroomPosts.value.length; i++) {
+    if (DateTime.now() < Date.parse(classroomPosts.value[i].due_date)) {
       upcomingQuizzes.value.push({
-        id: classroomQuizzes.value[i].id,
-        title: classroomQuizzes.value[i].title,
-        due: classroomQuizzes.value[i].due_date,
-        fromNow: dateDiff(classroomQuizzes.value[i].due_date)
+        id: classroomPosts.value[i].id,
+        title: classroomPosts.value[i].title,
+        due: classroomPosts.value[i].due_date,
+        fromNow: dateDiff(classroomPosts.value[i].due_date)
       })
     }
   }
