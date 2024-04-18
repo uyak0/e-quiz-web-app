@@ -12,6 +12,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\UserQuizAnswersController;
 use App\Models\UserQuizAnswers;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +57,8 @@ Route::group(['prefix' => 'user'], function() {
 });
 
 Route::group(['prefix' => 'auth'], function() {
+    Route::post('/forgot-password', [UserController::class, 'forgotPassword']);
+    Route::post('/reset-password', [UserController::class, 'resetPassword'])->name('password.reset');
     Route::get('/check-authentication', [UserController::class, 'isAuthenticated']);
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/logout', [LoginController::class, 'logout']);

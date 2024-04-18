@@ -90,6 +90,15 @@ const router = createRouter({
       }
     },
     {
+      path: '/reset-password',
+      name: 'resetPassword',
+      component: () => import('@/views/ResetPasswordView.vue'),
+      meta: {
+        requiresAuth: false,
+        title: 'Reset Password'
+      }
+    },
+    {
       path: '/:userRole/:userId',
       beforeEnter: async (to, from) => {
         const auth = await checkAuth()
