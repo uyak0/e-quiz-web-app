@@ -74,6 +74,7 @@ Route::group(['prefix' => 'quiz'], function() {
 Route::group(['prefix' => 'assignment'], function() {
     Route::get('/', [AssignmentsController::class, 'index']);
     Route::post('/create', [AssignmentsController::class, 'store']);
+    Route::get('/show/{id}', [AssignmentsController::class, 'show']);
 });
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);
