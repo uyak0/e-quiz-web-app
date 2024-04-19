@@ -11,6 +11,7 @@
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
+        "nesbot/carbon": "^3.2",
         "pusher/pusher-php-server": "^7.2",
         "symfony/http-client": "^7.0",
         "symfony/mailgun-mailer": "^7.0"

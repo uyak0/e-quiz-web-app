@@ -12,9 +12,14 @@ class Student extends Model
     protected $table = 'students';
     protected $fillable = ['points'];
     public $timestamps = false;
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    public function dailyQuiz(): BelongsTo
+    {
+        return $this->belongsTo(DailyQuiz::class);
+    }
 }
