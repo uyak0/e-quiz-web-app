@@ -13,6 +13,7 @@
   const userRole = route.params.userRole
   const userName = ref('')
   const studentPoints = ref(0)
+  const dailyQuiz = ref({})
 
   const enableButton = defineModel('enableButton')
   const emit = defineEmits(['modalEnabled'])
@@ -29,9 +30,16 @@
     }
   }
 
+  async function getDailyQuiz() {
+    const res = await axios.get(API + 'quiz/daily')
+    dailyQuiz.value = res.data
+    console.log(res.data)
+  }
+
   onMounted(() => {
     getUserData()
     getPoints()
+    getDailyQuiz()
   })
 </script>
 
@@ -51,6 +59,11 @@
       <button @click="emit('modalEnabled')" v-else-if="userRole === 'teacher' && enableButton"
         class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
         + Create a classroom
+      </button>
+
+      <!-- Daily Quiz -->
+      <button class="bg-purple-400 duration-300 ease-in-out rounded-md px-2">
+        ! DAILY QUIZ !
       </button>
     </div>
 
