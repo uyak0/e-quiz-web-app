@@ -83,6 +83,10 @@ Route::group(['prefix' => 'assignment'], function() {
     Route::get('/', [AssignmentsController::class, 'index']);
     Route::post('/create', [AssignmentsController::class, 'store']);
     Route::get('/show/{id}', [AssignmentsController::class, 'show']);
+    Route::get('/{assignmentId}/comments', [AssignmentsController::class, 'getComments']);
+    Route::post('/{assignmentId}/comments', [AssignmentsController::class, 'postComment']);
+    Route::post('/{assignmentId}/submit', [AssignmentsController::class, 'submitAssignment'])->middleware('auth');
+    Route::get('/{assignmentId}/submissions', [AssignmentsController::class, 'getSubmissionDetails']);
 });
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);

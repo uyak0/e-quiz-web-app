@@ -15,7 +15,8 @@ class Assignment extends Model
         'description',
         'due_date',
         'files',
-        'classroom_id'
+        'classroom_id',
+        //'teacher_id' //column created for showing who created the assignments;
     ];
 
     public function classroom()
@@ -28,4 +29,14 @@ class Assignment extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function submissions(): HasMany
+    {
+        return $this->hasMany(Submission::class);
+    }
+
+    /*public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class);
+    }*/
 }

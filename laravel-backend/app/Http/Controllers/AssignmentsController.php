@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 use App\Models\Assignment;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class AssignmentsController extends Controller
 {
@@ -60,4 +63,103 @@ class AssignmentsController extends Controller
 
         return response()->json($assignment);
     }
+
+    public function getComments($assignmentId)
+    {
+        $comments = Comment::where('assignment_id', $assignmentId)
+                            ->with('user') // Assuming you have a User model and a relationship set up
+                            ->get();
+
+        return response()->json($comments);
+    }
+
+    public function postComment(Request $request, $assignmentId)
+    {
+        $comment = new Comment();
+        $comment->user_id = Auth::id(); // Assuming users are authenticated
+        $comment->assignment_id = $assignmentId;
+        $comment->content = $request->content;
+        $comment->save();
+
+        return response()->json([
+            'message' => 'Comment posted successfully',
+            'comment' => $comment
+        ]);
+    }
+
+    public function submitAssignment(Request $request, $assignmentId)
+    {
+        $request->validate([
+            'files.*' => 'required|file',
+        ]);
+    
+        $files = $request->file('files');
+        $filePaths = [];
+    
+        foreach ($files as $file) {
+            $originalFileName = $file->getClientOriginalName();
+            $path = $file->store(
+                'submissions/' . $assignmentId . '/' . Auth::id(),
+                'public'
+            );
+            $url = Storage::disk('public')->url($path);
+            $filePaths[] = [
+                'url' => str_replace('http://localhost', 'http://localhost:8000', $url), //replace it with domain name since localhost:8000 handle this for filesystem
+                'original_name' => $originalFileName // Store the original file name
+            ];
+        }
+    
+        $submission = new Submission();
+        $submission->assignment_id = $assignmentId;
+        $submission->user_id = Auth::id();
+        $submission->file_path = json_encode($filePaths); // Store all file paths as a JSON array
+        $submission->submitted_at = now();
+        $submission->save();
+    
+        return response()->json([
+            'message' => 'Submission successful',
+            'submission' => $submission
+        ]);
+    }
+
+    public function getSubmissionDetails($assignmentId)
+    {
+        $submissions = Submission::where('assignment_id', $assignmentId)
+                                ->with('user') // Ensure you have a 'user' relationship defined in your Submission model
+                                ->get(['id', 'user_id', 'file_path', 'submitted_at', 'grade', 'feedback'])
+                                ->map(function ($submission) {
+                                    // Assuming 'file_path' contains an array of files
+                                    $submission->file_path = json_decode($submission->file_path, true);
+                                    return $submission;
+                                });
+        return response()->json($submissions);
+    }
+
+    // public function getComments($assignmentId)
+    // {
+    //     $comments = Comment::where('assignment_id', $assignmentId)
+    //                         ->with('user') // Assuming you have a User model and a relationship set up
+    //                         ->get();
+
+    //     return response()->json($comments);
+    // }
+
+    public function gradeAssignment(Request $request, $submissionId)
+    {
+        $request->validate([
+            'grade' => 'required|numeric',
+            'feedback' => 'nullable|string',
+        ]);
+
+        $submission = Submission::findOrFail($submissionId);
+        $submission->grade = $request->grade;
+        $submission->feedback = $request->feedback;
+        $submission->save();
+
+        return response()->json([
+            'message' => 'Assignment graded successfully',
+            'submission' => $submission
+        ]);
+    }
+
 }

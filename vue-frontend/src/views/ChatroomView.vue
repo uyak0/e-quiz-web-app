@@ -103,7 +103,7 @@
                                     <div v-else>
                                         {{ message.message }}
                                     </div>
-                                    <div class="absolute top-1/2 -translate-y-1/2 left-full ml-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">12:00</div>
+                                    <div class="absolute top-1/2 -translate-y-1/2 left-full ml-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">{{ formatMessageTime(message.created_at) }}</div>
                                 </div>
                                 <three-dots-icon class="w-4 h-4 cursor-pointer"></three-dots-icon>
                             </div>
@@ -122,7 +122,7 @@
                                     <div v-else>
                                         {{ message.message }}
                                     </div>
-                                    <div class="absolute top-1/2 -translate-y-1/2 right-full mr-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">12:00</div>
+                                    <div class="absolute top-1/2 -translate-y-1/2 right-full mr-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">{{ formatMessageTime(message.created_at) }}</div>
                                 </div>
                                 <img :src="fileLink('UserProfile.png')" class="w-6 h-6 rounded-full border-2 border-blue-400" alt="User">
                             </div>
@@ -357,20 +357,30 @@ function submitMessage() {
 }
 
 async function getMessages() {
+  if (!selectedUser.value) {
+    console.error("Selected user is undefined.");
+    return;
+  }
+  const result = await axios.get(`${API}messages?receiver_id=${selectedUser.value.id}`)
 
-            if (!selectedUser.value) {
-                console.error("Selected user is undefined.");
-                return;
-            }
-            const result = await axios.get(`${API}messages?receiver_id=${selectedUser.value.id}`)
-
-            if(result.data.messages) {
-                userMessages.value = result.data.messages.reverse();
-                console.log(userMessages.value); 
+  if(result.data.messages) {
+    userMessages.value = result.data.messages.reverse().map(message => {
+      return {
+        ...message,
+        formattedTime: formatMessageTime(message.created_at)
+      };
+    });
+    console.log(userMessages.value); 
 
     scrollToChatBottom();
   }
 }
+
+function formatMessageTime(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleString([], { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 
 const sendMessageUpdateRequest = (messageId) => {
   axios.put(`${API}messages/${messageId}`)
@@ -514,16 +524,16 @@ function fileLink(file) {
             }
         }
 
-watch(() => emittedMessage, (newMessage, oldMessage) => {
-  if (newMessage) {
-    const isMessageExist = userMessages.value.find(m => m.id == newMessage.id);
+        watch(() => emittedMessage, (newMessage, oldMessage) => {
+          if (newMessage) {
+            const isMessageExist = userMessages.value.find(m => m.id == newMessage.id);
 
-    if (!isMessageExist) {
-      userMessages.value.push(newMessage);
-      scrollToChatBottom();
-    }
-  }
-})
+            if (!isMessageExist) {
+              userMessages.value.push(newMessage);
+              scrollToChatBottom();
+            }
+          }
+        })
 
         // For page first load component mount
         onMounted(() => {

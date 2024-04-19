@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function submissions(): HasMany
+    {
+        return $this->hasMany(Submission::class);
+    }
+
     public function unseenMessages()
     {
         return $this->hasMany(Chat::class, 'sender_id')
