@@ -91,6 +91,8 @@ Route::group(['prefix' => 'assignment'], function() {
     Route::post('/{assignmentId}/comments', [AssignmentsController::class, 'postComment']);
     Route::post('/{assignmentId}/submit', [AssignmentsController::class, 'submitAssignment'])->middleware('auth');
     Route::get('/{assignmentId}/submissions', [AssignmentsController::class, 'getSubmissionDetails']);
+    Route::put('/grade/{submission}', [AssignmentsController::class, 'gradeSubmission'])->middleware('auth');
+    Route::get('/{assignmentId}/studentSubmissionDetails', [AssignmentsController::class, 'fetchStudentSubmissionDetails']);
 });
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);

@@ -129,12 +129,26 @@ class AssignmentsController extends Controller
             ];
         }
 
-        $submission = new Submission();
-        $submission->assignment_id = $assignmentId;
-        $submission->user_id = Auth::id();
-        $submission->file_path = json_encode($filePaths); // Store all file paths as a JSON array
-        $submission->submitted_at = now();
+        // Check if the submission already exists
+        $submission = Submission::where('assignment_id', $assignmentId)
+                                ->where('user_id', Auth::id())
+                                ->first();
+
+        if ($submission) {
+            // Update existing submission
+            $submission->file_path = json_encode($filePaths); // Update file paths
+            $submission->submitted_at = now(); // Update submission time
+        } else {
+            // Create new submission
+            $submission = new Submission();
+            $submission->assignment_id = $assignmentId;
+            $submission->user_id = Auth::id();
+            $submission->file_path = json_encode($filePaths); // Store all file paths as a JSON array
+            $submission->submitted_at = now();
+        }
+
         $submission->save();
+
 
         return response()->json([
             'message' => 'Submission successful',
@@ -164,10 +178,10 @@ class AssignmentsController extends Controller
     //     return response()->json($comments);
     // }
 
-    public function gradeAssignment(Request $request, $submissionId)
+    public function gradeSubmission(Request $request, $submissionId)
     {
         $request->validate([
-            'grade' => 'required|numeric',
+            'grade' => 'required|numeric|min:0|max:100',
             'feedback' => 'nullable|string',
         ]);
 
@@ -180,6 +194,22 @@ class AssignmentsController extends Controller
             'message' => 'Assignment graded successfully',
             'submission' => $submission
         ]);
+    }
+
+    public function fetchStudentSubmissionDetails($assignmentId)
+    {
+        $userId = Auth::id(); // Get the logged-in user's ID
+
+        $submission = Submission::where('assignment_id', $assignmentId)
+                                ->where('user_id', $userId)
+                                ->with('user')
+                                ->first(['id', 'user_id', 'file_path', 'submitted_at', 'grade', 'feedback']);
+
+        if ($submission) {
+            $submission->file_path = json_decode($submission->file_path, true);
+        }
+
+        return response()->json($submission);
     }
 
 }

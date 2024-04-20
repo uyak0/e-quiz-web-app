@@ -34,6 +34,7 @@ const submitComment = async () => {
 };
 
 const selectedFiles = ref([]); // To store the selected file
+const isSubmitted = ref(false);
 
 const handleFileUpload = (event) => {
   for (let file of event.target.files) {
@@ -63,7 +64,8 @@ const submitAssignment = async () => {
       },
     });
     alert('Assignment submitted successfully.');
-    selectedFiles.value = []; // Optionally clear the selected files after successful submission
+   // selectedFiles.value = []; // Optionally clear the selected files after successful submission
+    isSubmitted.value = true;
   } catch (error) {
     console.error('Error submitting assignment:', error);
     alert('Failed to submit assignment.');
@@ -71,7 +73,7 @@ const submitAssignment = async () => {
 };
 
 const submissions = ref([]);
-var clickedSubmission = ref([]);
+var clickedSubmission = ref({});
 
 const fetchSubmissionDetails = async () => {
   try {
@@ -87,18 +89,47 @@ async function openGradeSubmissionModal(clickedSub){
   clickedSubmission = clickedSub;
 }
 
+const submitGradeAndFeedback = async () => {
+  try {
+    await axios.put(`${API}assignment/grade/${clickedSubmission.id}`, {
+      grade: clickedSubmission.grade,
+      feedback: clickedSubmission.feedback
+    });
+    alert('Grade and feedback submitted successfully.');
+    gradeSubmissionModal.value = false; // Close the modal
+    fetchSubmissionDetails(); // Refresh the submissions list to show updated grades and feedback
+  } catch (error) {
+    console.error('Error submitting grade and feedback:', error);
+    alert('Failed to submit grade and feedback.');
+  }
+};
+
+const studentSubmissionDetails = ref(null);
+
+const fetchStudentSubmissionDetails = async () => {
+  try {
+    const response = await axios.get(`${API}assignment/${assignmentId}/studentSubmissionDetails`);
+    studentSubmissionDetails.value = response.data;
+  } catch (error) {
+    console.error('Error fetching student submission details:', error);
+  }
+};
+
 
 onMounted(async () => {
   try {
     const response = await axios.get(`${API}assignment/show/${assignmentId}`);
     assignment.value = response.data;
     // Modify the file structure to include the original file name
-    assignment.value.files = assignment.value.files.map(file => ({
+    assignment.value.files = assignment.value.files?.map(file => ({
       url: file.url,
       originalName: file.original_name
     }));
     fetchComments();
     fetchSubmissionDetails();
+    if (userRole === 'student') {
+      await fetchStudentSubmissionDetails(); // Fetch student submission details if the user is a student
+    }
   } catch (error) {
     console.error(error);
     assignment.value = {
@@ -156,9 +187,15 @@ onMounted(async () => {
           file:bg-blue-50 file:text-blue-700
           hover:file:bg-blue-100
         "/>
-        <button @click="submitAssignment" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <button v-if="!isSubmitted" @click="submitAssignment" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Submit
         </button>
+        <p v-else class="mt-2 text-green-600 font-bold">Submitted</p>
+        <div v-if="studentSubmissionDetails && (studentSubmissionDetails.grade || studentSubmissionDetails.feedback)">
+          <p class="text-black"><strong>Grade:</strong> {{ studentSubmissionDetails.grade || 'Not graded yet' }}</p>
+          <p class="text-black"><strong>Feedback:</strong> {{ studentSubmissionDetails.feedback || 'No feedback provided yet.' }}</p>
+        </div>
+        
       </div>
       <div v-if ="userRole === 'teacher'" class="bg-white shadow-md rounded-lg p-4 ">
         <h3 class="font-semibold mb-2 text-black">Submissions</h3>
@@ -188,6 +225,18 @@ onMounted(async () => {
             <a :href="file.url" target="_blank" class="text-blue-500 hover:underline">{{ file.original_name }}</a>
          </li>
         </ul>
+        <div>
+          <label for="grade">Grade (0-100):</label>
+          <input type="number" id="grade" v-model="clickedSubmission.grade" min="0" max="100" class="border-2 rounded">
+        </div>
+        <div class="mt-2">
+          <label for="feedback">Feedback:</label>
+          <textarea id="feedback" v-model="clickedSubmission.feedback" rows="4" class="border-2 rounded w-full"></textarea>
+        </div>
+        <button @click="submitGradeAndFeedback" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Submit Grade and Feedback
+        </button>
+        
       </div>
     </Modal>
   </div> 
