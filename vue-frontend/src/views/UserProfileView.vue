@@ -81,6 +81,11 @@
       <div @click="logOut" class="w-full text-3xl py-5 px-5 border border-x-0 border-cyan-300 hover:bg-sky-300 hover:text-gray-950 cursor-pointer">
         > Logout
       </div>
+      <div class="w-full text-3xl py-5 px-5 border border-x-0 border-cyan-300 border-t-0 hover:bg-sky-300 hover:text-gray-950 cursor-pointer">
+        <RouterLink :to="{ name: 'forgotPassword' }" >
+        > Change Password 
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>

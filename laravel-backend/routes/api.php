@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AssignmentsController;
+use App\Http\Controllers\DailyQuizController;
 use App\Http\Controllers\QuizzesController;
+use App\Models\DailyQuiz;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentsController;
@@ -72,7 +74,7 @@ Route::group(['prefix' => 'student'], function() {
 
 Route::group(['prefix' => 'quiz'], function() {
     Route::get('/', [QuizzesController::class, 'index']);
-    Route::get('/daily', [QuizzesController::class, 'dailyQuiz']);
+    Route::get('/daily', [DailyQuizController::class, 'newDailyQuiz']);
     Route::post('/create', [QuizzesController::class, 'store']);
     Route::post('/answer-submit', [UserQuizAnswersController::class, 'store']);
     Route::get('/answer-get', [UserQuizAnswersController::class, 'get']);

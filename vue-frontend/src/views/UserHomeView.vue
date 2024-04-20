@@ -116,7 +116,7 @@
         </div>
 
         <!-- Join Classroom (for classrooms no.>= 1)-->
-        <button @click="enableModal" v-if="classrooms.length && userRole === 'student'" class="cursor-pointer hover:border-gray-100 hover:text-gray-100 ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
+        <button @click="enableModal" v-if="classrooms.length && userRole === 'student'" class="cursor-pointer hover:dark:border-gray-100 hover:dark:text-gray-100 hover:text-gray-900 hover:border-gray-900  ease-in-out duration-500 my-4 mx-4 rounded-md border-dashed border-2 border-gray-500 bg-transparent text-gray-500 h-48 sm:w-48 overflow-hidden w-full">
           <div class="w-full h-full text-2xl flex flex-col justify-items-center justify-center">
             <p class="place-self-center font-bold">+</p>
             <p class="place-self-center font-bold text-center">Join More Classrooms</p>

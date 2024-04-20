@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DailyQuiz;
 use App\Models\UserQuizAnswers;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -22,11 +23,17 @@ class UserQuizAnswersController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->daily_quiz == true) {
+            DailyQuiz::where('student_id', auth()->user()->student->id)
+                ->where('quiz_id', $request->quiz_id)
+                ->update(['is_completed' => true]);
+        }
+
         $userQuizAnswers = UserQuizAnswers::create([
             'quiz_id' => $request->quiz_id,
             'user_id' => $request->user_id,
             'user_answers' => $request->user_answers,
-            'rewarded' => false 
+            'rewarded' => false
         ]);
 
         return response()->json($userQuizAnswers, 201);

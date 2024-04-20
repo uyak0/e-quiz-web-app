@@ -102,14 +102,34 @@
       const data = {
         quiz_id: route.params.quizId,
         user_id: route.params.userId,
-        user_answers: JSON.stringify(userAnswers.value)
+        user_answers: JSON.stringify(userAnswers.value),
+        daily_quiz: false
       }
+
+      if (route.query.type === 'daily_quiz') {
+        data.daily_quiz = true 
+      }
+
       const res = await axios.post(API + 'quiz/answer-submit', data)
 
-      router.push({ 
-        name: 'quizResult', 
-        query: { quizId: route.params.quizId }
-      })
+      if (route.query.type === 'daily_quiz') {
+        router.push({ 
+          name: 'quizResult', 
+          query: { 
+            quizId: route.params.quizId,
+            type: 'daily_quiz'
+          }
+        })
+      }
+      else {
+        router.push({ 
+          name: 'quizResult', 
+          query: { 
+            quizId: route.params.quizId,
+            classroom: route.query.classroom
+          }
+        })
+      }
     }
   }
 

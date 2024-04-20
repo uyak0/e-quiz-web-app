@@ -13,7 +13,9 @@
   const userRole = route.params.userRole
   const userName = ref('')
   const studentPoints = ref(0)
-  const dailyQuiz = ref({})
+  const dailyQuiz = ref({
+    quiz_id: 0      // default value so it loads
+  })
 
   const enableButton = defineModel('enableButton')
   const emit = defineEmits(['modalEnabled'])
@@ -32,39 +34,42 @@
 
   async function getDailyQuiz() {
     const res = await axios.get(API + 'quiz/daily')
-    dailyQuiz.value = res.data
-    console.log(res.data)
+    dailyQuiz.value = res.data.daily_quiz
+    console.table(dailyQuiz.value)
   }
+
+  onBeforeMount(() => {
+    getDailyQuiz()
+  })
 
   onMounted(() => {
     getUserData()
     getPoints()
-    getDailyQuiz()
   })
 </script>
 
 <template>
   <div class="drop-shadow-md text-black dark:text-slate-400 bg-gray-200 sticky font-jetBrains flex flex-rows text-2xl justify-between px-2 py-1 dark:bg-gray-600 place-items-center">
     <div name="left modules" class="">
-      <RouterLink v-if="route.name !== 'quizResult'" :to="{ name: 'userHome' }" class="dark:hover:text-black hover:text-gray-500"> E-Quizz </RouterLink>
-      <RouterLink v-else :to="{ name: 'classroom' }" class="bg-blue-400 rounded-md px-2 hover:bg-blue-700 hover:text-black"> Back to Classroom </RouterLink>
+      <RouterLink v-if="route.name !== 'quizResult' || route.query.type === 'daily_quiz'" :to="{ name: 'userHome' }" class="dark:hover:text-black hover:text-gray-500"> E-Quizz </RouterLink>
+      <RouterLink v-else :to="{ name: 'classroom', params: { classroomId: route.query.classroom } }" class="bg-blue-400 rounded-md px-2 hover:bg-blue-700 hover:text-black"> Back to Classroom </RouterLink>
 
 
       <!--Create/join classroom button-->
       <button @click="emit('modalEnabled')" v-if="userRole === 'student' && enableButton"
-        class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
+        class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2" v-cloak>
         + Join a classroom
       </button>
 
       <button @click="emit('modalEnabled')" v-else-if="userRole === 'teacher' && enableButton"
-        class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2">
+        class="ml-2 bg-blue-300 hover:bg-blue-600 duration-150 ease-in hover:text-white text-black rounded-md px-2" v-cloak>
         + Create a classroom
       </button>
 
       <!-- Daily Quiz -->
-      <button class="bg-purple-400 duration-300 ease-in-out rounded-md px-2">
+      <RouterLink v-if="pageName === 'Home' && dailyQuiz.quiz_id !== 0" :to="{ name: 'quiz', params: { quizId: dailyQuiz.quiz_id }, query: { type: 'daily_quiz' }}" class="bg-purple-500 text-white duration-300 ease-in-out rounded-md px-2">
         ! DAILY QUIZ !
-      </button>
+      </RouterLink>
     </div>
 
     <!-- Page Name -->

@@ -1,5 +1,5 @@
 <script setup>
-  import { onBeforeMount, onUpdated, ref } from 'vue' 
+  import { onMounted, onUpdated, ref } from 'vue' 
   import axios from 'axios';
   import { useRoute } from 'vue-router'
   import TopBar from '@/components/TopBar.vue';
@@ -80,7 +80,7 @@
     }
   }
 
-  onBeforeMount(async () => {
+  onMounted(async () => {
     await getQuizData()
     await getQuizResult()
     await rewardPoints()

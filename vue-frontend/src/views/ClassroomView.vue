@@ -349,7 +349,7 @@ onMounted(() => {
               <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
               <div class="border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2">
                 <div v-for="(quiz, index) of upcomingQuizzes" :key="index">
-                  <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id } }"
+                  <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id }, query: { classroom: route.params.classroomId } }"
                     class="pb-4 flex flex-col w-full group">
                     <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
                     <h3 class="text-md">Due: {{ quiz.due }}</h3>
@@ -364,7 +364,7 @@ onMounted(() => {
             <div v-for="(post, index) of classroomPosts" :key="index" class="py-2 flex flex-col w-full">
               <!-- Quizzes -->
               <div v-if="post.type === 'quiz'">
-                <RouterLink :to="{ name: 'quiz', params: { quizId: post.id } }"
+                <RouterLink :to="{ name: 'quiz', params: { quizId: post.id }, query: { classroom: route.params.classroomId } }"
                   class="hover:bg-gray-400 ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
                   <h1 class="border-b-2 dark:border-gray-400 font-jetBrains dark:group-hover:border-gray-300">Quiz</h1>
                   <div class="w-full flex flex-row justify-between place-items-center">
