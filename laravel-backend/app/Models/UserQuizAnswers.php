@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class UserQuizAnswers extends Model
 {
     use HasFactory;
-
-    protected $fillable = [ 
+    protected $table = 'user_quiz_answers';
+    protected $fillable = [
         'user_answers',
-        'rewarded', 
+        'rewarded',
         'quiz_id',
         'user_id',
     ];

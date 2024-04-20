@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Assignment extends Model
 {
     use HasFactory;
+    protected $table = 'assignments';
     protected $fillable = [
         'title',
         'description',
@@ -24,7 +25,6 @@ class Assignment extends Model
         return $this->belongsTo(Classroom::class);
     }
 
-    
     public function comments():HasMany
     {
         return $this->hasMany(Comment::class);

@@ -34,17 +34,16 @@
 
   async function getDailyQuiz() {
     const res = await axios.get(API + 'quiz/daily')
-    dailyQuiz.value = res.data.daily_quiz
-    console.table(dailyQuiz.value)
+    if (res.data.daily_quiz) {
+      dailyQuiz.value = res.data.daily_quiz
+    }
+    else return
   }
-
-  onBeforeMount(() => {
-    getDailyQuiz()
-  })
 
   onMounted(() => {
     getUserData()
     getPoints()
+    getDailyQuiz()
   })
 </script>
 
@@ -67,8 +66,10 @@
       </button>
 
       <!-- Daily Quiz -->
-      <RouterLink v-if="pageName === 'Home' && dailyQuiz.quiz_id !== 0" :to="{ name: 'quiz', params: { quizId: dailyQuiz.quiz_id }, query: { type: 'daily_quiz' }}" class="bg-purple-500 text-white duration-300 ease-in-out rounded-md px-2">
-        ! DAILY QUIZ !
+      <RouterLink v-if="pageName === 'Home' && dailyQuiz.quiz_id !== 0" :to="{ name: 'quiz', params: { quizId: dailyQuiz.quiz_id }, query: { type: 'daily_quiz' }}" class="bg-purple-500 text-white duration-300 ease-in-out rounded-md px-2 border-b-4 border-b-purple-600 hover:bg-purple-300 hover:border-b-purple-400 hover:text-gray-800 hover:*:animate-none">
+        <span class="animate-pulse">
+          ! DAILY QUIZ !
+        </span>
       </RouterLink>
     </div>
 
@@ -84,7 +85,7 @@
 
       <div>
         <RouterLink :to="{ name: 'Chatroom' }"> 
-          <svg class="w-10 h-10 dark:text-white text-black cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V7a2 2 0 012-2h3.586a1 1 0 01.707.293l2.414 2.414A1 1 0 0016.414 8H17z"></path></svg>
+          <svg class="w-10 h-10 dark:text-white text-black hover:text-gray-500 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V7a2 2 0 012-2h3.586a1 1 0 01.707.293l2.414 2.414A1 1 0 0016.414 8H17z"></path></svg>
         </RouterLink>
       </div>
 

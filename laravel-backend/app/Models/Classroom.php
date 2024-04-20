@@ -20,7 +20,7 @@ class Classroom extends Model
 
     public function students()
     {
-        return $this->hasManyThrough('App\Models\Student', 'App\Models\User');
+        return $this->through('users')->has('student');
     }
 
     public function quizzes(): HasMany

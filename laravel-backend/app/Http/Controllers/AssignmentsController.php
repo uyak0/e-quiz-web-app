@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use App\Models\Comment;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 use App\Models\Assignment;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\NewAssignmentAssigned;
 
 class AssignmentsController extends Controller
 {
@@ -21,37 +24,54 @@ class AssignmentsController extends Controller
     public function store(Request $request): JsonResponse
     {
         $urls = [];
-
         $assignment = new Assignment();
-        $assignment->title = $request->title;
-        $assignment->description = $request->description;
-        $assignment->due_date = $request->due_date;
-        $assignment->classroom_id = $request->classroom_id;
 
-        $assignment->save();
+        try {
+            $assignment->title = $request->title;
+            $assignment->description = $request->description;
+            $assignment->due_date = $request->due_date;
+            $assignment->classroom_id = $request->classroom_id;
 
-        if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $originalFileName = $file->getClientOriginalName(); // Get the original file name
-                $path = $file->store(
-                    'classroom-' . $request->classroom_id . '/assignment-' . $assignment->id,
-                    'public' // Specify the disk name here, make it public so client-side can access to it lol
-                );
-                $url = Storage::disk('public')->url($path);
-                $urls[] = [
-                    'url' => str_replace('http://localhost', 'http://localhost:8000', $url), //replace it with domain name since localhost:8000 handle this for filesystem
-                    'original_name' => $originalFileName // Store the original file name
-                ];
+            $assignment->save();
+
+            if ($request->hasFile('files')) {
+                foreach ($request->file('files') as $file) {
+                    $originalFileName = $file->getClientOriginalName(); // Get the original file name
+                    $path = $file->store(
+                        'classroom-' . $request->classroom_id . '/assignment-' . $assignment->id,
+                        'public' // Specify the disk name here, make it public so client-side can access to it lol
+                    );
+                    $url = Storage::disk('public')->url($path);
+                    $urls[] = [
+                        'url' => str_replace('http://localhost', 'http://localhost:8000', $url), //replace it with domain name since localhost:8000 handle this for filesystem
+                        'original_name' => $originalFileName // Store the original file name
+                    ];
+                }
+
+                $assignment->files = json_encode($urls); // Store URLs and original file names as JSON
+                $assignment->save();
             }
 
-            $assignment->files = json_encode($urls); // Store URLs and original file names as JSON
-            $assignment->save(); 
-        }
+            $classroom = Classroom::find($request->classroom_id);
+            $classroomUsers = $classroom->users;
+            $classroomStudents = [];
+            $classroomStudents = $classroomUsers->filter(function ($user) {
+                return $user->roles->contains('name', 'student');
+            });
 
-        return response()->json([
-            'message' => 'Assignment created successfully',
-            'assignment' => $assignment
-        ]);
+            Notification::send($classroomStudents, new NewAssignmentAssigned($assignment));
+
+            return response()->json([
+                'message' => 'Assignment created successfully',
+                'assignment' => $assignment,
+            ]);
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while creating the assignment',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show($id)
@@ -92,10 +112,10 @@ class AssignmentsController extends Controller
         $request->validate([
             'files.*' => 'required|file',
         ]);
-    
+
         $files = $request->file('files');
         $filePaths = [];
-    
+
         foreach ($files as $file) {
             $originalFileName = $file->getClientOriginalName();
             $path = $file->store(
@@ -108,14 +128,14 @@ class AssignmentsController extends Controller
                 'original_name' => $originalFileName // Store the original file name
             ];
         }
-    
+
         $submission = new Submission();
         $submission->assignment_id = $assignmentId;
         $submission->user_id = Auth::id();
         $submission->file_path = json_encode($filePaths); // Store all file paths as a JSON array
         $submission->submitted_at = now();
         $submission->save();
-    
+
         return response()->json([
             'message' => 'Submission successful',
             'submission' => $submission

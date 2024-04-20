@@ -13,6 +13,25 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+    public function changeEmail(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required'
+        ]);
+
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return response()->json(['message' => 'The provided password does not match our records.'], 400);
+        }
+
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $user->email = $request->email;
+        $user->save();
+
+        return response()->json(['status' => 'Email updated successfully']);
+    }
+
     public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([

@@ -19,7 +19,13 @@ class DailyQuizController extends Controller
             ->where('is_completed', true)->get();
         $latestDailyQuiz = DailyQuiz::where('student_id', $student_id)->latest()->first();
 
-        if ($latestDailyQuiz) {
+        if ($completedQuizzes->count() == 0) {   // if the student has not completed any quiz, then return an error message
+            return response()->json([
+                'message' => 'No daily quiz available.'
+            ]);
+        }
+
+        else if ($latestDailyQuiz) {
             if ($latestDailyQuiz->is_completed == false) {   // if the latest daily quiz is not completed, then return an error message
                 return response()->json([
                     'message' => 'Uncompleted daily quiz',

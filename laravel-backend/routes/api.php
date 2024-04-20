@@ -52,6 +52,7 @@ Route::group(['prefix' => 'classroom'], function() {
 
 Route::group(['prefix' => 'user'], function() {
     Route::get('/', [UserController::class, 'getUser']);
+    Route::put('/change-email', [UserController::class, 'changeEmail']);
     Route::get('/role', [UserController::class, 'getUserRole']);
     Route::get('/classrooms/{id?}', [ClassroomsController::class, 'userClassrooms']);
     Route::get('/in-classroom', [UserController::class, 'inClassroom']);
@@ -70,6 +71,7 @@ Route::group(['prefix' => 'auth'], function() {
 Route::group(['prefix' => 'student'], function() {
     Route::put('{userId}/classroom-join/{classroomId}', [ClassroomsController::class, 'joinClassroom']);
     Route::get('/points', [StudentsController::class, 'getPoints']);
+    Route::get('/badges', [StudentsController::class, 'getBadges']);
 });
 
 Route::group(['prefix' => 'quiz'], function() {
