@@ -50,6 +50,8 @@ Route::group(['prefix' => 'classroom'], function() {
     Route::post('/removeStudent', [ClassroomsController::class,'removeStudent']);
 });
 
+Route::post('/student/{userId}/leave-classroom/{classroomId}', [ClassroomsController::class, 'leaveClassroom']);
+
 Route::group(['prefix' => 'user'], function() {
     Route::get('/', [UserController::class, 'getUser']);
     Route::put('/change-email', [UserController::class, 'changeEmail']);
@@ -93,6 +95,7 @@ Route::group(['prefix' => 'assignment'], function() {
     Route::get('/{assignmentId}/submissions', [AssignmentsController::class, 'getSubmissionDetails']);
     Route::put('/grade/{submission}', [AssignmentsController::class, 'gradeSubmission'])->middleware('auth');
     Route::get('/{assignmentId}/studentSubmissionDetails', [AssignmentsController::class, 'fetchStudentSubmissionDetails']);
+    Route::delete('/{id}', [AssignmentsController::class, 'destroy']);
 });
 
 Route::get("online-users", [UserController::class, "getOnlineUsers"]);

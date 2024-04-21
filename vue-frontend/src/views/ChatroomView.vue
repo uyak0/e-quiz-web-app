@@ -86,7 +86,7 @@
           </div>
 
                    <!-- Chat Body -->
-                    <div class="overflow-y-auto max-h-64 min-h-[19rem] px-4" ref="chatContentRef">
+                    <div class="overflow-y-auto max-h-64 min-h-[19rem] px-4" ref="chatContentRef" @scroll="handleChatScroll">
                         <div v-for="message in userMessages" :key="message.id">
                             <!--Receiver Message -->
                             <div v-if="message.sender_id != userId" class="flex items-center justify-start mb-4">
@@ -156,7 +156,7 @@
                 
                 <div v-else class="flex flex-col items-center justify-center min-h-[19rem]">
                     
-                    <p class="text-2xl font-semibold mt-4 text-black">E-Quiz Web App</p>
+                    <p class="text-2xl font-semibold mt-20 text-black">E-Quiz Web App</p>
                     <p class="text-gray-500">Start a conversation</p>
                 </div>
                 
@@ -173,6 +173,7 @@
 import axios from 'axios';
 import ThreeDotsIcon from "@/components/icons/ThreeDotsIcon.vue";
 import AddIcon from "@/components/icons/AddIcon.vue";
+import _ from 'lodash';
 import ImageIcon from "@/components/icons/ImageIcon.vue";
 import DocoumentIcon from "@/components/icons/DocoumentIcon.vue";
 import {useRoute, useRouter } from "vue-router";
@@ -207,6 +208,7 @@ const PUSHER_APP_KEY = import.meta.env.VITE_PUSHER_APP_KEY;
     const selectedImageUrl = ref('');
     const documentInput = ref(null); 
     const currentUserMode = ref('');
+    let scrollPoint = ref(0);
 
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = true;
@@ -405,6 +407,8 @@ const sendMessageUpdateRequest = (messageId) => {
             nextTick(() => {
                 if(chatContentRef.value){
                     chatContentRef.value.scrollTop = chatContentRef.value.scrollHeight;
+
+                    scrollPoint.value = chatContentRef.value.scrollTop;
                 }
             });
         }
@@ -523,6 +527,32 @@ function fileLink(file) {
                 return '';
             }
         }
+
+
+        const handleChatScroll = _.debounce((e) => {
+          if (e.target.scrollTop - 100 < scrollPoint.value) {
+            const oldMessage = userMessages.value[0];
+
+            axios.get(`${API}messages?receiver_id=${selectedUser.value.id}&earlier_date=${oldMessage.created_at}`)
+                .then(response => {
+                  if (response && response.data.messages){
+                    const filtered = [];
+
+                    response.data.messages.reverse().forEach(message => {
+                      if (!userMessages.value.find(m => m.id == message.id)){
+                        filtered.push(message);
+                      }
+                    })
+                    userMessages.value = [...filtered, ...userMessages.value];
+                  }
+                }).catch(error => {
+                  console.error(error.response);
+                })
+
+        }
+
+        scrollPoint.value = e.target.scrollTop;
+    }, 1000);
 
         watch(() => emittedMessage, (newMessage, oldMessage) => {
           if (newMessage) {

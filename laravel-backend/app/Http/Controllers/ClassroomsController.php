@@ -279,5 +279,19 @@ class ClassroomsController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Student removed successfully']);
     }
 
+    public function leaveClassroom(Request $request, $userId, $classroomId)
+    {
+        $deleted = DB::table('user_classrooms')
+                     ->where('user_id', $userId)
+                     ->where('classroom_id', $classroomId)
+                     ->delete();
+
+        if ($deleted) {
+            return response()->json(['message' => 'Successfully left the classroom.'], 200);
+        } else {
+            return response()->json(['message' => 'Could not find the classroom association or an error occurred.'], 404);
+        }
+    }
+
 
 }

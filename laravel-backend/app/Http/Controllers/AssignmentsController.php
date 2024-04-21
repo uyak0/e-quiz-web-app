@@ -213,4 +213,24 @@ class AssignmentsController extends Controller
         return response()->json($submission);
     }
 
+    public function destroy($id)
+    {
+        $assignment = Assignment::findOrFail($id);
+
+        // Check if the assignment has files and they are not null
+        $files = json_decode($assignment->files, true);
+        if ($files !== null) {
+            // Delete associated files
+            foreach ($files as $file) {
+                $filePath = str_replace(url('/storage'), '', $file['url']);
+                Storage::delete('/public' . $filePath);
+            }
+        }
+
+        // Delete the assignment
+        $assignment->delete();
+
+        return response()->json(['message' => 'Assignment deleted successfully'], 200);
+    }
+
 }

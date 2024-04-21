@@ -108,6 +108,23 @@ async function deleteClassroom() {
   }
 }
 
+const leaveClassroom = async () => {
+  if (!confirm('Are you sure you want to leave this classroom?')) {
+    return;
+  }
+
+  try {
+    const userId = route.params.userId; 
+    const classroomId = route.params.classroomId;
+    await axios.post(`${API}student/${userId}/leave-classroom/${classroomId}`);
+    alert('You have left the classroom.');
+    router.push(`/student/${userId}/home`); // Navigate to the home page
+  } catch (error) {
+    console.error('Error leaving classroom:', error);
+    alert('Failed to leave the classroom. Please try again.');
+  }
+};
+
 const showName = ref(true)
 const showDesc = ref(true)
 const showNameEditBtn = ref(true)
@@ -299,6 +316,12 @@ onMounted(() => {
             </button>
             <button v-if="classroomDetails.type === 'anyone_can_join'" @click="shareCodeModal = true"
               class="after:content-['+_Student'] md:after:content-['+_Add_a_Student'] text-center text-md md:text-lg bg-gray-300 rounded-md px-2 text-gray-900">
+            </button>
+          </span>
+          <!--leave classroom for student-->
+          <span v-if="userRole === 'student'" class="py-2">
+            <button @click="leaveClassroom" class="rounded-md bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4">
+              Leave
             </button>
           </span>
         </div>

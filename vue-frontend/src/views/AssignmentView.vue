@@ -115,6 +115,21 @@ const fetchStudentSubmissionDetails = async () => {
   }
 };
 
+const deleteAssignment = async () => {
+  if (!confirm('Are you sure you want to delete this assignment?')) {
+    return;
+  }
+
+  try {
+    await axios.delete(`${API}assignment/${assignmentId}`);
+    alert('Assignment deleted successfully.');
+    router.push(`/teacher/${route.params.userId}/classroom/${route.params.classroomId}`); 
+  } catch (error) {
+    console.error('Error deleting assignment:', error);
+    alert('Failed to delete assignment.');
+  }
+};
+
 
 onMounted(async () => {
   try {
@@ -148,10 +163,13 @@ onMounted(async () => {
     <div class="flex-1">
       <div class="bg-white shadow-md rounded-lg p-4">
         <h2 class="text-2xl font-bold mb-2 text-black">{{ assignment.title }}</h2>
+        <button @click="deleteAssignment" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+  Delete Assignment
+</button>
         <p class="text-gray-700">{{ assignment.description }}</p>
         <p class="text-gray-600">Due date: {{ new Date(assignment.due_date).toLocaleString() }}</p>
         <div class="mt-4">
-          <h2 class="font-semibold mb-2">Attached Files:</h2>
+          <h2 class="font-semibold mb-2 text-black">Attached Files:</h2>
           <ul>
             <li v-for="(file, index) in assignment.files" :key="index">
               <a :href="file.url" target="_blank" class="text-blue-500 hover:underline">{{ file.originalName }}</a>

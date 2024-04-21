@@ -20,9 +20,15 @@ class ChatController extends Controller
     {
         $messagesQuery = Chat::getMessagesQueryBetweenTwoUsers($request, auth()->user()->id, $request->receiver_id);
 
+        if($request -> earlier_date) {
+            $dataFormatted = (new \DateTime($request -> earlier_date)) -> format ("Y-m-d H:i:s");
+
+            $messagesQuery->where("created_at", "<", $dataFormatted);
+        }
+
         // display top 10 messages for user
         $result = $messagesQuery->orderBy('created_at', 'DESC')
-                        ->limit($request->limit ?? 20)
+                        ->limit($request->limit ?? 10)
                         ->get();
 
         if($result->count()) {
