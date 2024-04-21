@@ -47,7 +47,10 @@ class NewAssignmentAssigned extends Notification implements ShouldQueue
                     ->line('You have been assigned a new assignment.')
                     ->line('Title: ' . $this->title)
                     ->line('Description: ' . $this->description)
-                    ->action('View Assignment', 'localhost:5173/classroom/' . $this->classroom_id . '/assignment/' . $this->id);
+            ->action(
+                'View Assignment',
+                'http://localhost:5173/student/' . auth()->user()->id .
+                '/classroom/' . $this->classroom_id . '/assignment/' . $this->id);
     }
 
     /**

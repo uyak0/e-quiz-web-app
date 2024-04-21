@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\NewAssignmentAssigned;
+use Carbon\Carbon;
 
 class AssignmentsController extends Controller
 {
@@ -29,7 +30,7 @@ class AssignmentsController extends Controller
         try {
             $assignment->title = $request->title;
             $assignment->description = $request->description;
-            $assignment->due_date = $request->due_date;
+            $assignment->due_date = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
             $assignment->classroom_id = $request->classroom_id;
 
             $assignment->save();

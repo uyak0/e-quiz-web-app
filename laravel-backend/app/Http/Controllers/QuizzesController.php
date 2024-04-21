@@ -6,7 +6,7 @@ use App\Models\Classroom;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Quiz;
-use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Collection;
 use Carbon\Carbon;
 use App\Notifications\NewQuizAssigned;
@@ -67,7 +67,7 @@ class QuizzesController extends Controller
         try {
             $quiz = Quiz::create([
                 'title' => $request->title,
-                'due_date' => $request->due_date,
+                'due_date' => Carbon::parse($request->due_date)->format('Y-m-d H:i:s'),
                 'classroom_id' => $request->classroom_id,
             ]);
 
@@ -116,6 +116,7 @@ class QuizzesController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while creating the quiz',
+                'error' => $e->getMessage()
             ], 500);
         }
 

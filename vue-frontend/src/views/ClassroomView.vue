@@ -430,7 +430,7 @@ onMounted(() => {
         </div>
         <h1 class="pb-2 text-2xl">What do you want to create?</h1>
         <span class="py-2 gap-2 flex flex-row *:rounded-md *:w-1/2 *:py-5 text-xl text-gray-900">
-          <RouterLink :to="{ name: 'createQuiz' }" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">
+          <RouterLink :to="{ name: 'createQuiz', query: { classroomId: route.params.classroomId }}" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">
             <vue-feather type="book-open" size="50" />
             <h1>Quiz</h1>
           </RouterLink>
