@@ -11,9 +11,10 @@ use Illuminate\Notifications\Notification;
 class NewAssignmentAssigned extends Notification implements ShouldQueue
 {
     use Queueable;
-    protected $title;
-    protected $description;
-    protected $id;
+    public $title;
+    public $description;
+    public $id;
+    public $classroom_id;
 
     /**
      * Create a new notification instance.
@@ -23,6 +24,7 @@ class NewAssignmentAssigned extends Notification implements ShouldQueue
         $this->title = $assignment->title;
         $this->description = $assignment->description;
         $this->id = $assignment->id;
+        $this->classroom_id = $assignment->classroom_id;
     }
 
     /**
@@ -43,9 +45,9 @@ class NewAssignmentAssigned extends Notification implements ShouldQueue
         return (new MailMessage)
                     ->greeting('Hello!')
                     ->line('You have been assigned a new assignment.')
-                    ->line($this->title)
-                    ->line($this->description)
-                    ->action('View Assignment', url('localhost:5173/assignment/' . $this->id));
+                    ->line('Title: ' . $this->title)
+                    ->line('Description: ' . $this->description)
+                    ->action('View Assignment', 'localhost:5173/' . $this->classroom_id . '/assignment/' . $this->id);
     }
 
     /**
