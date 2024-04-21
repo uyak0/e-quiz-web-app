@@ -93,7 +93,9 @@
     <div class="flex justify-center">
       <div class="h-screen dark:bg-slate-700 bg-gray-100 shadow-lg dark:text-darkMode text-soft-black w-full sm:w-3/4 mx-auto py-8 justify-center">
         <div name="Info" class="flex flex-rows">
-          <UserAvatar class="w-1/4 h-1/4 mx-8 my-8 rounded-full border border-sky-200" /> 
+          <div class="w-1/2 md:w-1/4">
+            <UserAvatar class="mx-8 my-8 rounded-full border border-sky-200" /> 
+          </div>
           <span class="py-2 flex flex-col place-self-center overflow-hidden">
             <p class="text-4xl sm:text-6xl font-bold sm:my-4 mx-4">{{ user.name }}</p>
             <select v-model="mode" @change="updateMode" class="rounded-sm ml-4 inline-block text-black">
@@ -107,7 +109,7 @@
               <p v-if="userRole === 'student'" class="w-fit text-xl sm:text-2xl px-2 bg-pink-300 rounded-md text-gray-900">{{ studentPoints }}pts</p>
             </span>
             <span class="flex flex-row gap-2 mx-4 font-jetBrains my-2">
-              <button @click="badgesModal[index] = true" v-for="(badge, index) in studentBadges" class="w-fit text-xl sm:text-2xl px-2 bg-yellow-300 rounded-md text-gray-900" :title="badge.name">{{ badge.name }}</button>
+              <button @click="badgesModal[index] = true" v-for="(badge, index) in studentBadges" class="w-fit text-xl sm:text-2xl px-2 hover:text-white hover:bg-yellow-700 bg-yellow-300 rounded-full text-gray-900" :title="badge.name">{{ badge.name }}</button>
             </span>
           </span>
         </div>
