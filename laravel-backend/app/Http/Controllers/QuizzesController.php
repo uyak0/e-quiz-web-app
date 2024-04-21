@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Quiz;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Carbon\Carbon;
+use App\Notifications\NewQuizAssigned;
 
 class QuizzesController extends Controller
 {
@@ -99,6 +102,15 @@ class QuizzesController extends Controller
                     break;
                 }
             }
+
+            $classroom = Classroom::find($request->classroom_id);
+            $classroomUsers = $classroom->users;
+            $classroomStudents = [];
+            $classroomStudents = $classroomUsers->filter(function ($user) {
+                return $user->roles->contains('name', 'student');
+            });
+
+            Notification::send($classroomStudents, new NewQuizAssigned($quiz));
         }
         catch (\Exception $e) {
             return response()->json([
