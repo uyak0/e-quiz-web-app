@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Assignment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -34,7 +35,7 @@ class NewAssignmentAssigned extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'broadcast'];
     }
 
     /**
@@ -63,5 +64,15 @@ class NewAssignmentAssigned extends Notification implements ShouldQueue
         return [
             //
         ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'classroom_id' => $this->classroom_id
+        ]);
     }
 }
