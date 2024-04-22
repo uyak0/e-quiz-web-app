@@ -5,12 +5,15 @@ import Arrow from "@/components/Arrow.vue";
 import Modal from "@/components/Modal.vue";
 import Notification from "@/components/Notification.vue";
 
+
 import axios from "axios";
 import Pusher from 'pusher-js';
 import Echo from 'laravel-echo';
 
 import { onMounted, ref, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const API = import.meta.env.VITE_LARAVEL_API
 const PUSHER_KEY = import.meta.env.VITE_PUSHER_APP_KEY;
@@ -20,6 +23,7 @@ const route = useRoute()
 const router = useRouter()
 const userId = route.params.userId
 const userRole = route.params.userRole
+const userData = ref({})
 
 const classrooms = ref([])
 const classroomCode = ref('')
@@ -31,9 +35,10 @@ const selectedType = ref('anyone_can_join'); //default
 const joinOrCreateClassroomBtn = ref(true)
 const modalEnabled = ref(false)
 const modalInput = ref(null)
+const currentUserMode = ref('')
 
 const notifs = ref([])
-const toast = ref(false)
+
 
 Pusher.logToConsole = true;
 
@@ -73,6 +78,26 @@ function TaskNotif() {
           notifs.value.shift();
         }, 5000);
       });
+  }
+}
+
+function displayToastMessage(message) {
+  toast(message, {
+    autoClose: 3000, // Auto close after 3 seconds
+    type: "info", // Type of toast - info, success, error, etc.
+    position: "top-right", // Position of toast on the screen
+    // You can add more options here as per your requirements
+  });
+}
+
+async function getUserDetails() {
+  try {
+    const res = await axios.get(`${API}user`, {params: { id: userId }});
+    const userData = res.data;
+    currentUserMode.value = userData.mode; // Correctly set the user's current mode
+    console.log('User data:', userData);
+  } catch (error) {
+    console.error('Error fetching user details:', error);
   }
 }
 
@@ -140,6 +165,19 @@ function enableModal() {
 onMounted(() => {
   getClassrooms();
   TaskNotif();
+  getUserDetails();
+  window.Echo.private(`chatroom.${userId}`)
+    .listen('.message-sent', (e) => {
+      const message = e.message;
+      const senderName = e.user.name;
+      const toastMessage = `New message from ${senderName}: ${message.message}`;
+      console.log("Received message: ", e);
+
+      if (currentUserMode.value.toLowerCase() !== 'do not disturb') {
+          displayToastMessage(toastMessage);
+      }
+      
+    });
 })
 </script>
 

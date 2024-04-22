@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
 import Modal from '@/components/Modal.vue';
+import TopBar from '@/components/TopBar.vue';
+import VueFeather from 'vue-feather'
 
 const API = import.meta.env.VITE_LARAVEL_API;
 const route = useRoute();
@@ -10,7 +12,21 @@ const router = useRouter();
 const assignmentId = route.params.assignmentId;
 const userRole = route.params.userRole
 const gradeSubmissionModal = ref(false)
+const fileInput = ref(null);
 
+
+const isLate = (submittedAt) => {
+  const dueDate = new Date(assignment.value.due_date);
+  const submissionDate = new Date(submittedAt);
+  return submissionDate > dueDate;
+};
+
+const removeFile = (index) => {
+  selectedFiles.value.splice(index, 1);
+  if (fileInput.value) {
+    fileInput.value.value = ''; // Reset the file input
+  }
+};
 
 const assignment = ref({
   title: 'Loading...',
@@ -40,10 +56,11 @@ const handleFileUpload = (event) => {
   for (let file of event.target.files) {
     const fileData = {
       file: file,
-      url: URL.createObjectURL(file) // Generate a URL for previewing the file
+      url: URL.createObjectURL(file) 
     };
-    selectedFiles.value.push(fileData); // Add new file to the list
+    selectedFiles.value.push(fileData);
   }
+  event.target.value = ''; 
 };
 
 const submitAssignment = async () => {
@@ -54,7 +71,7 @@ const submitAssignment = async () => {
 
   const formData = new FormData();
   selectedFiles.value.forEach((fileData, index) => {
-    formData.append(`files[${index}]`, fileData.file); // Append each file to formData with an array-like key
+    formData.append(`files[${index}]`, fileData.file); 
   });
 
   try {
@@ -158,21 +175,33 @@ onMounted(async () => {
 </script>
 
 <template>
+  <TopBar />
   <div class="flex flex-col md:flex-row p-4 gap-4">
     <!-- Left Section: Assignment Details -->
     <div class="flex-1">
-      <div class="bg-white shadow-md rounded-lg p-4">
-        <h2 class="text-2xl font-bold mb-2 text-black">{{ assignment.title }}</h2>
-        <button @click="deleteAssignment" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-  Delete Assignment
-</button>
+      <div class="bg-white shadow-md rounded-lg p-4" style="max-height: 500px; overflow-y: auto;">
+        <div class="flex justify-between items-center">
+          <h2 class="text-2xl font-bold mb-2 text-black">{{ assignment.title }}</h2>
+          <button @click="deleteAssignment" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+            Delete
+          </button>
+        </div>
         <p class="text-gray-700">{{ assignment.description }}</p>
         <p class="text-gray-600">Due date: {{ new Date(assignment.due_date).toLocaleString() }}</p>
         <div class="mt-4">
           <h2 class="font-semibold mb-2 text-black">Attached Files:</h2>
-          <ul>
-            <li v-for="(file, index) in assignment.files" :key="index">
-              <a :href="file.url" target="_blank" class="text-blue-500 hover:underline">{{ file.originalName }}</a>
+          <ul class="grid grid-cols-2 gap-4">
+            <li v-for="(file, index) in assignment.files" :key="index" class="border rounded-lg p-4 flex items-center gap-4">
+              <div v-if="file.type && file.type.includes('image')" class="flex-shrink-0">
+                <img :src="file.url" alt="file.originalName" class="h-20 w-20 object-cover rounded">
+              </div>
+              <div v-else-if="file.type && file.type.includes('text')" class="flex-shrink-0">
+                <vue-feather type="file-text" class="w-14 h-14 text-gray-500"></vue-feather>
+              </div>
+              <div v-else class="flex-shrink-0">
+                <vue-feather type="file" class="w-14 h-14 text-gray-500"></vue-feather>
+              </div>
+              <a :href="file.url" target="_blank" class="flex-grow text-blue-500 hover:underline">{{ file.originalName }}</a>
             </li> 
           </ul>
         </div>
@@ -180,9 +209,13 @@ onMounted(async () => {
       <!-- Comment Section -->
       <div class="mt-4 bg-white shadow-md rounded-lg p-4">
         <h3 class="font-semibold mb-2 text-black">Comments</h3>
-        <div v-for="comment in comments" :key="comment.id" class="border-b border-gray-200 py-2">
-          <p class="text-black"><strong>{{ comment.user.name }}:</strong> {{ comment.content }}</p>
-          <p class="text-sm text-black">{{ new Date(comment.created_at).toLocaleString() }}</p>
+        <div class="max-h-[calc(100vh-250px)] overflow-y-auto">
+          <div v-for="comment in comments" :key="comment.id" class="border-b border-gray-200 py-2 flex justify-between">
+            <p class="text-black"><strong>{{ comment.user.name }}:</strong> {{ comment.content }}</p>
+            <div class="text-sm text-black text-right">
+              {{ new Date(comment.created_at).toLocaleString() }}
+            </div>
+          </div>
         </div>
         <div class="mt-4">
           <textarea v-model="newComment" placeholder="Write a comment..." class="w-full p-2 border rounded text-black"></textarea>
@@ -195,10 +228,26 @@ onMounted(async () => {
     <div class="w-full md:w-1/3">
       <div v-if="userRole === 'student'" class="bg-white shadow-md rounded-lg p-4">
         <h3 class="font-semibold mb-2 text-black">Submit Your Work</h3>
-        <div v-for="(fileData, index) in selectedFiles" :key="index" class="mt-2">
-          <a :href="fileData.url" target="_blank" class="text-blue-500 hover:underline">{{ fileData.file.name }}</a>
+        <div v-for="(fileData, index) in selectedFiles" :key="index" class="mt-2 pb-3 flex items-center">
+          <div class="flex-grow flex items-center gap-3 border rounded-lg p-3">
+            <div v-if="fileData.file.type.includes('image')" class="flex items-center gap-3">
+              <img :src="fileData.url" class="h-16 w-16 object-cover rounded">
+              <a :href="fileData.url" target="_blank" class="flex-grow text-blue-500 hover:underline">{{ fileData.file.name }}</a>
+            </div>
+
+            <div v-else-if="fileData.file.type.includes('text')" class="flex items-center gap-3">
+              <vue-feather type="file-text" class="w-10 h-10 text-gray-500"></vue-feather>
+              <a :href="fileData.url" target="_blank" class="flex-grow text-blue-500 hover:underline">{{ fileData.file.name }}</a>
+            </div>
+
+            <div v-else class="flex items-center gap-3">
+              <vue-feather type="file" class="w-10 h-10 text-gray-500"></vue-feather>
+              <a :href="fileData.url" target="_blank" class="flex-grow text-blue-500 hover:underline">{{ fileData.file.name }}</a>
+            </div>
+            <button @click="removeFile(index)" class="ml-auto bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">X</button>
+          </div>
         </div>
-        <input type="file" multiple @change="handleFileUpload" class="block w-full text-sm text-gray-500
+        <input type="file" multiple @change="handleFileUpload" ref="fileInput" class="block w-full text-sm text-gray-500
           file:mr-4 file:py-2 file:px-4
           file:rounded-full file:border-0
           file:text-sm file:font-semibold
@@ -213,49 +262,77 @@ onMounted(async () => {
           <p class="text-black"><strong>Grade:</strong> {{ studentSubmissionDetails.grade || 'Not graded yet' }}</p>
           <p class="text-black"><strong>Feedback:</strong> {{ studentSubmissionDetails.feedback || 'No feedback provided yet.' }}</p>
         </div>
-        
       </div>
-      <div v-if ="userRole === 'teacher'" class="bg-white shadow-md rounded-lg p-4 ">
+      <!--teacher check submission section-->
+      <div v-if="userRole === 'teacher'" class="bg-white shadow-md rounded-lg p-4 ">
         <h3 class="font-semibold mb-2 text-black">Submissions</h3>
-          <div class="w-full flex flex-col gap-3">
-            <div @click="openGradeSubmissionModal(submission)" v-for="submission in submissions" :key="submission.id" class="ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md bg-soft-white text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group">
-              <div class=" flex justify-between items-center dark:group-hover:border-gray-300">
-                <h2 class="text-xl">{{ submission.user.name }}</h2>
-                <span>{{ new Date(submission.submitted_at).toLocaleDateString() }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span>Grade: {{ submission.grade || 'Not graded yet' }}</span>
-              </div>
+        <div class="w-full flex flex-col gap-3">
+          <div 
+            v-for="submission in submissions" 
+            :key="submission.id" 
+            @click="openGradeSubmissionModal(submission)" 
+            :class="{'bg-red-500': isLate(submission.submitted_at), 'bg-soft-white': !isLate(submission.submitted_at)}" 
+            class="ease-in-out duration-200 md:ml-5 mx-2 flex flex-col rounded-md shadow-md text-gray-900 dark:text-darkMode border-gray-200 dark:bg-gray-500 dark:border-none dark:hover:text-gray-800 p-2 cursor-pointer group"
+          >
+            <div class="flex justify-between items-center dark:group-hover:border-gray-300">
+              <h2 class="text-xl">{{ submission.user.name }}</h2>
+              <span>{{ new Date(submission.submitted_at).toLocaleDateString() }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span>Grade: {{ submission.grade || 'Not graded yet' }}</span>
             </div>
           </div>
+        </div>
       </div>
     </div>
 
 
     <Modal v-model="gradeSubmissionModal">
-      <div class="modal-content p-4 bg-gray-300 w-3/4 h-fit place-self-center text-black">
-        <div>Submission ID = {{clickedSubmission.id}}</div>
-        <div>Submission Time = {{clickedSubmission.submitted_at}}</div>
-        <div>Student ID = {{clickedSubmission.user?.id}}</div>
-        <div>Student Name = {{clickedSubmission.user?.name}}</div>
-        <ul>
-         <li v-for="(file, index) in clickedSubmission.file_path" :key="index">
-            <a :href="file.url" target="_blank" class="text-blue-500 hover:underline">{{ file.original_name }}</a>
-         </li>
-        </ul>
-        <div>
-          <label for="grade">Grade (0-100):</label>
-          <input type="number" id="grade" v-model="clickedSubmission.grade" min="0" max="100" class="border-2 rounded">
-        </div>
-        <div class="mt-2">
-          <label for="feedback">Feedback:</label>
-          <textarea id="feedback" v-model="clickedSubmission.feedback" rows="4" class="border-2 rounded w-full"></textarea>
-        </div>
-        <button @click="submitGradeAndFeedback" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Submit Grade and Feedback
-        </button>
-        
+    <div class="modal-content p-4 bg-white shadow-xl rounded-lg w-3/4 h-fit place-self-center text-black">
+      <h3 class="text-xl font-bold mb-4">Grade Submission</h3>
+      <div class="mb-2">
+        <span class="font-semibold">Submission ID:</span> {{clickedSubmission.id}}
       </div>
-    </Modal>
+      <div class="mb-2">
+        <span class="font-semibold">Submission Time:</span> {{ new Date(clickedSubmission.submitted_at).toLocaleString() }}
+      </div>
+      <div class="mb-2">
+        <span class="font-semibold">Student ID:</span> {{clickedSubmission.user?.id}}
+      </div>
+      <div class="mb-4">
+        <span class="font-semibold">Student Name:</span> {{clickedSubmission.user?.name}}
+      </div>
+      <div class="mb-4">
+        <h4 class="font-semibold mb-2">Submitted Files:</h4>
+        <ul class="list-disc pl-5">
+          <li v-for="(file, index) in clickedSubmission.file_path" :key="index" class="mb-2">
+            <div v-if="file.type && file.type.includes('image')" class="flex items-center">
+              <img :src="file.url" alt="file.original_name" class="h-20 w-20 object-cover rounded mr-2">
+              <a :href="file.url" target="_blank" class="text-blue-500 hover:underline">{{ file.original_name }}</a>
+            </div>
+            <div v-else-if="file.type && file.type.includes('text')" class="flex items-center">
+              <vue-feather type="file-text" class="w-6 h-6 mr-2 text-gray-500"></vue-feather>
+              <a :href="file.url" target="_blank" class="text-blue-500 hover:underline">{{ file.original_name }}</a>
+            </div>
+            <div v-else class="flex items-center">
+              <vue-feather type="file" class="w-6 h-6 mr-2 text-gray-500"></vue-feather>
+              <a :href="file.url" target="_blank" class="text-blue-500 hover:underline">{{ file.original_name }}</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="mb-4">
+        <label for="grade" class="block font-semibold mb-1">Grade (0-100):</label>
+        <input type="number" id="grade" v-model="clickedSubmission.grade" min="0" max="100" class="border-2 rounded w-full p-2">
+      </div>
+      <div class="mb-4">
+        <label for="feedback" class="block font-semibold mb-1">Feedback:</label>
+        <textarea id="feedback" v-model="clickedSubmission.feedback" rows="4" class="border-2 rounded w-full p-2"></textarea>
+      </div>
+      <button @click="submitGradeAndFeedback" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Submit Grade and Feedback
+      </button>
+    </div>
+  </Modal>
   </div> 
 </template>

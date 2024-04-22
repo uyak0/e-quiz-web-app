@@ -9,6 +9,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import Modal from '@/components/Modal.vue'
 import { DateTime } from 'luxon';
 
+
 const route = useRoute()
 const router = useRouter()
 const API = import.meta.env.VITE_LARAVEL_API
@@ -35,6 +36,8 @@ const newStudentEmail = ref('')
 const newDueDate = ref(new Date())
 
 const userRole = route.params.userRole
+
+
 
 async function getClassroomData() {
   const [classroomRes, topStudentsRes, classroomDataRes] = await Promise.all([
@@ -178,6 +181,14 @@ async function addStudent() {
     newStudentEmail.value = ''; // Reset the input field
     addStudentModal.value = false; // Close the modal
     
+    
+    if (response.data.newStudent) {
+      classroomUsers.value.push(response.data.newStudent);
+    }
+    
+    
+    await openMemberListModal(); //  refresh the list
+    
   } catch (error) {
     console.error(error);
     alert('Failed to add student. Please try again.');
@@ -226,6 +237,16 @@ function dateDiff(date) {
 function changeDue(date) {
   changeDueModal.value = true
   newDueDate.value = Date.parse(date)
+}
+
+function navigateToChatroom(receiverId) {
+  // Assuming `userRole` and `userId` are available in your component's context
+  // You might need to adjust how these values are obtained based on your application's state management
+  router.push({ 
+    name: 'Chatroom', 
+    params: { userRole: 'student', userId: '2' }, // Example static values, replace with actual dynamic values
+    query: { receiver_id: receiverId } 
+  });
 }
 
 onMounted(() => {
@@ -467,30 +488,36 @@ onMounted(() => {
     </Modal>
 
     <Modal v-model="memberListModal">
-      <div class="modal-content p-4 bg-red-300 w-3/4 h-fit place-self-center">
+      <div class="modal-content p-4 bg-red-300 w-1/2 h-fit place-self-center">
         <div>
           <h2 class="text-2xl font-bold mb-4 text-black">Member List</h2>
           <ul>
-            <li v-for="user in classroomUsers" :key="user.id" class="text-black flex justify-between">
+            <li v-for="(user, index) in classroomUsers" :key="user.id" :class="{'border-b': index !== classroomUsers.length - 1, 'border-black': index !== classroomUsers.length - 1}" class="text-black flex justify-between items-center pt-2 pb-2">
               {{ user.name }}
-              <button v-if="userRole === 'teacher' " @click="removeStudent(user.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
-                Remove
-              </button>
+              <div class="flex items-center">
+                <vue-feather v-if="userRole === 'teacher'" @click="removeStudent(user.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" type="trash-2"></vue-feather>
+                <!-- Chat Button -->
+                <button @click="navigateToChatroom(user.id)" class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                  Chat
+                </button>
+              </div>
             </li>
           </ul>
         </div>
-        <div class="flex flex-row justify-end">
-          <button v-if="userRole === 'teacher'" @click="addStudentModal = true">+ Add New Student</button>
-          <button @click="memberListModal = false" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200">Close</button>
+        <div class="flex flex-row justify-end mt-4">
+          <button v-if="userRole === 'teacher'" class="text-black pr-8" @click="addStudentModal = true">+ Add New Student</button>
+          <button @click="memberListModal = false" class="bg-red-400 hover:bg-red-600 duration-300 hover:text-gray-200 p-2">Close</button>
         </div>
       </div>
     </Modal>
 
     <Modal v-model="addStudentModal">
-      <div class="modal-content bg-sky-500">
-        <h2>Add New Student</h2>
-        <input class="text-black" type="email" v-model="newStudentEmail" placeholder="Enter student's email">
-        <button @click="addStudent">Add Student</button>
+      <div class="modal-content bg-sky-500 h-fit place-self-center w-1/2 p-3 flex flex-col">
+        <h2 class="text-black text-2xl mb-4">Add New Student</h2>
+        <input class="text-black text-lg mb-4" type="email" v-model="newStudentEmail" placeholder="Enter student's email">
+        <div class="mt-auto flex justify-end">
+          <button class="text-black bg-green-500 p-2" @click="addStudent">+ Add Student</button>
+        </div>
       </div>
     </Modal>
 
