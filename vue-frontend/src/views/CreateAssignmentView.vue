@@ -74,6 +74,7 @@ async function createAssignment() {
         'Content-Type': 'multipart/form-data'
       }
     })
+    router.push({ name: 'classroom' });
     console.log(response.data)
   } catch (error) {
     console.error(error)

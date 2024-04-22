@@ -19,6 +19,7 @@ const classroomAssignments = ref([])
 const classroomPosts = ref([])
 
 const upcomingQuizzes = ref([])
+const upcomingAssignments = ref([])
 const classroomDetails = ref([])
 const classroomDesc = ref('')
 const classroomName = ref('')
@@ -57,17 +58,26 @@ async function getClassroomData() {
 }
 
 function getUpcoming() {
-  for (let i = 0; i < classroomPosts.value.length; i++) {
-    if (DateTime.now() < Date.parse(classroomPosts.value[i].due_date)) {
+  for (let i = 0; i < classroomQuizzes.value.length; i++) {
+    if (DateTime.now() < Date.parse(classroomQuizzes.value[i].due_date)) {
       upcomingQuizzes.value.push({
-        id: classroomPosts.value[i].id,
-        title: classroomPosts.value[i].title,
-        due: classroomPosts.value[i].due_date,
-        fromNow: dateDiff(classroomPosts.value[i].due_date)
+        id: classroomQuizzes.value[i].id,
+        title: classroomQuizzes.value[i].title,
+        due: classroomQuizzes.value[i].due_date,
+        fromNow: dateDiff(classroomQuizzes.value[i].due_date)
       })
     }
   }
-  console.log(upcomingQuizzes.value)
+  for (let i = 0; i < classroomAssignments.value.length; i++) {
+    if (DateTime.now() < Date.parse(classroomAssignments.value[i].due_date)) {
+      upcomingAssignments.value.push({
+        id: classroomAssignments.value[i].id,
+        title: classroomAssignments.value[i].title,
+        due: classroomAssignments.value[i].due_date,
+        fromNow: dateDiff(classroomAssignments.value[i].due_date)
+      })
+    }
+  }
 }
 
 async function getPosts() {     // Classified assignments, quizzes as Posts
@@ -85,7 +95,7 @@ async function getPosts() {     // Classified assignments, quizzes as Posts
     return assignment
   })
 
-  classroomPosts.value = [...classroomQuizzes.value, ...classroomAssignments.value]
+  classroomPosts.value = [{quizzes: {...classroomQuizzes.value}}, {assignments: {...classroomAssignments.value}}]
   console.log(classroomPosts.value)
   getUpcoming();
 }
@@ -387,11 +397,19 @@ onMounted(() => {
             </div>
 
             <!-- Upcoming Quizzes -->
-            <div v-if="upcomingQuizzes.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
+            <div v-if="upcomingTasks.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
               <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
               <div class="border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2">
                 <div v-for="(quiz, index) of upcomingQuizzes" :key="index">
                   <RouterLink :to="{ name: 'quiz', params: { quizId: quiz.id }, query: { classroom: route.params.classroomId } }"
+                    class="pb-4 flex flex-col w-full group">
+                    <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
+                    <h3 class="text-md">Due: {{ quiz.due }}</h3>
+                    <h4 class="text-sm">{{ quiz.fromNow }}</h4>
+                  </RouterLink>
+                </div>
+                <div v-for="(quiz, index) of upcomingAssignments" :key="index">
+                  <RouterLink :to="{ name: 'assignment', params: { quizId: quiz.id }}"
                     class="pb-4 flex flex-col w-full group">
                     <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
                     <h3 class="text-md">Due: {{ quiz.due }}</h3>
