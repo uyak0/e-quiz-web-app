@@ -12,6 +12,7 @@ import { DateTime } from 'luxon';
 
 const route = useRoute()
 const router = useRouter()
+const userId = route.params.userId
 const API = import.meta.env.VITE_LARAVEL_API
 
 const classroomQuizzes = ref([])
@@ -26,6 +27,7 @@ const classroomName = ref('')
 const topStudents = ref([])
 const copied = ref(false)
 const classroomUsers = ref([]);
+const currentUser = ref([])
 
 const createTaskModal = ref(false)
 const shareCodeModal = ref(false)
@@ -167,6 +169,11 @@ async function changeDesc() {
   showDescEditBtn.value = true
 }
 
+function getCurrentUser() {
+  currentUser.value = classroomUsers.value.filter((user) => { return user.id == route.params.userId })
+  console.log(currentUser.value)
+}
+
 async function openMemberListModal() {
   try {
     const response = await axios.get(API + 'classroom/users/' + route.params.classroomId);
@@ -175,6 +182,7 @@ async function openMemberListModal() {
     console.error("Failed to fetch classroom users", error);
   }
   memberListModal.value = true;
+  currentUser.value = getCurrentUser();
 }
 
 async function addStudent() {
@@ -250,12 +258,12 @@ function changeDue(date) {
 }
 
 const navigateToChatroom = (user) => {
-  // Assuming `user.name` is the identifier you want to pass to the ChatroomView
-  // Replace 'ChatroomView' with the actual name or path of your chatroom view component
   router.push({ name: 'Chatroom', query: { search: user.name } });
-  // Assuming you have a ref or reactive property for controlling the modal's visibility
   memberListModal.value = false;
 };
+
+
+
 
 onMounted(() => {
   getClassroomData();
@@ -508,12 +516,12 @@ onMounted(() => {
         <div>
           <h2 class="text-2xl font-bold mb-4 text-black">Member List</h2>
           <ul>
-            <li v-for="(user, index) in classroomUsers" :key="user.id" :class="{'border-b': index !== classroomUsers.length - 1, 'border-black': index !== classroomUsers.length - 1}" class="text-black flex justify-between items-center pt-2 pb-2">
+            <li v-for="(user, index) in classroomUsers" :key="index" :class="{'border-b': index !== classroomUsers.length - 1, 'border-black': index !== classroomUsers.length - 1}" class="text-black flex justify-between items-center pt-2 pb-2">
               {{ user.name }}
               <div class="flex items-center">
-                <vue-feather v-if="userRole === 'teacher'" @click="removeStudent(user.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" type="trash-2"></vue-feather>
+                <vue-feather v-if="userRole === 'teacher' && user.id != userId" @click="removeStudent(user.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" type="trash-2"></vue-feather>
                 <!-- Chat Button -->
-                <button @click="navigateToChatroom(user)" class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                <button v-if="user.id != userId" @click="navigateToChatroom(user)" class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
                   Chat
                 </button>
               </div>

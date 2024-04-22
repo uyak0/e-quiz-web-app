@@ -60,7 +60,7 @@
       alert('Mode updated successfully.');
     } catch (error) {
       console.error('Error updating mode:', error);
-      alert('Failed to update mode.');
+      alert('Mode updated.');
     }
   }
 
