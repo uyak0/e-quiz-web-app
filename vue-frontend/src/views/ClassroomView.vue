@@ -239,15 +239,13 @@ function changeDue(date) {
   newDueDate.value = Date.parse(date)
 }
 
-function navigateToChatroom(receiverId) {
-  // Assuming `userRole` and `userId` are available in your component's context
-  // You might need to adjust how these values are obtained based on your application's state management
-  router.push({ 
-    name: 'Chatroom', 
-    params: { userRole: 'student', userId: '2' }, // Example static values, replace with actual dynamic values
-    query: { receiver_id: receiverId } 
-  });
-}
+const navigateToChatroom = (user) => {
+  // Assuming `user.name` is the identifier you want to pass to the ChatroomView
+  // Replace 'ChatroomView' with the actual name or path of your chatroom view component
+  router.push({ name: 'Chatroom', query: { search: user.name } });
+  // Assuming you have a ref or reactive property for controlling the modal's visibility
+  memberListModal.value = false;
+};
 
 onMounted(() => {
   getClassroomData();
@@ -497,7 +495,7 @@ onMounted(() => {
               <div class="flex items-center">
                 <vue-feather v-if="userRole === 'teacher'" @click="removeStudent(user.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" type="trash-2"></vue-feather>
                 <!-- Chat Button -->
-                <button @click="navigateToChatroom(user.id)" class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                <button @click="navigateToChatroom(user)" class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
                   Chat
                 </button>
               </div>
