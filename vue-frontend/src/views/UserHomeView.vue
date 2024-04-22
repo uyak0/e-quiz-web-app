@@ -4,14 +4,14 @@ import Classroom from "@/components/Classroom.vue";
 import Arrow from "@/components/Arrow.vue";
 import Modal from "@/components/Modal.vue";
 import Notification from "@/components/Notification.vue";
-
+import VueFeather from 'vue-feather'; 
 
 import axios from "axios";
 import Pusher from 'pusher-js';
 import Echo from 'laravel-echo';
 
 import { onMounted, ref, nextTick } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
@@ -38,6 +38,8 @@ const modalInput = ref(null)
 const currentUserMode = ref('')
 
 const notifs = ref([])
+const retainedNotifs = ref([])
+const showNotifs = ref(false)
 
 
 Pusher.logToConsole = true;
@@ -76,7 +78,8 @@ function TaskNotif() {
         console.log(notifs.value)
         setTimeout(() => {
           notifs.value.shift();
-        }, 5000);
+          retainedNotifs.value.push(notification);
+        }, 10000);
       });
   }
 }
@@ -279,15 +282,28 @@ onMounted(() => {
     
 
     <Notification class="w-1/4">
-      <div v-for="(notif, index) in notifs" id="toast-default" class="flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+      <div v-for="(notif, index) in notifs" id="toast-default" class="flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-md border border-gray-300 dark:text-gray-400 dark:bg-gray-800" role="alert">
         <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-blue-500 bg-blue-100 rounded-lg dark:bg-blue-800 dark:text-blue-200">
           <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.147 15.085a7.159 7.159 0 0 1-6.189 3.307A6.713 6.713 0 0 1 3.1 15.444c-2.679-4.513.287-8.737.888-9.548A4.373 4.373 0 0 0 5 1.608c1.287.953 6.445 3.218 5.537 10.5 1.5-1.122 2.706-3.01 2.853-6.14 1.433 1.049 3.993 5.395 1.757 9.117Z"/>
           </svg>
           <span class="sr-only">Fire icon</span>
         </div>
-        <div class="ms-3 text-sm font-normal">{{ notif.title }}</div>
-        <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
+        <div v-if="notif.due_date" class="p-2">
+          <p class="text-2xl"> You got a new quiz! </p>
+          <p class="text-lg"> {{ notif.title }} </p>
+          <button>
+            <RouterLink :to="{ name: 'classroom', params: { classroomId: notif.classroom_id }}"> Check it out </RouterLink>
+          </button>
+        </div>
+        <div v-else="notif.due_date" class="p-2">
+          <p class="text-2xl"> You got a new assignment! </p>
+          <p class="text-lg"> {{ notif.title }} </p>
+          <button class="rounded-md bg-purple-400 text-black px-2">
+            <RouterLink :to="{ name: 'classroom', params: { classroomId: notif.classroom_id }}">Check it out</RouterLink>
+          </button>
+        </div>
+        <button @click="notifs.shift()" type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">
           <span class="sr-only">Close</span>
           <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
@@ -295,6 +311,36 @@ onMounted(() => {
         </button>
       </div>
     </Notification>
+
+    <div @click="showNotifs = !showNotifs" v-if="retainedNotifs.length" class="rounded-t-md p-2 cursor-pointer dark:bg-gray-600 bg-gray-400 text-white dark:text-darkMode absolute bottom-0 right-10">
+      <span v-show="showNotifs===false">
+        <vue-feather type="bell"></vue-feather>
+        <vue-feather type="circle" size="9" fill="red" stroke="white" class="absolute right-2 top-1"></vue-feather>
+      </span>
+      <span v-show="showNotifs===true" class="float-right hover:bg-red-600 rounded-md px-2 mb-2 border-b-2 border-b-red-500 w-full bg-red-400 text-black hover:text-white font-jetBrains font-bold text-center">Close Notification</span>
+
+      <div v-show="showNotifs">
+        <RouterLink :to="{ name: 'classroom', params: { classroomId: notif.classroom_id }}" v-for="(notif, index) in retainedNotifs" :key="index" class="hover:bg-gray-300 hover:text-gray-900 flex shadow-md bg-gray-500 p-2 rounded-md my-2 gap-3">
+          <div class="self-center inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-blue-500 bg-blue-100 rounded-lg dark:bg-blue-800 dark:text-blue-200">
+            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.147 15.085a7.159 7.159 0 0 1-6.189 3.307A6.713 6.713 0 0 1 3.1 15.444c-2.679-4.513.287-8.737.888-9.548A4.373 4.373 0 0 0 5 1.608c1.287.953 6.445 3.218 5.537 10.5 1.5-1.122 2.706-3.01 2.853-6.14 1.433 1.049 3.993 5.395 1.757 9.117Z"/>
+            </svg>
+            <span class="sr-only">Fire icon</span>
+          </div>
+          <span v-if="notif.due_date">
+            <p class="text-lg font-bold"> New quiz </p>
+            <p class="text-md"> {{ notif.title }} </p>
+          </span>
+          <span v-else>
+            <p class="text-lg font-bold"> New assignment </p>
+            <p class="text-md"> {{ notif.title }} </p>
+          </span>
+          <div class="rounded-md hover:bg-gray-400/50 self-center flex">
+            <vue-feather type="x" class="hover:text-gray-100 self-center"></vue-feather>
+          </div>
+        </RouterLink>
+      </div>
+    </div>
 
 
   </div>
