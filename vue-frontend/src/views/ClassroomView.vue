@@ -97,7 +97,7 @@ async function getPosts() {     // Classified assignments, quizzes as Posts
     return assignment
   })
 
-  classroomPosts.value = [{quizzes: {...classroomQuizzes.value}}, {assignments: {...classroomAssignments.value}}]
+  classroomPosts.value = [...classroomQuizzes.value, ...classroomAssignments.value]
   console.log(classroomPosts.value)
   getUpcoming();
 }
@@ -405,7 +405,7 @@ onMounted(() => {
             </div>
 
             <!-- Upcoming Quizzes -->
-            <div v-if="upcomingTasks.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
+            <div v-if="upcomingQuizzes.length || upcomingAssignments.length" class="p-1 w-full md:w-auto px-2 text-gray-900 dark:text-darkMode">
               <h1 class="text-lg text-gray-900 dark:text-darkMode">Upcoming</h1>
               <div class="border dark:border-gray-600 shadow-md bg-white dark:bg-gray-600 rounded-md p-2">
                 <div v-for="(quiz, index) of upcomingQuizzes" :key="index">
@@ -417,7 +417,7 @@ onMounted(() => {
                   </RouterLink>
                 </div>
                 <div v-for="(quiz, index) of upcomingAssignments" :key="index">
-                  <RouterLink :to="{ name: 'assignment', params: { quizId: quiz.id }}"
+                  <RouterLink :to="{ name: 'assignment', params: { assignmentId: quiz.id }}"
                     class="pb-4 flex flex-col w-full group">
                     <h1 class="text-2xl group-hover:underline">{{ quiz.title }}</h1>
                     <h3 class="text-md">Due: {{ quiz.due }}</h3>

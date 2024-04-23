@@ -139,6 +139,7 @@ class AssignmentsController extends Controller
             // Update existing submission
             $submission->file_path = json_encode($filePaths); // Update file paths
             $submission->submitted_at = now(); // Update submission time
+            error_log(now());
         } else {
             // Create new submission
             $submission = new Submission();
