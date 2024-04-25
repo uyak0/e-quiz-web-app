@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const API = import.meta.env.VITE_LARAVEL_API
 
-async function checkAuth(){
+async function checkAuth() {
   const auth = await axios.get(API + 'auth/check-authentication')
   return auth.data
 }
@@ -14,12 +14,12 @@ async function inClassroom(id) {
       params: {
         classroom_id: id
       }
-    }) 
+    })
 
-    if (inClass.data.status) return true 
+    if (inClass.data.status) return true
   }
   catch (error) {
-    console.log(error) 
+    console.log(error)
   }
 }
 
@@ -30,7 +30,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: false,
         title: 'E-Quizz'
       }
@@ -47,7 +47,7 @@ const router = createRouter({
     {
       path: '/:userRole/:userId/chatroom',
       name: 'Chatroom',
-      component: ()=> import('@/views/ChatroomView.vue'),
+      component: () => import('@/views/ChatroomView.vue'),
       meta: {
         title: 'Chatroom'
       },
@@ -59,12 +59,12 @@ const router = createRouter({
       }
     },
     {
-      path: '/login', 
+      path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
       beforeEnter: async (to, from) => {
         const auth = await checkAuth()
-        if (auth.status) 
+        if (auth.status)
           return { name: 'userHome', params: { userRole: auth.role, userId: auth.id } }
       },
       meta: {
@@ -83,10 +83,19 @@ const router = createRouter({
     {
       path: '/forgot-password',
       name: 'forgotPassword',
-      component: () => import('@/views/ForgotPasswordView.vue') ,
+      component: () => import('@/views/ForgotPasswordView.vue'),
       meta: {
         requiresAuth: false,
         title: 'Forgot Password'
+      }
+    },
+    {
+      path: '/reset-password',
+      name: 'resetPassword',
+      component: () => import('@/views/ResetPasswordView.vue'),
+      meta: {
+        requiresAuth: false,
+        title: 'Reset Password'
       }
     },
     {
@@ -115,6 +124,29 @@ const router = createRouter({
           }
         },
         {
+          path: 'quiz',
+          children: [
+            {
+              path: 'create',
+              name: 'createQuiz',
+              component: () => import('@/views/CreateQuizView.vue'),
+              meta: { title: 'Create Quiz' }
+            },
+            {
+              path: ':quizId',
+              name: 'quiz',
+              component: () => import('@/views/QuizView.vue'),
+              meta: { title: 'Quiz' }
+            },
+            {
+              path: 'result',
+              name: 'quizResult',
+              component: () => import('@/views/QuizResultView.vue'),
+              meta: { title: 'Quiz Result' },
+            }
+          ]
+        },
+        {
           path: 'classroom',
           children: [
             {
@@ -122,8 +154,8 @@ const router = createRouter({
               beforeEnter: async (to, from) => {
                 const inClass = await inClassroom(to.params.classroomId)
                 if (inClass.status) {
-                  return true 
-                } 
+                  return true
+                }
               },
               children: [
                 {
@@ -133,26 +165,20 @@ const router = createRouter({
                   meta: { title: 'Classroom' },
                 },
                 {
-                  path: 'quiz',
+                  path: 'assignment',
                   children: [
                     {
                       path: 'create',
-                      name: 'createQuiz',
-                      component: () => import('@/views/CreateQuizView.vue'),
-                      meta: { title: 'Create Quiz' }
+                      name: 'createAssignment',
+                      component: () => import('@/views/CreateAssignmentView.vue'),
+                      meta: { title: 'Create Assignment' }
                     },
                     {
-                      path: ':quizId',
-                      name: 'quiz',
-                      component: () => import('@/views/QuizView.vue'),
-                      meta: { title: 'Quiz' }
+                      path: ':assignmentId',
+                      name: 'assignment',
+                      component: () => import('@/views/AssignmentView.vue'),
+                      meta: { title: 'Assignment' }
                     },
-                    {
-                      path: 'result',
-                      name: 'quizResult',
-                      component: () => import('@/views/QuizResultView.vue'),
-                      meta: { title: 'Quiz Result' },
-                    }
                   ]
                 },
               ]

@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Quiz;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Collection;
+use Carbon\Carbon;
+use App\Notifications\NewQuizAssigned;
 
 class QuizzesController extends Controller
 {
@@ -53,6 +57,7 @@ class QuizzesController extends Controller
         $sortedQuestions = $questions->sortBy('question_no')->values()->all();
         return response()->json([
             'quiz_name' => $quiz->title,
+            'due_date' => $quiz->due_date,
             $sortedQuestions
         ]);
     }
@@ -62,7 +67,7 @@ class QuizzesController extends Controller
         try {
             $quiz = Quiz::create([
                 'title' => $request->title,
-                'due_date' => $request->due_date,
+                'due_date' => Carbon::parse($request->due_date)->format('Y-m-d H:i:s'),
                 'classroom_id' => $request->classroom_id,
             ]);
 
@@ -97,11 +102,21 @@ class QuizzesController extends Controller
                     break;
                 }
             }
+
+            $classroom = Classroom::find($request->classroom_id);
+            $classroomUsers = $classroom->users;
+            $classroomStudents = [];
+            $classroomStudents = $classroomUsers->filter(function ($user) {
+                return $user->roles->contains('name', 'student');
+            });
+
+            Notification::send($classroomStudents, new NewQuizAssigned($quiz));
         }
         catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while creating the quiz',
+                'error' => $e->getMessage()
             ], 500);
         }
 

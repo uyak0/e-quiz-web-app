@@ -7,6 +7,7 @@ use App\Models\Chat;
 use App\Events\MessageSent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -19,9 +20,15 @@ class ChatController extends Controller
     {
         $messagesQuery = Chat::getMessagesQueryBetweenTwoUsers($request, auth()->user()->id, $request->receiver_id);
 
+        if($request -> earlier_date) {
+            $dataFormatted = (new \DateTime($request -> earlier_date)) -> format ("Y-m-d H:i:s");
+
+            $messagesQuery->where("created_at", "<", $dataFormatted);
+        }
+
         // display top 10 messages for user
         $result = $messagesQuery->orderBy('created_at', 'DESC')
-                        ->limit($request->limit ?? 20)
+                        ->limit($request->limit ?? 10)
                         ->get();
 
         if($result->count()) {
@@ -68,5 +75,59 @@ class ChatController extends Controller
         return response()->json(['status' => true, 'chat' => $chat]);
     }
 
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file', // Validate the file
+            'receiver_id' => 'required|exists:users,id', 
+        ]);
+
+        $file = $request->file('file');
+        $receiverId = $request->receiver_id;
+
+        // Define the file storage path
+        $path = $file->store('public/uploads');
+
+        // Generate a URL to access the file
+        $url = Storage::url($path); 
+
+        $chat = new Chat();
+        $chat->sender_id = auth()->user()->id;
+        $chat->receiver_id = $receiverId;
+        $chat->message = $url; // Store the URL or a reference to the file in the message
+        $chat->save();
+
+        broadcast(new MessageSent(auth()->user(), $chat))->toOthers();
+
+        return response()->json(['status' => true, 'chat' => $chat], 201);
+    }
+
+    
+    public function uploadDocument(Request $request)
+    {
+        $request->validate([
+            'document' => 'required|file|mimes:pdf,doc,docx,txt', // Validate the document
+            'receiver_id' => 'required|exists:users,id', 
+        ]);
+
+        $document = $request->file('document');
+        $receiverId = $request->receiver_id;
+
+        $path = $document->store('public/documents');
+
+        $url = Storage::url($path); 
+
+        $originalFileName = $document->getClientOriginalName(); // Get the original file name
+
+        $chat = new Chat();
+        $chat->sender_id = auth()->user()->id;
+        $chat->receiver_id = $receiverId;
+        $chat->message = json_encode(['url' => $url, 'originalFileName' => $originalFileName]);
+        $chat->save();
+
+        broadcast(new MessageSent(auth()->user(), $chat))->toOthers();
+
+        return response()->json(['status' => true, 'chat' => $chat], 201);
+    }
 
 }

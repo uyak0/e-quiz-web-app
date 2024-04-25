@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('mode')->default('normal')->comment('User mode: normal, do not disturb, invisible');
             $table->rememberToken();
             $table->timestamps();
         });

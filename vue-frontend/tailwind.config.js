@@ -11,6 +11,11 @@ export default {
         'jetBrains': ['JetBrains Mono', 'monospace'],
         'firaSans': ['Fira Sans', 'sans-serif']
       },
+      colors: {
+        'soft-black': '#181818',
+        'soft-white': '#f8f8f8',
+        'darkMode': 'rgba(var(--color-darkModeText), 0.64)',
+      }
     },
   },
   plugins: [],

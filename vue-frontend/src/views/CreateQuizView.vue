@@ -25,7 +25,7 @@
     title: '',
     due_date: new Date(),
     questions: questionProps.value,
-    classroom_id: route.params.classroomId
+    classroom_id: route.query.classroomId
   })
 
   function addCorrectAnswer(index, correctAnswers) {
@@ -73,11 +73,12 @@
       return
     }
 
-    if (quizProps.value.due_date < Date.now()){
+    else if (quizProps.value.due_date < Date.now()){
       alert('Due date cannot be earlier than the current date!')
+      return
     }
 
-    if (questionProps.value.length < 1) {
+    else if (questionProps.value.length < 1) {
       alert('Please add at least one question to the quiz')
       return
     }
@@ -85,13 +86,13 @@
     const data = {
       title: quizProps.value.title,
       due_date: quizProps.value.due_date.toISOString().slice(0, 19).replace('T', ' '),
-      classroom_id: Number(route.params.classroomId),
+      classroom_id: Number(route.query.classroomId),
       questions: questionProps.value
     }
 
     const res = await axios.post(API + 'quiz/create', data)
     if (res.data.status === 'success') {
-      router.push('/teacher/' + route.params.userId + '/classroom/' + route.params.classroomId)
+      router.push('/teacher/' + route.params.userId + '/classroom/' + route.query.classroomId)
     }
   }
 

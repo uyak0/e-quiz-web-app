@@ -85,96 +85,133 @@
             </div>
           </div>
 
-          <!-- Chat Body -->
-          <div class="overflow-y-auto max-h-64 min-h-[19rem] px-4" ref="chatContentRef">
-            <div v-for="message in userMessages" :key="message.id">
-              <!--Receiver Message -->
-              <div v-if="message.sender_id != userId" class="flex items-center justify-start mb-4">
-                <img :src="fileLink('UserProfile.png')" class="w-6 h-6 rounded-full border-2 border-blue-400"
-                  alt="User">
-                <div class="relative group text-sm p-2 shadow bg-white rounded-md max-w-xs text-black">
-                  {{ message.message }}
+                   <!-- Chat Body -->
+                    <div class="overflow-y-auto max-h-64 min-h-[19rem] px-4" ref="chatContentRef" @scroll="handleChatScroll">
+                        <div v-for="message in userMessages" :key="message.id">
+                            <!--Receiver Message -->
+                            <div v-if="message.sender_id != userId" class="flex items-center justify-start mb-4">
+                                <img :src="fileLink('UserProfile.png')" class="w-6 h-6 rounded-full border-2 border-blue-400" alt="User">
+                                <div class="relative group text-sm p-2 shadow bg-white rounded-md max-w-xs text-black break-words">
+                                    <!-- Check if message is an image URL and render accordingly -->
+                                    <div v-if="isImageUrl(message.message)">
+                                        <img :src="`http://localhost:8000${message.message.replace(/\\/g, '')}`" alt="Image" class="max-w-full h-auto max-h-96 image-fit cursor-pointer" @click="showLargeImage(`http://localhost:8000${message.message.replace(/\\/g, '')}`)" @load="scrollToChatBottom">
+                                    </div>
+                                    <!-- Check if message is a document URL -->
+                                    <div v-else-if="isDocumentUrl(message.message)">
+                                        <a v-if="isDocumentUrl(message.message)" :href="getDocumentUrl(message.message)" target="_blank" class="text-blue-500 hover:underline">{{ getDocumentName(message.message) }}</a>
+                                    </div>
+                                    <div v-else>
+                                        {{ message.message }}
+                                    </div>
+                                    <div class="absolute top-1/2 -translate-y-1/2 left-full ml-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">{{ formatMessageTime(message.created_at) }}</div>
+                                </div>
+                                <three-dots-icon class="w-4 h-4 cursor-pointer"></three-dots-icon>
+                            </div>
+                            <!--Sender Message -->
+                            <div v-else class="flex items-center justify-end mb-4">
+                                <three-dots-icon class="w-4 h-4 cursor-pointer"></three-dots-icon>
+                                <div class="relative group text-sm p-2 shadow bg-indigo-100 rounded-md max-w-xs text-black break-words">
+                                    <!-- Check if message is an image URL and render accordingly -->
+                                    <div v-if="isImageUrl(message.message)">
+                                        <img :src="`http://localhost:8000${message.message.replace(/\\/g, '')}`" alt="Image" class="max-w-full h-auto max-h-96 cursor-pointer" @click="showLargeImage(`http://localhost:8000${message.message.replace(/\\/g, '')}`)" @load="scrollToChatBottom">
+                                    </div>
+                                    <!-- Check if message is a document URL -->
+                                    <div v-else-if="isDocumentUrl(message.message)">
+                                        <a v-if="isDocumentUrl(message.message)" :href="getDocumentUrl(message.message)" target="_blank" class="text-blue-500 hover:underline">{{ getDocumentName(message.message) }}</a>
+                                    </div>
+                                    <div v-else>
+                                        {{ message.message }}
+                                    </div>
+                                    <div class="absolute top-1/2 -translate-y-1/2 right-full mr-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">{{ formatMessageTime(message.created_at) }}</div>
+                                </div>
+                                <img :src="fileLink('UserProfile.png')" class="w-6 h-6 rounded-full border-2 border-blue-400" alt="User">
+                            </div>
+                        </div>
+                    </div>
 
-                  <div
-                    class="absolute top-1/2 -translate-y-1/2 left-full ml-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">
-                    12:00</div>
-                </div>
-                <three-dots-icon class="w-4 h-4 cursor-pointer"></three-dots-icon>
-              </div>
-              <!--Sender Message -->
-              <div v-else class="flex items-center justify-end mb-4">
-                <three-dots-icon class="w-4 h-4 cursor-pointer"></three-dots-icon>
-                <div class="relative group text-sm p-2 shadow bg-indigo-100 rounded-md max-w-xs text-black">
-                  {{ message.message }}
+                    <!--Chat Footer-->
+                    <div class="flex items-center p-4 bg-white rounded-bl-md rounded-br-md">
+                        <div class="relative group">
+                        <!-- Hover content with transition for smoother appearance/disappearance -->
+                        <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col">
+                        <div class="bg-blue-500 text-white px-4 py-2 rounded-md mb-1 flex items-center cursor-pointer" @click="triggerFileInput">
+                            <image-icon class="w-7 h-7"></image-icon>
+                            <p class="font-semibold text-sm ml-2">Image</p>
+                            <input type="file" ref="fileInput" class="hidden" @change="sendMediaMessage" accept="image/*" />
+                        </div>
+                        <div class="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center cursor-pointer" @click="triggerDocumentInput">
+                            <docoument-icon class="w-7 h-7"></docoument-icon>
+                            <p class="font-semibold text-sm ml-2">Document</p>
+                            <input type="file" ref="documentInput" class="hidden" @change="sendDocumentMessage" accept=".pdf,.doc,.docx,.txt" />
+                        </div>
+                        </div>
+                        <!-- Icon -->
+                        <add-icon class="w-10 h-10 -ml-3 cursor-pointer"></add-icon>
+                    </div>
 
-                  <div
-                    class="absolute top-1/2 -translate-y-1/2 right-full mr-1 hidden group-hover:block bg-gray-600 py-1 px-1.5 rounded z-50 text-white w-max">
-                    12:00</div>
+                        <input type="text" v-model="messageContent" placeholder="Type your message here"  class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-400  text-black" @keyup.enter="submitMessage">
+                        <button @click="submitMessage" class="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-400 ml-2" >Send</button>
+                    </div>
                 </div>
-                <!--<div v-if="message.seen == 0" class="bg-black">Seen</div>
-                                <div v-else="message.seen == 1" class="bg-black">Unseen</div>-->
-                <img :src="fileLink('UserProfile.png')" class="w-6 h-6 rounded-full border-2 border-blue-400"
-                  alt="User">
-              </div>
+                
+                <div v-else class="flex flex-col items-center justify-center min-h-[19rem]">
+                    
+                    <p class="text-2xl font-semibold mt-20 text-black">E-Quiz Web App</p>
+                    <p class="text-gray-500">Start a conversation</p>
+                </div>
+                
             </div>
-          </div>
-
-          <!--Chat Footer-->
-          <div class="flex items-center p-4 bg-white rounded-bl-md rounded-br-md">
-            <input type="text" v-model="messageContent" placeholder="Type your message here"
-              class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-400 mb-4 text-black">
-            <button @click="submitMessage"
-              class="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-400 ml-2">Send</button>
-          </div>
         </div>
-
-        <div v-else class="flex flex-col items-center justify-center min-h-[19rem]">
-
-          <p class="text-2xl font-semibold mt-4 text-black">E-Quiz Web App</p>
-          <p class="text-gray-500">Start a conversation</p>
-        </div>
-
-      </div>
     </div>
-  </div>
+    <!-- Image Modal -->
+    <div v-if="selectedImageUrl" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center" @click="selectedImageUrl = ''">
+        <img :src="selectedImageUrl" style="max-width: 100%; max-height: 95%;" @click.stop>
+    </div>
 </template>
 
 <script setup>
 import axios from 'axios';
 import ThreeDotsIcon from "@/components/icons/ThreeDotsIcon.vue";
-import { useRoute, useRouter } from "vue-router";
-import { ref, onMounted, provide, reactive, watch, computed } from 'vue'; // Import onMounted to fetch data when the component is mounted
+import AddIcon from "@/components/icons/AddIcon.vue";
+import _ from 'lodash';
+import ImageIcon from "@/components/icons/ImageIcon.vue";
+import DocoumentIcon from "@/components/icons/DocoumentIcon.vue";
+import {useRoute, useRouter } from "vue-router";
+import { ref, onMounted, provide, reactive, watch, computed, nextTick} from 'vue'; // Import onMounted to fetch data when the component is mounted
 
 import Pusher from 'pusher-js';
 import Echo from 'laravel-echo';
 
 import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css'
+import 'vue3-toastify/dist/index.css';
 
 const API = import.meta.env.VITE_LARAVEL_API;
 const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_APP_CLUSTER;
 const PUSHER_APP_KEY = import.meta.env.VITE_PUSHER_APP_KEY;
-
-const emits = defineEmits(['onCloseChat'])
-const route = useRoute();
-const router = useRouter();
-const user = ref({});
-const userId = route.params.userId
-const userRole = route.params.userRole
-const searchQuery = ref("")
-const messageContent = ref("");
-const userMessages = ref([]);
-const userData = ref({})
-const emittedMessage = ref(null);
-const onlineUsers = ref([]);
-const isChatOpen = ref(false)
-const selectedUser = ref(null)
-const chatContentRef = ref(null);
+    
+    const emits = defineEmits(['onCloseChat'])
+    const route = useRoute();
+    const router = useRouter();
+    const user = ref({});
+    const userId = route.params.userId
+    const userRole = route.params.userRole
+    const searchQuery = ref(route.query.search || '');
+    const messageContent = ref("");
+    const userMessages = ref([]);
+    const userData = ref({})
+    const emittedMessage = ref(null);
+    const onlineUsers = ref([]);
+    const isChatOpen = ref(false)
+    const selectedUser = ref(null)
+    const chatContentRef = ref(null);
+    const fileInput = ref(null);
+    const selectedImageUrl = ref('');
+    const documentInput = ref(null); 
+    const currentUserMode = ref('');
+    let scrollPoint = ref(0);
 
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = true;
-
-window.Pusher = Pusher;
 
 // Echo Initialization
 window.Echo = new Echo({
@@ -205,15 +242,16 @@ console.log(window.Echo)
 
 const chatPanels = reactive({ panels: [] });
 
-async function getUser() {
-  try {
-    const res = await axios.get(`${API}user`, { params: { id: userId } });
-    userData.value = res.data
-    console.log('User data:', userData.value);
-  } catch (error) {
-    console.error('Error fetching user:', error);
-  }
-}
+        async function getUser() {
+            try {
+                const res = await axios.get(`${API}user`, {params: { id: userId }});
+                userData.value = res.data
+                currentUserMode.value = userData.value.mode; // toast message respect to receiver preferences instead sender preferences of mode
+                console.log('User data:', userData.value);
+            } catch (error) {
+                console.error('Error fetching user:', error);
+            }
+        }
 
 async function getOnlineUsers() {
   const result = await axios.get(API + 'online-users')
@@ -241,9 +279,10 @@ function showChatPanel(user, emittedMessage = null) {
     selectedUser.value = user; // Set the selected user
     isChatOpen.value = true; // Open the chat pane
 
-    chatPanels.panels.push(userPanel);
+                chatPanels.panels.push(userPanel);
+                
+                getMessages(); // Fetch messages for the selected user immediately after opening the chat panel
 
-    getMessages(); // Fetch messages for the selected user immediately after opening the chat panel
 
     return true;
   }
@@ -320,20 +359,30 @@ function submitMessage() {
 }
 
 async function getMessages() {
-
   if (!selectedUser.value) {
     console.error("Selected user is undefined.");
     return;
   }
   const result = await axios.get(`${API}messages?receiver_id=${selectedUser.value.id}`)
 
-  if (result.data.messages) {
-    userMessages.value = result.data.messages.reverse();
-    console.log(userMessages.value); // Log the userMessages value
+  if(result.data.messages) {
+    userMessages.value = result.data.messages.reverse().map(message => {
+      return {
+        ...message,
+        formattedTime: formatMessageTime(message.created_at)
+      };
+    });
+    console.log(userMessages.value); 
 
     scrollToChatBottom();
   }
 }
+
+function formatMessageTime(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleString([], { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 
 const sendMessageUpdateRequest = (messageId) => {
   axios.put(`${API}messages/${messageId}`)
@@ -344,23 +393,30 @@ const sendMessageUpdateRequest = (messageId) => {
     });
 }
 
-const filteredUsers = computed(() => {
-  return onlineUsers.value.filter(user => user.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
+        const filteredUsers = computed(() => {
+            return onlineUsers.value.filter(user => 
+                user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) && user.mode !== 'invisible'
+            );
+        });
 
-})
 
+        
 
-function scrollToChatBottom() {
-  //Auto scroll to the chat bottom to show the latest message
-  setTimeout(() => {
-    if (chatContentRef && chatContentRef.value) {
-      chatContentRef.value.scrollTop = chatContentRef.value.scrollHeight;
-    }
-  }, 300);
-}
+        function scrollToChatBottom(){
+            // wait for the DOM to update
+            nextTick(() => {
+                if(chatContentRef.value){
+                    chatContentRef.value.scrollTop = chatContentRef.value.scrollHeight;
 
-async function logout() {
-  let confirmLogOut = confirm('Are you sure you want to log out?')
+                    scrollPoint.value = chatContentRef.value.scrollTop;
+                }
+            });
+        }
+        
+                
+
+        async function logout(){
+            let confirmLogOut = confirm('Are you sure you want to log out?')
 
   if (confirmLogOut) {
     const logOutUser = await axios.post(API + 'auth/logout')
@@ -373,52 +429,168 @@ function fileLink(file) {
   return new URL(`/src/assets/${file}`, import.meta.url).href;
 }
 
+        
+        async function navigateToProfile() {
+            router.push({ name: 'userProfile' });
+        }
 
-async function navigateToProfile() {
-  router.push({ name: 'userProfile' });
-}
+        function triggerFileInput() {
+            if (fileInput.value) {
+                fileInput.value.click();
+            }
+        }
 
-watch(() => emittedMessage, (newMessage, oldMessage) => {
-  if (newMessage) {
-    const isMessageExist = userMessages.value.find(m => m.id == newMessage.id);
+        function triggerDocumentInput() {
+            if (documentInput.value) {
+                documentInput.value.click();
+            }
+        }
 
-    if (!isMessageExist) {
-      userMessages.value.push(newMessage);
-      scrollToChatBottom();
-    }
-  }
-})
+        async function sendMediaMessage(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', files[0]);
+                formData.append('receiver_id', selectedUser.value.id); // Include the receiver_id in the formData
 
-// Fetch user data when the component is mounted
-onMounted(() => {
+                
+                try {
+                    const response = await axios.post(`${API}messages/upload`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
+                    
+                    getMessages(); 
+                    scrollToChatBottom();
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                }
+            }
+            event.target.value = ""; // Reset the file input after handling
+        }
 
-  getUser(userId)
-  getOnlineUsers()
+        async function sendDocumentMessage(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                const formData = new FormData();
+                formData.append('document', files[0]);
+                formData.append('receiver_id', selectedUser.value.id); // Include the receiver_id in the formData
 
-  window.Echo.private(`chatroom.${userId}`)
-    .listen('.message-sent', (e) => {
-      const message = e.message;
-      const senderName = e.user.name;
-      const toastMessage = `New message from ${senderName}: ${message.message}`;
-      console.log("Received message: ", e);
+                try {
+                    const response = await axios.post(`${API}messages/upload-document`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
+                    
+                    getMessages(); 
+                    scrollToChatBottom();
+                } catch (error) {
+                    console.error('Error uploading document:', error);
+                }
+            }
+            event.target.value = ""; // Reset the file input after handling
+        }
+
+        function isImageUrl(message) {
+            return /\.(jpg|jpeg|png|gif)$/.test(message);
+        }
+
+        function isDocumentUrl(message) {
+            try {
+                const parsedMessage = JSON.parse(message);
+                return /\.(pdf|doc|docx|txt)$/.test(parsedMessage.url);
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function showLargeImage(url) {
+            selectedImageUrl.value = url;
+        }
+
+        function getDocumentName(message) {
+            try {
+                const { originalFileName } = JSON.parse(message);
+                return originalFileName;
+            } catch (error) {
+                return "Unknown Document";
+            }
+        }
+  
+        function getDocumentUrl(message) {
+            try {
+                const { url } = JSON.parse(message);
+                return `http://localhost:8000${url.replace(/\\/g, '/')}`;
+            } catch (error) {
+                return '';
+            }
+        }
 
 
-      if (selectedUser.value && selectedUser.value.id === e.message.sender_id && isChatOpen.value) {
-        // Add the message to the chat without automatically opening the chat panel
-        userMessages.value.push(message);
-        scrollToChatBottom();
-      } else {
-        // for handling the case where the message is received but the chat panel isn't open
+        const handleChatScroll = _.debounce((e) => {
+          if (e.target.scrollTop - 100 < scrollPoint.value) {
+            const oldMessage = userMessages.value[0];
 
-        displayToastMessage(toastMessage);
-        //sendMessageUpdateRequest(message.id);
-      }
+            axios.get(`${API}messages?receiver_id=${selectedUser.value.id}&earlier_date=${oldMessage.created_at}`)
+                .then(response => {
+                  if (response && response.data.messages){
+                    const filtered = [];
 
+                    response.data.messages.reverse().forEach(message => {
+                      if (!userMessages.value.find(m => m.id == message.id)){
+                        filtered.push(message);
+                      }
+                    })
+                    userMessages.value = [...filtered, ...userMessages.value];
+                  }
+                }).catch(error => {
+                  console.error(error.response);
+                })
 
+        }
 
+        scrollPoint.value = e.target.scrollTop;
+    }, 1000);
 
-    });
+        watch(() => emittedMessage, (newMessage, oldMessage) => {
+          if (newMessage) {
+            const isMessageExist = userMessages.value.find(m => m.id == newMessage.id);
 
+            if (!isMessageExist) {
+              userMessages.value.push(newMessage);
+              scrollToChatBottom();
+            }
+          }
+        })
+
+        // For page first load component mount
+        onMounted(() => {
+
+            getUser(userId)
+            getOnlineUsers()
+            
+           window.Echo.private(`chatroom.${userId}`)
+                .listen('.message-sent', (e) => {
+                    const message = e.message;
+                    const senderName = e.user.name;
+                    const toastMessage = `New message from ${senderName}: ${message.message}`;
+                    console.log("Received message: ", e);
+
+                    if (selectedUser.value && selectedUser.value.id === e.message.sender_id && isChatOpen.value) {
+                        // Add the message to the chat without automatically opening the chat panel
+                        userMessages.value.push(message);
+                        scrollToChatBottom();
+                    } else {
+                        // Check if neither the sender nor the receiver is in 'do not disturb' mode before showing the toast
+                        if (currentUserMode.value.toLowerCase() !== 'do not disturb') {
+                            displayToastMessage(toastMessage);
+                        }
+                        //***current problem is need to refresh the page again in order to have the mode behaviour
+                    }
+                });
+                    
 
 })
 
