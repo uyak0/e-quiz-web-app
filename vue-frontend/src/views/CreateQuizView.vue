@@ -119,7 +119,7 @@
           <QuestionTypeDDL v-model="item.questionType" />
         </div>
         <!-- Delete Button -->
-        <vue-feather @click="deleteQuestion()" class="text-2xl cursor-pointer hover:text-red-600" type="x-circle" />
+        <vue-feather @click="deleteQuestion(index)" class="text-2xl cursor-pointer hover:text-red-600" type="x-circle" />
       </div>
       <!-- Question Description -->
       <input type="text" v-model="item.questionDesc" placeholder="Type Question here..." class="placeholder:text-slate-600 bg-transparent w-full mb-4 overflow-visible outline-none border-b-[1px] border-b-slate-300">

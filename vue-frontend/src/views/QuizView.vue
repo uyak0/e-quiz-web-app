@@ -51,10 +51,9 @@
     const singleAnswer = event.target.type === 'radio'
     console.log(userAnswers.value)
 
-    // this code fucking suck
     if (!existingAnswer) {
       if (multiAnswer || singleAnswer) {   
-        userAnswers.value.push({ questionNum: qNum, answer: [answer] })     //this fucking suck
+        userAnswers.value.push({ questionNum: qNum, answer: [answer] })     
       }
       else {
         userAnswers.value.push({ questionNum: qNum, answer: answer })
@@ -92,7 +91,7 @@
     let confirmSubmit;
     const questions = quiz.value[0]
     
-    if (userAnswers.value.length !== quiz.value[0].length) {
+    if (userAnswers.value.length !== questions.length) {
       alert('Please answer all questions before submitting!')
     } else {
       confirmSubmit = confirm('Are you sure you want to submit your answers?')
@@ -151,9 +150,9 @@
     <div name="name and due date" class="flex justify-between place-items-center">
       <h1 class="text-4xl p-4">{{quiz.quiz_name}}</h1>
       <h1 v-if="userRole === 'student'" class="p-4">Due Date: {{ quiz.due_date }}</h1>
-      <div class="flex w-fit">
+      <div v-if="userRole === 'teacher'" class="flex w-fit">
         <p class="w-fit"> Due Date: </p>
-        <VueDatePicker v-if="userRole === 'teacher'" v-model="quiz.due_date" />
+        <VueDatePicker v-model="quiz.due_date" />
       </div>
     </div>
     <div v-for="(question, qNum) in quiz[0]" :key="qNum" class="rounded-md border-2 mx-4 my-4 py-4 px-4 font-jetBrains">

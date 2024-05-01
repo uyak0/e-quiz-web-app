@@ -50,7 +50,9 @@ class NewQuizAssigned extends Notification
                     ->line('Due Date: ' . $this->due_date)
             ->action('View Quiz',
                 'http://localhost:5173/student/' . auth()->user()->id .
-                '/classroom/' . $this->classroom_id . '/quiz/' . $this->id);
+                    '/quiz/' . $this->id .
+                    '?classroom=' . $this->classroom_id
+            );
     }
 
     /**
