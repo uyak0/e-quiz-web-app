@@ -64,7 +64,7 @@
 
   function quit() {
     let res = confirm('Are you sure you want to quit quiz creation? Any unsaved changes will be lost!')
-    if (res) router.push({ name: 'classroom' })
+    if (res) router.push({ name: 'classroom', params: { classroomId: route.query.classroomId }})
   }
 
   async function submitQuizCreation() {

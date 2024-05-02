@@ -80,10 +80,13 @@
   }
 
   function quit() {
-    let res = confirm("Are you sure you want to leave? Don't worry, you can still come back!")
+    let res = confirm("Are you sure you want to leave? Any unsaved answers will be lost!");
     if (res) {
-      localStorage.setItem('prevUserAnswers', JSON.stringify(userAnswers.value))
-      router.push({ name: 'classroom' })
+      // localStorage.setItem('prevUserAnswers', JSON.stringify(userAnswers.value))
+      if (route.query.type !== 'daily_quiz') {
+        router.push({ name: 'classroom', params: { classroomId: route.query.classroom }});
+      }
+      else router.push({ name: 'userHome' });
     }
   }
 
